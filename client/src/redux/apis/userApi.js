@@ -26,6 +26,27 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 providesTags: ["user"]
             }),
+            getFilteredData: builder.query({
+                query: (type) => {
+                    return {
+                        url: `/filter`,
+                        method: "GET",
+                         params:type
+                    }
+                },
+                transformResponse:data => data.result,
+                providesTags: ["user"]
+            }),
+            getCArousel: builder.query({
+                query: (id) => {
+                    return {
+                        url: `/carousel`,
+                        method: "GET"
+                    }
+                },
+                transformResponse:data => data.result,
+                providesTags: ["user"]
+            }),
             getAllProducts: builder.query({
                 query: () => {
                     return {
@@ -150,6 +171,9 @@ export const {
     useCreateOrderMutation,
     useDeleteFullCartMutation,
     useGetAllProductsQuery,
-    useCancelOrderMutation
+    useCancelOrderMutation,
+    useGetCArouselQuery,
+    // useGetFilteredDataQuery,
+    useLazyGetFilteredDataQuery
     
 } = userApi

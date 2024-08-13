@@ -10,7 +10,9 @@ const AllOrders = () => {
     const [cancelOrder, { isSuccess }] = useCancelOrderMutation()
 
     useEffect(() => {
-        toast.success("Order Cancel Success")
+        if (isSuccess) {
+            toast.success("Order Cancel Success")
+        }
     }, [isSuccess])
 
     return (

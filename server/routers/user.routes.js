@@ -1,5 +1,6 @@
 const router = require("express").Router()
 const userController = require("./../controllers/user.controller")
+const adminController = require("./../controllers/admin.controller")
 
 router
     .get("/get-orders/:userId", userController.getOrders)
@@ -13,6 +14,8 @@ router
     .put("/cancel-order/:id", userController.cancelOrder)
     .delete("/delete-all-cart", userController.deleteAllCart)
     .get("/get-products", userController.getAllProduct)
+    .get("/carousel", adminController.getAllCarousels)
+    .get("/filter", userController.getFilteredProducts)
 
 
 

@@ -19,16 +19,34 @@ const AdminNavbar = () => {
         <div className="bg-light-golden py-1">
             <div className="m-5 z-20 relative">
                 <div className="navbar rounded-lg bg-amber-400">
-                    <div className="flex-1 flex items-center space-x-4">
-                        <Link to="/">
-                            <div className="justify-center">
-                                <img
-                                    className="w-20 h-14"
-                                    src="https://static.vecteezy.com/system/resources/previews/027/990/875/non_2x/royal-frame-logo-generative-ai-free-png.png"
-                                    alt="Logo"
-                                />
+                    <div className="flex-1 flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                            <Link to="/">
+                                <div className="justify-center">
+                                    <img
+                                        className="w-20 h-14"
+                                        src="https://static.vecteezy.com/system/resources/previews/027/990/875/non_2x/royal-frame-logo-generative-ai-free-png.png"
+                                        alt="Logo"
+                                    />
+                                </div>
+                            </Link>
+                            <div className="hidden md:flex flex-1 space-x-4">
+                                <Link to="/admin/dashboard" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                    Dashboard
+                                </Link>
+                                <Link to="/admin/allOrders" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                    All Orders
+                                </Link>
+                                <Link to="/admin/allUsers" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                    All Users
+                                </Link>
+                                <Link to="/admin/addCarousel" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                    Carousel
+                                </Link>
                             </div>
-                        </Link>
+                        </div>
+
+                        {/* This is the menu icon that will be on the right side */}
                         <div className="md:hidden flex-none">
                             <button
                                 onClick={() => setSidebarOpen(!isSidebarOpen)}
@@ -50,39 +68,6 @@ const AdminNavbar = () => {
                                 </svg>
                             </button>
                         </div>
-                        <div className="hidden md:flex flex-1 space-x-4">
-                            <Link to="/admin/dashboard" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
-                                Dashboard
-                            </Link>
-                            <Link to="/admin/allOrders" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
-                                All Orders
-                            </Link>
-                            <Link to="/admin/settings" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
-                                Settings
-                            </Link>
-                        </div>
-                    </div>
-
-                    <div className="flex-none">
-                        <button
-                            onClick={() => setSidebarOpen(!isSidebarOpen)}
-                            className="btn btn-ghost btn-circle hover:bg-amber-200 transition duration-300 ease-in-out"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-6 w-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M15 12h6m-6-4h6m-6 8h6M3 3h18v18H3V3z"
-                                />
-                            </svg>
-                        </button>
                     </div>
                 </div>
 
@@ -113,6 +98,15 @@ const AdminNavbar = () => {
                         <ul className="space-y-4 mt-12">
                             <li>
                                 <Link to="/admin/dashboard" className="block p-2 hover:bg-yellow-200">Dashboard</Link>
+                            </li>
+                            <li>
+                                <Link to="/admin/allOrders" className="block p-2 hover:bg-yellow-200">All Orders</Link>
+                            </li>
+                            <li>
+                                <Link to="/admin/allUsers" className="block p-2 hover:bg-yellow-200">All Users</Link>
+                            </li>
+                            <li>
+                                <Link to="/admin/addCarousel" className="block p-2 hover:bg-yellow-200">Carousel</Link>
                             </li>
                             <li>
                                 <Link to="/admin/settings" className="block p-2 hover:bg-yellow-200">Settings</Link>

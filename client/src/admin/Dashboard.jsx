@@ -26,12 +26,17 @@ const Dashboard = () => {
   }, [isError])
 
 
-  return <>
-    <div className="flex justify-end m-5">
-      <button onClick={() => document.getElementById('add').showModal()} className="btn bg-gray-400 text-black">Add Product</button>
+  return <div className='bg-light-golden'>
+    <div className="flex justify-end">
+      <button
+        onClick={() => document.getElementById('add').showModal()}
+        className="btn bg-amber-400 hover:bg-golden mr-5 transition"
+      >
+        Add Product
+      </button>
 
       {/* Add Modal */}
-      <dialog id="add" className="modal">
+      <dialog id="add" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Add Product</h3>
           <Form refetch={refetch} />
@@ -40,9 +45,10 @@ const Dashboard = () => {
       {/* Add Modal End */}
     </div>
 
-    {/* Product Table */}
-    <div className="overflow-x-auto shadow-md sm:rounded-lg">
-      <table className="w-full text-sm text-left text-gray-500 border-separate border-spacing-2">
+    {/* Product Table and Card Display */}
+    <div className="hidden sm:block overflow-x-auto shadow-md sm:rounded-lg m-5">
+      {/* Table View */}
+      <table className="w-full text-sm text-left text-gray-500 border-spacing-2">
         <thead className="text-xs text-gray-700 uppercase bg-light-golden">
           <tr className="text-md font-semibold tracking-wide text-left text-gray-900 bg-light-golden uppercase border-b border-gray-600">
             <th className="p-3 font-bold uppercase text-gray-600">#</th>
@@ -66,12 +72,12 @@ const Dashboard = () => {
             data && data.map((item, i) => {
               if (item.isDelete === false) {
                 return (
-                  <tr key={item._id} className="bg-white lg:hover:bg-light-golden">
+                  <tr key={item._id} className="bg-light-golden hover:bg-white transition">
                     <td className="p-3 text-gray-800 text-center border-b">{i + 1}</td>
                     <td className="p-3 text-gray-800 text-center border-b">{item.name}</td>
                     <td className="p-3 text-gray-800 text-center border-b">
                       <div className="text-center">
-                        <img src={item.image} height={50} width={50} alt={item.name} />
+                        <img src={item.image} height={50} width={50} alt={item.name} className="rounded-md shadow-sm" />
                       </div>
                     </td>
                     <td className="p-3 text-gray-800 text-center border-b">{item.desc}</td>
@@ -85,11 +91,23 @@ const Dashboard = () => {
                     <td className="p-3 text-gray-800 text-center border-b">{item.height}</td>
                     <td className="p-3 text-gray-800 text-center border-b">{item.purity}</td>
                     <td className="p-3 text-gray-800 text-center border-b">
-                      <button type="button" onClick={() => {
-                        document.getElementById('update').showModal();
-                        setEditData(item);
-                      }} className="btn bg-green-300">Edit</button>
-                      <button type="button" onClick={() => deleteProduct(item._id)} className="btn bg-red-500">Delete</button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          document.getElementById('update').showModal();
+                          setEditData(item);
+                        }}
+                        className="btn bg-green-300 hover:bg-green-400 transition"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteProduct(item._id)}
+                        className="btn bg-red-500 hover:bg-red-600 transition"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 );
@@ -100,15 +118,58 @@ const Dashboard = () => {
       </table>
     </div>
 
+    <div className="sm:hidden grid grid-cols-1 gap-4 m-5">
+      {/* Card View */}
+      {data && data.map((item) => {
+        if (item.isDelete === false) {
+          return (
+            <div key={item._id} className="bg-light-golden p-4 rounded-lg shadow-md">
+              <div className="text-center">
+                <img src={item.image} height={100} width={100} alt={item.name} className="rounded-md mb-2" />
+              </div>
+              <h4 className="text-lg font-bold mb-2">{item.name}</h4>
+              <p className="mb-2">Description: {item.desc}</p>
+              <p className="mb-2">Price: {item.price}</p>
+              <p className="mb-2">MRP: {item.mrp}</p>
+              <p className="mb-2">Discount: {item.discount}</p>
+              <p className="mb-2">Width: {item.width}</p>
+              <p className="mb-2">Weight: {item.prductWeight}</p>
+              <p className="mb-2">Material: {item.material}</p>
+              <p className="mb-2">Type: {item.productType}</p>
+              <p className="mb-2">Height: {item.height}</p>
+              <p className="mb-2">Purity: {item.purity}</p>
+              <div className="flex justify-between mt-2">
+                <button
+                  onClick={() => {
+                    document.getElementById('update').showModal();
+                    setEditData(item);
+                  }}
+                  className="btn bg-green-300 hover:bg-green-400 transition"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => deleteProduct(item._id)}
+                  className="btn bg-red-500 hover:bg-red-600 transition"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          );
+        }
+      })}
+    </div>
+
     {/* Update Modal */}
-    <dialog id="update" className="modal">
+    <dialog id="update" className="modal modal-bottom sm:modal-middle">
       <div className="modal-box">
         <h3 className="font-bold text-lg">Update Product</h3>
         <Form edit={editData} refetch={refetch} />
       </div>
     </dialog>
     {/* Update Modal End */}
-  </>
+  </div>
 }
 
 const Form = ({ edit, refetch }) => {
@@ -180,9 +241,10 @@ const Form = ({ edit, refetch }) => {
     if (updateSuccess) {
       toast.success("Product Updtae Success")
       document.getElementById("update").close()
+      refetch()
     }
   }, [updateSuccess])
-  return <>
+  return <div className=''>
     {
       isLoading || updateLoad
         ? <>
@@ -295,7 +357,7 @@ const Form = ({ edit, refetch }) => {
 
 
 
-  </>
+  </div>
 }
 
 

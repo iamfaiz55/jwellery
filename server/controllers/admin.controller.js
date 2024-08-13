@@ -1,10 +1,14 @@
 const asyncHandler = require("express-async-handler")
+const multer = require("multer")
 const { checkEmpty } = require("../utils/checkEmpty")
 const Product = require("../models/Product")
 const Order = require("../models/Order")
 const upload = require("../utils/upload")
 const cloudinary = require("../utils/uploadCloud.config")
 const User = require("../models/User")
+const Carousel = require("../models/Carousel")
+
+
 exports.addProduct = asyncHandler(async (req, res) => {
     console.log(req.body);
     
@@ -60,7 +64,6 @@ exports.updateProduct = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: "Product not found" });
     }
 
-    // Handle file upload if a new image is provided
     upload(req, res, async err => {
         if (err) {
             return res.status(400).json({ message: "File upload failed", error: err.message });
@@ -72,24 +75,20 @@ exports.updateProduct = asyncHandler(async (req, res) => {
         if (req.files && req.files[0]) {
             const file = req.files[0];
 
-            // Delete the old image from Cloudinary
             if (product.cloudinary_id) {
                 await cloudinary.uploader.destroy(product.cloudinary_id);
             }
 
-            // Upload the new image to Cloudinary
             const uploadResult = await cloudinary.uploader.upload(file.path);
             secure_url = uploadResult.secure_url;
-            public_id = uploadResult.public_id; // Store the new public_id
+            public_id = uploadResult.public_id; 
         }
 
-        // Extract the product details from the request body
         const {
             name, mrp, price, discount, height, width, prductWeight, material,
             productType, desc, purity
         } = req.body;
 
-        // Update the product in the database
         const updatedProduct = await Product.findByIdAndUpdate(
             pUId,
             {
@@ -123,7 +122,7 @@ exports.deleteProduct = asyncHandler(async(req, res)=> {
 
 
 exports.getAllOrders = asyncHandler(async(req, res)=> {
-    const result = await Order.find().populate("orderItems.productId").populate("userId")
+    const result = await Order.find().populate("orderItems.productId").populate("userId").populate("deliveryAddressId")
     res.json({message:"All Orders Fetch Success", result})
 })
 
@@ -146,5 +145,88 @@ exports.addEvenOffers = asyncHandler(async(req, res)=> {
 
 exports.getAllUsers = asyncHandler(async(req, res)=> {
     const result = await User.find()
-    res.json({message:"All Users Fetch Success"})
+    res.json({message:"All Users Fetch Success", result})
+})
+
+
+
+exports.addCarousel = asyncHandler(async (req, res) => {
+
+   
+    upload(req, res, async err => {
+        if (err) {
+            return res.status(400).json({ message: "File upload failed", error: err.message });
+        }
+        const file = req.files[0]; 
+        if (!file) {
+            return res.status(400).json({ message: "No file uploaded" });
+        }
+        const { secure_url } = await cloudinary.uploader.upload(file.path);
+        const { mainHeading, paragraph } = req.body;
+        await Carousel.create({mainHeading, paragraph, image:secure_url});
+        res.json({ message: "Product Carousel Success" });
+    });
+  
+});
+
+exports.getAllCarousels = asyncHandler(async(req, res)=> {
+        const result = await Carousel.find().exec();
+        const cleanResult = result.map(item => ({
+            _id: item._id,
+            image: item.image,
+            mainHeading: item.mainHeading,
+            paragraph: item.paragraph
+        }));
+
+        res.json({ message: "All Carousel Items Get Success", result: cleanResult });
+})
+
+exports.deleteCarousel = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+        const carouselItem = await Carousel.findById(id);
+        if (carouselItem.image) {
+            const publicId = carouselItem.image.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(publicId);
+        }
+        await Carousel.findByIdAndDelete(id);
+        res.json({ message: 'Carousel deleted successfully' });
+});
+
+exports.updateCarousel = asyncHandler(async (req, res) => {
+    upload(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({ message: 'File upload failed', error: err.message });
+        }
+
+        const { carouselId, mainHeading, paragraph } = req.body;
+
+        const carouselItem = await Carousel.findById(carouselId);
+        if (!carouselItem) {
+            return res.status(404).json({ message: 'Carousel item not found' });
+        }
+
+        let imageUrl = carouselItem.image;
+
+        if (req.files && req.files.length > 0) {
+            const file = req.files[0];
+
+            try {
+                const publicId = carouselItem.image.split('/').pop().split('.')[0];
+                await cloudinary.uploader.destroy(publicId);
+
+                const result = await cloudinary.uploader.upload(file.path);
+
+                imageUrl = result.secure_url;
+            } catch (error) {
+                return res.status(500).json({ message: 'Failed to upload new image', error: error.message });
+            }
+        }
+
+        await Carousel.findByIdAndUpdate(
+            carouselId,
+            { mainHeading, paragraph, image: imageUrl },
+        );
+
+        res.status(200).json({ message: 'Carousel item updated successfully', image: imageUrl });
+    });
 })

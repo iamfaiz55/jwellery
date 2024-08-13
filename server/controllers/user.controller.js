@@ -143,3 +143,22 @@ exports.cancelOrder = asyncHandler(async(req, res)=> {
     await Order.findByIdAndUpdate(id, {status:"cancelled"})
     res.json({message:"Order Cancel Success"})
 })
+
+exports.getFilteredProducts = asyncHandler(async (req, res) => {
+    const { productType } = req.query;
+
+ 
+    const validProductTypes = [
+        "rings", "earings", "necklace", "mangalsutra", "chain", "pendant", 
+        "nose-pin", "bangles", "forehead-ornament", "anklet", "coins"
+    ];
+    if (!validProductTypes.includes(productType)) {
+        return res.status(400).json({ message: "Invalid product type" });
+    }
+
+   
+        const products = await Product.find({ productType });
+
+        res.status(200).json({message:"filter Success", result:products});
+ 
+});

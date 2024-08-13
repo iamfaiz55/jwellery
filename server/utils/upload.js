@@ -8,7 +8,6 @@ const postStorage = multer.diskStorage({
     },
 });
 
-// Ensure the field name here matches "image" or whatever is specified in the frontend
-const upload = multer({ storage: postStorage }).array("image", 1); 
+const upload = multer({ storage: postStorage }).array("image", 1);
 
 module.exports = upload;

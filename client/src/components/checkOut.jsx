@@ -56,7 +56,7 @@ const CheckOut = () => {
     return (
         <>
             <div className="h-screen grid grid-cols-3">
-                <div className="lg:col-span-2 col-span-3 bg-indigo-50 space-y-8 px-12">
+                <div className="lg:col-span-2 col-span-3 bg-yellow-50 space-y-8 px-12">
                     {/* Checkout Message */}
                     <div className="mt-8 p-4 relative flex flex-col sm:flex-row sm:items-center bg-white shadow rounded-md">
                         <div className="flex flex-row items-center border-b sm:border-b-0 w-full sm:w-auto pb-4 sm:pb-0">
@@ -76,7 +76,7 @@ const CheckOut = () => {
                                     />
                                 </svg>
                             </div>
-                            <div className="text-sm font-medium ml-3">Checkout</div>
+                            <div className="text-sm font-medium ml-3 text-yellow-800">Checkout</div>
                         </div>
                         <div className="text-sm tracking-wide text-gray-500 mt-4 sm:mt-0 sm:ml-4">
                             Complete your shipping and payment details below.
@@ -98,58 +98,47 @@ const CheckOut = () => {
                             </svg>
                         </div>
                     </div>
-                    <button className="btn bg-gray-400" onClick={() => document.getElementById('add').showModal()}>Add Address</button>
+                    <button className="btn bg-yellow-400 text-black hover:bg-yellow-500" onClick={() => document.getElementById('add').showModal()}>Add Address</button>
                     <dialog id="add" className="modal">
-                        <div className="modal-box">
-                            <h3 className="font-bold text-lg">Hello!</h3>
-
+                        <div className="modal-box bg-yellow-50">
+                            <h3 className="font-bold text-lg text-yellow-800">Add Address</h3>
                             <Form />
-
                         </div>
                     </dialog>
                     {/* Address List with Checkbox */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-md">
-                        {data &&
-                            data.map((item) => (
-                                <div key={item._id} className="overflow-hidden group relative rounded-lg p-1 flex justify-center items-center">
-                                    <div className="hidden group-hover:block animate-gradient absolute top-0 left-0 w-full h-full bg-gradient-to-r from-zinc-900 via-gray-200/40 to-zinc-700 rounded-lg shadow-xl"></div>
-                                    <label className="relative z-10 w-full bg-white p-6 sm:p-8 rounded-lg flex items-center cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            className="form-checkbox h-5 w-5 text-gray-500"
-                                            checked={selectedAddress === item._id}
-                                            onChange={() => handleAddressChange(item._id)}
-                                        />
-                                        <div className="ml-4">
-                                            <h3 className="text-xl font-bold text-gray-900">{item.addressType}</h3>
-                                            <p className="mt-2 text-sm text-gray-500">House {item.houseNo}</p>
-                                            <p className="mt-2 text-sm text-gray-500">Country {item.country}</p>
-                                            <p className="mt-2 text-sm text-gray-500">State {item.state}</p>
-                                            <p className="mt-2 text-sm text-gray-500">Pincode {item.pincode}</p>
-                                            <p className="mt-2 text-sm text-gray-500">Mobile {item.mobile}</p>
-                                        </div>
-                                    </label>
-                                </div>
-                            ))}
+                        {data && data.map((item) => (
+                            <div key={item._id} className="overflow-hidden group relative rounded-lg p-1 flex justify-center items-center">
+                                <div className="hidden group-hover:block animate-gradient absolute top-0 left-0 w-full h-full bg-gradient-to-r from-yellow-300 via-yellow-100 to-yellow-500 rounded-lg shadow-xl"></div>
+                                <label className="relative z-10 w-full bg-white p-6 sm:p-8 rounded-lg flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        className="form-checkbox h-5 w-5 text-yellow-500"
+                                        checked={selectedAddress === item._id}
+                                        onChange={() => handleAddressChange(item._id)}
+                                    />
+                                    <div className="ml-4">
+                                        <h3 className="text-xl font-bold text-gray-900">{item.addressType}</h3>
+                                        <p className="mt-2 text-sm text-gray-500">House {item.houseNo}</p>
+                                        <p className="mt-2 text-sm text-gray-500">Country {item.country}</p>
+                                        <p className="mt-2 text-sm text-gray-500">State {item.state}</p>
+                                        <p className="mt-2 text-sm text-gray-500">Pincode {item.pincode}</p>
+                                        <p className="mt-2 text-sm text-gray-500">Mobile {item.mobile}</p>
+                                    </div>
+                                </label>
+                            </div>
+                        ))}
                     </div>
-
-                    <button onClick={handlePayNow} className="submit-button px-4 py-3 rounded-full bg-gray-400 text-white  w-full text-xl font-semibold transition-colors">
+                    <button onClick={handlePayNow} className="submit-button px-4 py-3 rounded-full bg-yellow-400 text-white w-full text-xl font-semibold transition-colors hover:bg-yellow-500">
                         Pay Now
                     </button>
                 </div>
 
                 <div className="col-span-1 bg-white lg:block hidden">
-                    <h1 className="py-6 border-b-2 text-xl text-gray-600 px-8">Order Summary</h1>
-
-
-
-
-                    {
-                        product && <>
-
-
+                    <h1 className="py-6 border-b-2 text-xl text-yellow-800 px-8">Order Summary</h1>
+                    {product && (
+                        <>
                             <ul className="py-6 border-b space-y-6 px-8">
-
                                 <li className="grid grid-cols-6 gap-2 border-b-1">
                                     <div className="col-span-1 self-center">
                                         <img
@@ -159,13 +148,12 @@ const CheckOut = () => {
                                         />
                                     </div>
                                     <div className="flex flex-col col-span-3 pt-2">
-                                        <span className="text-gray-600 text-md font-semi-bold">{product.name}</span>
+                                        <span className="text-gray-600 text-md font-semibold">{product.name}</span>
                                         <span className="text-gray-400 text-sm inline-block pt-2">{product.productType}</span>
                                     </div>
                                     <div className="col-span-2 pt-3">
                                         <div className="flex items-center space-x-2 text-sm justify-between">
                                             <span className="text-gray-400">1 x {product.price}</span>
-                                            {/* <span className="text-gray-400 font-semibold inline-block">{product.price}</span> */}
                                             <div className="flex items-center ml-6">
                                                 <button
                                                     onClick={minus}
@@ -186,8 +174,7 @@ const CheckOut = () => {
                                 </li>
                             </ul>
                         </>
-                    }
-
+                    )}
                     <div className="px-8 border-b">
                         <div className="flex justify-between py-4 text-gray-600">
                             <span>Subtotal</span>
