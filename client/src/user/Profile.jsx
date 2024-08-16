@@ -1,20 +1,64 @@
-import { useFormik } from 'formik';
-import React, { useEffect } from 'react';
-import * as yup from 'yup';
-import { toast } from 'sonner';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
-import { useAddAddressMutation, useGetAddressesQuery } from '../redux/apis/userApi';
+import { toast } from 'sonner';
+import { useAddAddressMutation, useGetAddressesQuery, useUpdateProfileMutation } from '../redux/apis/userApi';
+import * as yup from 'yup';
+import { useFormik } from 'formik';
 
 const Profile = () => {
-    const { user } = useSelector((state) => state.userData);
+    const [updateProfile, { isSuccess }] = useUpdateProfileMutation();
+    const { user } = useSelector(state => state.userData);
     const { data } = useGetAddressesQuery(user._id);
 
+
+    const fileInputRef = useRef();
+
+    const handleClick = () => {
+        fileInputRef.current.click();
+    };
+
+    const handleInput = (e) => {
+        const file = e.target.files[0];
+        const fd = new FormData();
+        fd.append('image', file);
+        fd.append('userId', user._id);
+        updateProfile(fd)
+    };
+
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success("Profile Update Success")
+            window.location.reload();
+        }
+    }, [isSuccess])
+    // useEffect(() => {
+    //     if (user) {
+    //         window.location.reload();
+    //     }
+    // }, [user]);
+
+
     return (
-        <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
-            <div className="relative flex flex-col items-center rounded-2xl w-full max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white shadow-2xl p-6">
+        <div className="flex flex-col justify-center items-center min-h-screen bg-light-golden">
+            <div className="relative flex flex-col items-center rounded-2xl w-full max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-light-golden shadow-2xl p-6">
                 <div className="mt-4 mb-8 w-full text-center">
-                    <h4 className="text-2xl font-bold text-navy-700">
+                    <div className="relative flex justify-center items-center">
+                        <motion.img
+                            src={user.image}
+                            className="w-24 h-24 rounded-full border-4 border-golden cursor-pointer"
+                            onClick={handleClick}
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ duration: 0.3 }}
+                        />
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleInput}
+                            className="hidden"
+                        />
+                    </div>
+                    <h4 className="text-2xl font-bold text-navy-700 mt-2">
                         Hi, {user && user.name}
                     </h4>
                     <p className="text-sm text-gray-500 mt-2">{user && user.email}</p>
@@ -124,6 +168,6 @@ const Form = ({ edit }) => {
             )}
         </>
     );
-}
+};
 
 export default Profile;

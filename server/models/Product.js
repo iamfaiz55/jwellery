@@ -12,7 +12,7 @@ const productSchema = new mongoose.Schema({
       material:{type:String,enum:["gold", "diamond", "bronz", "white-gold", "rose-gold", "platinum"],required:true},
       productType:{
          type:String,
-         enum:["rings", "earings", "neckless", "mangalsutra", "chain", "pendent", "nose-pin", "bangles","forehead-ornament","anklet","coins" ],
+         enum:["rings", "earings", "necklace", "mangalsutra", "chain", "pendent", "nose-pin", "bangles","forehead-ornament","anklet","coins" ],
          required:true
       },
       desc:{type:String,},

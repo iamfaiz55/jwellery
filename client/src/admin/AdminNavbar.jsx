@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLogoutAdminMutation } from '../redux/apis/adminAuthApi';
 import { toast } from 'sonner';
+import { useSelector } from 'react-redux';
 
 const AdminNavbar = () => {
     const navigate = useNavigate();
     const [logoutAdmin, { isSuccess }] = useLogoutAdminMutation();
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-
+    const { admin } = useSelector(state => state.adminData)
     useEffect(() => {
         if (isSuccess) {
             toast.success("Admin Logout Success");
@@ -30,20 +31,29 @@ const AdminNavbar = () => {
                                     />
                                 </div>
                             </Link>
-                            <div className="hidden md:flex flex-1 space-x-4">
-                                <Link to="/admin/dashboard" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
-                                    Dashboard
-                                </Link>
-                                <Link to="/admin/allOrders" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
-                                    All Orders
-                                </Link>
-                                <Link to="/admin/allUsers" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
-                                    All Users
-                                </Link>
-                                <Link to="/admin/addCarousel" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
-                                    Carousel
-                                </Link>
+                            <div className="flex justify-between">
+                                <div className="hidden md:flex flex-1 space-x-4">
+                                    <Link to="/admin/dashboard" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                        Dashboard
+                                    </Link>
+                                    <Link to="/admin/allOrders" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                        All Orders
+                                    </Link>
+                                    <Link to="/admin/allUsers" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                        All Users
+                                    </Link>
+                                    <Link to="/admin/addCarousel" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                        Carousel
+                                    </Link>
+                                </div>
+                                {
+                                    admin && <div className="hidden md:block absolute right-5">
+                                        <button className="btn bg-golden hover:bg-yellow-600" onClick={e => logoutAdmin()}>Logout</button>
+                                    </div>
+
+                                }
                             </div>
+
                         </div>
 
                         {/* This is the menu icon that will be on the right side */}

@@ -12,13 +12,13 @@ const Home = () => {
     // console.log(selectedType);
 
     let [filter, { data: filteredData, isSuccess, isError, error }] = useLazyGetFilteredDataQuery()//<= we type here
-    console.log(filteredData);
+    // console.log(filteredData);
 
     useEffect(() => {
         if (selectedType) {
             filter(selectedType)
         }
-    }, [selectedType])
+    }, [selectedType, filter])
 
     useEffect(() => {
         if (isError) {
@@ -46,7 +46,7 @@ const Home = () => {
         if (isSuccess) {
             setAllProducts(filteredData)
         }
-    }, [isSuccess])
+    }, [isSuccess, filteredData])
     useEffect(() => {
         if (mainData) {
             setAllProducts(products)
@@ -128,8 +128,8 @@ const Home = () => {
                                         <p className="mb-2 text-base text-gray-700">{item.desc}</p>
                                         <div className="flex items-center">
                                             <p className="mr-2 text-lg font-semibold text-gray-900">${item.price}</p>
-                                            <p className="text-base font-medium text-gray-500 line-through">$25.00</p>
-                                            <p className="ml-auto text-base font-medium text-green-500">20% off</p>
+                                            <p className="text-base font-medium text-gray-500 line-through">${item.mrp}</p>
+                                            <p className="ml-auto text-base font-medium text-green-500">${item.discount} off</p>
                                         </div>
                                     </div>
                                 </Link>
@@ -138,7 +138,7 @@ const Home = () => {
                     </div>
                 </section>
 
-                <Footer />
+
             </div>
         </div>
     );

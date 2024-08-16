@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    image:{
+        type:String,
+      default:"user.png"
+    },
     isBlock:{
         type:Boolean,
         defaul:false

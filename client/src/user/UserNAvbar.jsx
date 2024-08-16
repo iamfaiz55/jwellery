@@ -2,14 +2,20 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLogoutUserMutation } from '../redux/apis/userAuthApi';
 import { filterContext, usefilter } from '../App';
+import { useSelector } from 'react-redux';
+import { useGetAllCartItemsQuery } from '../redux/apis/userApi';
 
 const UserNavbar = () => {
     const { setSelectedType } = usefilter(filterContext);
     const [logoutUser] = useLogoutUserMutation();
     const [isSidebarOpen, setSidebarOpen] = useState(false);
+    const { user } = useSelector(state => state.userData)
+    const { data } = useGetAllCartItemsQuery(user && user._id)
+    const total = data && data.reduce((acc, item) => acc + item.productId.price * item.quantity, 0);
+    console.log(total);
 
-    const productItems = ["rings", "earings", "necklace", "mangalsutra", "chain", "pendant", "nose-pin", "bangles", "forehead-ornament", "anklet", "coins"];
-    const aboutItems = ["history", "vision", "mission", "team", "careers"];
+    const productItems = ["rings", "earings", "necklace", "mangalsutra", "chain", "pendent", "nose-pin", "bangles", "forehead-ornament", "anklet", "coins"];
+    const aboutItems = ["vision", "mission", "team", "about"];
     const babiesItems = ["bracelets", "anklets", "necklaces"];
     const goldItems = ["rings", "chains", "coins", "bars"];
     const platinumItems = ["rings", "bracelets", "necklaces"];
@@ -19,15 +25,13 @@ const UserNavbar = () => {
         setSidebarOpen(false);
     };
 
-
-
     return (
         <div className="bg-light-golden py-1">
             <div className="m-5 z-20 relative">
-                <div className="navbar rounded-lg bg-amber-400">
+                <div className="navbar rounded-lg bg-light-golden  border-2 border-black">
                     <div className="flex-1 flex items-center space-x-4">
                         <Link to="/">
-                            <div className="justify-center">
+                            <div className="justify-center  ">
                                 <img className="w-20 h-14" src="https://static.vecteezy.com/system/resources/previews/027/990/875/non_2x/royal-frame-logo-generative-ai-free-png.png" alt="" />
                             </div>
                         </Link>
@@ -75,64 +79,16 @@ const UserNavbar = () => {
                                 </div>
                                 <div className="dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-[400px] p-2 shadow transition-all duration-300 ease-in-out">
                                     {aboutItems.map((item, index) => (
-                                        <div
+                                        <Link
+                                            to={`/user/${item}`}
                                             key={index}
-                                            onClick={() => handleItemClick('About', item)}
                                             className="block p-2 hover:bg-yellow-200 cursor-pointer"
                                         >
                                             {item}
-                                        </div>
+                                        </Link>
                                     ))}
                                 </div>
                             </div>
-                            {/* <div className="dropdown dropdown-hover relative">
-                                <div className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
-                                    Babies
-                                </div>
-                                <div className="dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-[400px] p-2 shadow transition-all duration-300 ease-in-out">
-                                    {babiesItems.map((item, index) => (
-                                        <div
-                                            key={index}
-                                            onClick={() => handleItemClick('Babies', item)}
-                                            className="block p-2 hover:bg-yellow-200 cursor-pointer"
-                                        >
-                                            {item}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="dropdown dropdown-hover relative">
-                                <div className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
-                                    Gold
-                                </div>
-                                <div className="dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-[400px] p-2 shadow transition-all duration-300 ease-in-out">
-                                    {goldItems.map((item, index) => (
-                                        <div
-                                            key={index}
-                                            onClick={() => handleItemClick('Gold', item)}
-                                            className="block p-2 hover:bg-yellow-200 cursor-pointer"
-                                        >
-                                            {item}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="dropdown dropdown-hover relative">
-                                <div className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
-                                    Platinum
-                                </div>
-                                <div className="dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-[400px] p-2 shadow transition-all duration-300 ease-in-out">
-                                    {platinumItems.map((item, index) => (
-                                        <div
-                                            key={index}
-                                            onClick={() => handleItemClick('Platinum', item)}
-                                            className="block p-2 hover:bg-yellow-200 cursor-pointer"
-                                        >
-                                            {item}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div> */}
                         </div>
                     </div>
 
@@ -156,7 +112,7 @@ const UserNavbar = () => {
                                             strokeWidth="2"
                                             d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
-                                    <span className="badge badge-sm indicator-item">8</span>
+                                    <span className="badge badge-sm indicator-item">{data && data.length}</span>
                                 </div>
                             </div>
                             <div
@@ -164,8 +120,8 @@ const UserNavbar = () => {
                                 className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow transition-all duration-300 ease-in-out"
                             >
                                 <div className="card-body">
-                                    <span className="text-lg font-bold">8 Items</span>
-                                    <span className="text-info">Subtotal: $999</span>
+                                    <span className="text-lg font-bold">{data && data.length} Items</span>
+                                    <span className="text-info">Subtotal: ${total}</span>
                                     <div className="card-actions">
                                         <Link to="/user/cart" className="btn btn-primary btn-block">View cart</Link>
                                     </div>
@@ -181,7 +137,7 @@ const UserNavbar = () => {
                                 <div className="w-10 rounded-full">
                                     <img
                                         alt="Tailwind CSS Navbar component"
-                                        src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                                        src={user && user.image} />
                                 </div>
                             </div>
                             <ul
@@ -196,6 +152,7 @@ const UserNavbar = () => {
                                 </li>
                                 <li><Link to="/admin/dashboard" className='text-center'>Admin Page</Link></li>
                                 <li><Link to="/user/allOrders" className='text-center'>My Orders</Link></li>
+                                <li><Link to="/user/liked" className='text-center'>Liked</Link></li>
                                 <li><button onClick={() => logoutUser()} type="button" className="btn">Logout User</button></li>
                             </ul>
                         </div>
@@ -205,7 +162,8 @@ const UserNavbar = () => {
                 {/* Sidebar for small screens */}
                 <div
                     className={`fixed inset-0 z-40 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-                        } bg-amber-200 transition-transform duration-300 ease-in-out`}
+                        } bg-amber-200 transition-transform duration-300 ease-in-out overflow-y-auto`}
+                    style={{ maxHeight: '100vh' }} // Ensure sidebar doesn't overflow vertically
                 >
                     <div className="flex items-center justify-between p-4">
                         <h2 className="text-lg font-bold">Menu</h2>
@@ -223,17 +181,7 @@ const UserNavbar = () => {
                                 </button>
                             ))}
                         </div>
-                        <div className="flex flex-col space-y-2">
-                            {aboutItems.map((item, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => handleItemClick('About', item)}
-                                    className="btn btn-ghost text-left"
-                                >
-                                    {item}
-                                </button>
-                            ))}
-                        </div>
+
                         <div className="flex flex-col space-y-2">
                             {babiesItems.map((item, index) => (
                                 <button
@@ -266,6 +214,22 @@ const UserNavbar = () => {
                                     {item}
                                 </button>
                             ))}
+                        </div>
+                        <div className="flex flex-col space-y-2">
+                            <div className="card border border-golden rounded-lg shadow-md p-4">
+                                <div className="card-body">
+                                    {aboutItems.map((item, index) => (
+                                        <Link
+                                            key={index}
+                                            to={`/user/${item}`}
+                                            className="block p-2 hover:bg-yellow-200 text-left"
+                                        >
+                                            {item}
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                            {/* Other sections... */}
                         </div>
                     </div>
                 </div>

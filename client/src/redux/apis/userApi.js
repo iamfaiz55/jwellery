@@ -26,6 +26,17 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 providesTags: ["user"]
             }),
+            getLiked: builder.query({
+                query: (id) => {
+                    return {
+                        url: `/getLiked/${id}`,
+                        method: "GET",
+                        
+                    }
+                },
+                transformResponse:data => data.result,
+                providesTags: ["user"]
+            }),
             getFilteredData: builder.query({
                 query: (type) => {
                     return {
@@ -100,6 +111,28 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 invalidatesTags: ["user"]
             }),
+            like: builder.mutation({
+                query: likeData => {
+                    return {
+                        url: `/like`,
+                        method: "POST",
+                        body: likeData
+                    }
+                },
+                // transformResponse:data => data.result,
+                invalidatesTags: ["user"]
+            }),
+            deleteLike: builder.mutation({
+                query: id => {
+                    return {
+                        url: `/delete-like/${id}`,
+                        method: "DELETE",
+                        // body: likeData
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["user"]
+            }),
             getAllCartItems: builder.query({
                 query: id => {
                     return {
@@ -155,6 +188,29 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 invalidatesTags: ["user"]
             }),
+            updateProfile: builder.mutation({
+                query: data => {
+                    return {
+                        url: `/update-profile`,
+                        method: "PUT",
+                        body: data
+                    }
+                },
+                transformResponse:data => {
+                    const userProfile = JSON.parse(localStorage.getItem("user"));
+        
+                    if (userProfile) {
+                        // console.log(userProfile.image);
+                        userProfile.image = data.result.image;
+                        // console.log(userProfile.image);
+                        console.log(data);
+                        
+                         
+                        localStorage.setItem("user", JSON.stringify(userProfile));
+                    }   
+                },
+                invalidatesTags: ["user"]
+            }),
         
         }
     }
@@ -174,6 +230,10 @@ export const {
     useCancelOrderMutation,
     useGetCArouselQuery,
     // useGetFilteredDataQuery,
-    useLazyGetFilteredDataQuery
+    useLazyGetFilteredDataQuery,
+    useUpdateProfileMutation,
+    useLikeMutation,
+    useDeleteLikeMutation,
+    useGetLikedQuery
     
 } = userApi

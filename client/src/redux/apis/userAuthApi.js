@@ -6,7 +6,8 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 // logout-user
 export const userAuthApi = createApi({
     reducerPath: "userAuthApi",
-    baseQuery: fetchBaseQuery({ baseUrl: `${import.meta.env.VITE_BACKEND_URL}/api/userAuth`, credentials:"include" }),
+    // baseQuery: fetchBaseQuery({ baseUrl: `${import.meta.env.VITE_BACKEND_URL}/api/userAuth`, credentials:"include" }),
+    baseQuery: fetchBaseQuery({ baseUrl: `http://localhost:5000/api/userAuth`, credentials:"include" }),
     tagTypes: ["auth"],
     endpoints: (builder) => {
         return {

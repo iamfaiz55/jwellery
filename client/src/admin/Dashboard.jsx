@@ -322,7 +322,7 @@ const Form = ({ edit, refetch }) => {
               <option value={"earings"}>
                 Earings
               </option>
-              <option value={"neckless"}>Necklaces</option>
+              <option value={"necklace"}>Necklaces</option>
               <option value={"mangalsutra"}>mangalsutra</option>
               <option value={"chain"}>chain</option>
               <option value={"pendent"}>Pendent</option>

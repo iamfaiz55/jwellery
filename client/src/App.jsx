@@ -23,6 +23,12 @@ import AdminAllOrders from './admin/AdminAllOrders';
 // import AllUSers from './admin/AllUSers';
 import AllUsers from './admin/AllUSers';
 import AddCarousel from './admin/AddCarousel';
+import About from './admin/About';
+import OurMission from './admin/OurMission';
+import Footer from './components/Footer';
+import Vision from './admin/Vision';
+import Team from './admin/Team';
+import Liked from './components/Liked';
 // import Cart from '../../server/models/Cart';
 
 
@@ -77,8 +83,13 @@ const App = () => {
                   <Routes>
                     <Route path="register" element={<UserRegister />} />
                     <Route path="login" element={<UserLogin />} />
+                    <Route path="about" element={<About />} />
+                    <Route path="mission" element={<OurMission />} />
+                    <Route path="vision" element={<Vision />} />
+                    <Route path="team" element={<Team />} />
                     <Route path="cart" element={<><UserProtected compo={<Cart />} /></>} />
                     <Route path="cartCheckout" element={<><UserProtected compo={<CartCheckOut />} /></>} />
+                    <Route path="liked" element={<><UserProtected compo={<Liked />} /></>} />
                     <Route path="allOrders" element={<><UserProtected compo={<AllOrders />} /></>} />
                     <Route path="checkout/:id" element={<CheckOut />} />
                     <Route path="profile" element={<UserProtected compo={<Profile />} />} />
@@ -96,10 +107,10 @@ const App = () => {
                 </>
               }
             />
-
             <Route path="*" element={<h1>Page Not Found</h1>} />
           </Routes>
         </BrowserRouter>
+        <Footer />
       </CartContext.Provider>
     </filterContext.Provider>
   );

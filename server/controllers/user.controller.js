@@ -4,6 +4,12 @@ const Order = require("../models/Order")
 const UserAddress = require("../models/UserAddress")
 const Product = require("../models/Product")
 const Cart = require("../models/Cart")
+const User = require("../models/User")
+const upload = require("../utils/upload")
+const cloudinary = require("../utils/uploadCloud.config")
+const Liked = require("../models/Liked")
+// const Liked = require("../models/Liked")
+
 // const Ordre = require("../models/Ordre")
 
 exports.getOrders = asyncHandler(async(req, res)=> {
@@ -108,14 +114,50 @@ exports.addCart = asyncHandler(async (req, res) => {
        await Cart.create({userId:uId, productId:pId, quantity:1})
     }
 
-    res.json({ message: 'Cart updated successfully' });
+    res.json({ message: 'Cart Add successfully' });
 });
+exports.like = asyncHandler(async (req, res) => {
+    const { pId, uId } = req.body;
+console.log(req.body);
+
+    let result = await Liked.findOne({ userId: uId, productId: pId });
+
+    if (result) {
+     return res.status(400).json({message:" This Product is AlReady In Liked "})
+    } else {
+       await Liked.create({userId:uId, productId:pId})
+    }
+
+    res.json({ message: 'Liked successfully' });
+});
+exports.deleteLiked = asyncHandler(async (req, res) => {
+    const {id} = req.params;
+// console.log(req.body);
+
+  await Liked.findByIdAndDelete(id)
+
+    res.json({ message: 'product Deleted From Liked  ' });
+});
+exports.getAllLiked = asyncHandler(async (req, res) => {
+    const { uid } = req.params;
+    console.log(uid);
+    
+    const result = await Liked.find({ userId: uid }).populate("productId")
+    // console.log();
+    
+    res.json({ message: 'Liked Items Get Success', result });
+});
+
+
+
+
 
 exports.getAllCartItems = asyncHandler(async (req, res) => {
     const { uid } = req.params;
     const result = await Cart.find({ userId: uid }).populate("productId")
     res.json({ message: 'Cart Items Get Success', result });
 });
+
 
  
 exports.deleteItemFromCart = asyncHandler(async(req, res)=> {
@@ -149,7 +191,7 @@ exports.getFilteredProducts = asyncHandler(async (req, res) => {
 
  
     const validProductTypes = [
-        "rings", "earings", "necklace", "mangalsutra", "chain", "pendant", 
+        "rings", "earings", "necklace", "mangalsutra", "chain", "pendent", 
         "nose-pin", "bangles", "forehead-ornament", "anklet", "coins"
     ];
     if (!validProductTypes.includes(productType)) {
@@ -161,4 +203,36 @@ exports.getFilteredProducts = asyncHandler(async (req, res) => {
 
         res.status(200).json({message:"filter Success", result:products});
  
+});
+
+
+
+exports.updateProfile = asyncHandler(async (req, res) => {
+
+    upload(req, res, async (err) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error uploading file' });
+        }
+        const user = await User.findById(req.body.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+            if (user.image) {
+                const existing = user.image.split('/').pop().split('.')[0];
+                    await cloudinary.uploader.destroy(existing);
+            }
+        
+        const {secure_url} = await cloudinary.uploader.upload(req.files[0].path);
+        // console.log(req.body.userId);
+        
+       const updated = await User.findByIdAndUpdate(req.body.userId, {image:secure_url})
+    //    console.log(updated);
+       
+        res.json({ message: "Profile image upload successfully", result:{
+            name:updated.name,
+            email:updated.email,
+            _id:updated._id,
+            image:secure_url
+        } });
+    });
 });

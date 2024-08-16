@@ -57,7 +57,7 @@ exports.addProduct = asyncHandler(async (req, res) => {
 exports.updateProduct = asyncHandler(async (req, res) => {
     const { pUId } = req.params;
 
-    // Find the product by ID
+
     const product = await Product.findById(pUId);
 
     if (!product) {
@@ -230,3 +230,4 @@ exports.updateCarousel = asyncHandler(async (req, res) => {
         res.status(200).json({ message: 'Carousel item updated successfully', image: imageUrl });
     });
 })
+exports.blockUser = asyncHandler()
