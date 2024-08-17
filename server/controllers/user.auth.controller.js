@@ -57,7 +57,8 @@ exports.loginUser = asyncHandler(async (req, res) => {
         _id: result._id,
         name: result.name,
         email: result.email,
-        image:result.image
+        image:result.image,
+        isBlock:result.isBlock
     } })
 })
 

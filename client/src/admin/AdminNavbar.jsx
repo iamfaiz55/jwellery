@@ -45,6 +45,9 @@ const AdminNavbar = () => {
                                     <Link to="/admin/addCarousel" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
                                         Carousel
                                     </Link>
+                                    <Link to="/admin/categories" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                        Categories
+                                    </Link>
                                 </div>
                                 {
                                     admin && <div className="hidden md:block absolute right-5">
@@ -56,7 +59,6 @@ const AdminNavbar = () => {
 
                         </div>
 
-                        {/* This is the menu icon that will be on the right side */}
                         <div className="md:hidden flex-none">
                             <button
                                 onClick={() => setSidebarOpen(!isSidebarOpen)}
@@ -119,7 +121,7 @@ const AdminNavbar = () => {
                                 <Link to="/admin/addCarousel" className="block p-2 hover:bg-yellow-200">Carousel</Link>
                             </li>
                             <li>
-                                <Link to="/admin/settings" className="block p-2 hover:bg-yellow-200">Settings</Link>
+                                <Link to="/admin/categories" className="block p-2 hover:bg-yellow-200">Categories</Link>
                             </li>
                             <li>
                                 <button

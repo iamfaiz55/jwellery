@@ -7,6 +7,7 @@ import { CartContext } from '../App';
 
 const Cart = () => {
     const { user } = useSelector(state => state.userData);
+
     const { data } = useGetAllCartItemsQuery(user._id);
     // console.log(data.length);
 

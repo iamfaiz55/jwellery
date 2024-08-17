@@ -8,6 +8,7 @@ const User = require("../models/User")
 const upload = require("../utils/upload")
 const cloudinary = require("../utils/uploadCloud.config")
 const Liked = require("../models/Liked")
+const Categories = require("../models/Categories")
 // const Liked = require("../models/Liked")
 
 // const Ordre = require("../models/Ordre")
@@ -232,7 +233,14 @@ exports.updateProfile = asyncHandler(async (req, res) => {
             name:updated.name,
             email:updated.email,
             _id:updated._id,
-            image:secure_url
+            image:secure_url,
+            isBlock:updated.isBlock
         } });
     });
 });
+
+exports.getAllCategory = asyncHandler(async(req, res)=> {
+    //   const {cId}= req.params  
+      const result = await Categories.find()
+      res.json({message:"Categories Get Success", result })
+    })

@@ -29,16 +29,20 @@ import Footer from './components/Footer';
 import Vision from './admin/Vision';
 import Team from './admin/Team';
 import Liked from './components/Liked';
+import Categories from './admin/Categories';
 // import Cart from '../../server/models/Cart';
 
 
 
 export const CartContext = createContext();
 export const filterContext = createContext();
+// export const blockUnblock = createContext();
 export const useCart = () => useContext(CartContext);
 export const usefilter = () => useContext(filterContext);
+// export const useblock = () => useContext(blockUnblock);
 const App = () => {
   const [selectedType, setSelectedType] = useState();
+  // const [block, setBlock] = useState()
   const [cartData, setCartData] = useState(() => {
 
     const savedCartData = localStorage.getItem('cartData');
@@ -50,6 +54,7 @@ const App = () => {
   }, [cartData]);
   return (
     <filterContext.Provider value={{ selectedType, setSelectedType }}>
+      {/* <blockUnblock.Provider value={{ block, setBlock }}> */}
       <CartContext.Provider value={{ cartData, setCartData }}>
         <Toaster richColors position="top-center" />
         <BrowserRouter>
@@ -67,6 +72,7 @@ const App = () => {
                     <Route path="register" element={<AdminRegister />} />
                     <Route path="login" element={<AdminLogin />} />
                     <Route path="dashboard" element={<AdminProtected compo={<Dashboard />} />} />
+                    <Route path="categories" element={<AdminProtected compo={<Categories />} />} />
                     <Route path="allUsers" element={<AdminProtected compo={<AllUsers />} />} />
                     <Route path="addCarousel" element={<AdminProtected compo={<AddCarousel />} />} />
                     <Route path="allOrders" element={<AdminProtected compo={<AdminAllOrders />} />} />
@@ -112,6 +118,7 @@ const App = () => {
         </BrowserRouter>
         <Footer />
       </CartContext.Provider>
+      {/* </blockUnblock.Provider> */}
     </filterContext.Provider>
   );
 };

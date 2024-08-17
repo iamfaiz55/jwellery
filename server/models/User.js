@@ -15,11 +15,11 @@ const userSchema = new mongoose.Schema({
     },
     image:{
         type:String,
-      default:"user.png"
+      default:"https://static.vecteezy.com/system/resources/previews/027/990/875/non_2x/royal-frame-logo-generative-ai-free-png.png"
     },
     isBlock:{
         type:Boolean,
-        defaul:false
+        default:false
     }
 
 },{timestamps:true})

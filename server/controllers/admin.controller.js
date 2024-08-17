@@ -7,6 +7,7 @@ const upload = require("../utils/upload")
 const cloudinary = require("../utils/uploadCloud.config")
 const User = require("../models/User")
 const Carousel = require("../models/Carousel")
+const Categories = require("../models/Categories")
 
 
 exports.addProduct = asyncHandler(async (req, res) => {
@@ -230,4 +231,40 @@ exports.updateCarousel = asyncHandler(async (req, res) => {
         res.status(200).json({ message: 'Carousel item updated successfully', image: imageUrl });
     });
 })
-exports.blockUser = asyncHandler()
+exports.blockUser = asyncHandler(async(req, res)=> {
+  const {uId}= req.params
+
+
+
+ const updated= await User.findByIdAndUpdate(uId, {isBlock:true})
+  
+  res.json({message:"User Blocked Success", result:{
+    isBlock:true,
+    name:updated.name,
+    email:updated.email,
+    _id:updated._id,
+    image:updated.image,
+  }})
+})
+exports.unblockUser = asyncHandler(async(req, res)=> {
+  const {uId}= req.params  
+
+  const updated = await User.findByIdAndUpdate(uId, {isBlock:false})
+  res.json({message:"User Unblocked Success", result:{
+    isBlock:false,
+    name:updated.name,
+    email:updated.email,
+    _id:updated._id,
+    image:updated.image,
+  }})
+})
+exports.addCategory = asyncHandler(async(req, res)=> {
+  await Categories.create(req.body)
+  res.json({message:"Category Added Success"})
+})
+exports.deleteCategory = asyncHandler(async(req, res)=> {
+  const {cId}= req.params  
+  await Categories.findByIdAndDelete(cId)
+  res.json({message:"Category Delete Success"})
+})
+

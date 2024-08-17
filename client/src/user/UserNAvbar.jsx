@@ -1,29 +1,32 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLogoutUserMutation } from '../redux/apis/userAuthApi';
 import { filterContext, usefilter } from '../App';
 import { useSelector } from 'react-redux';
-import { useGetAllCartItemsQuery } from '../redux/apis/userApi';
+import { useGetAllCartItemsQuery, useGetAllCAtegoriesQuery } from '../redux/apis/userApi';
 
 const UserNavbar = () => {
+    const navigate = useNavigate()
     const { setSelectedType } = usefilter(filterContext);
     const [logoutUser] = useLogoutUserMutation();
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const { user } = useSelector(state => state.userData)
     const { data } = useGetAllCartItemsQuery(user && user._id)
     const total = data && data.reduce((acc, item) => acc + item.productId.price * item.quantity, 0);
-    console.log(total);
+    // console.log(total);
+    const { data: categories, refetch } = useGetAllCAtegoriesQuery()
+    // console.log(categories);
 
-    const productItems = ["rings", "earings", "necklace", "mangalsutra", "chain", "pendent", "nose-pin", "bangles", "forehead-ornament", "anklet", "coins"];
+    // const productItems = ["rings", "earings", "necklace", "mangalsutra", "chain", "pendent", "nose-pin", "bangles", "forehead-ornament", "anklet", "coins"];
+    const productItems = categories && categories.map(item => item.category)
     const aboutItems = ["vision", "mission", "team", "about"];
-    const babiesItems = ["bracelets", "anklets", "necklaces"];
-    const goldItems = ["rings", "chains", "coins", "bars"];
-    const platinumItems = ["rings", "bracelets", "necklaces"];
+
 
     const handleItemClick = (type, item) => {
         setSelectedType({ productType: item });
         setSidebarOpen(false);
     };
+
 
     return (
         <div className="bg-light-golden py-1">
@@ -62,7 +65,7 @@ const UserNavbar = () => {
                                     Products
                                 </div>
                                 <div className="dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-[400px] p-2 shadow transition-all duration-300 ease-in-out">
-                                    {productItems.map((item, index) => (
+                                    {productItems && productItems.map((item, index) => (
                                         <div
                                             key={index}
                                             onClick={() => handleItemClick('Products', item)}
@@ -119,11 +122,11 @@ const UserNavbar = () => {
                                 tabIndex={0}
                                 className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow transition-all duration-300 ease-in-out"
                             >
-                                <div className="card-body">
+                                <div className="card-body bg-light-golden">
                                     <span className="text-lg font-bold">{data && data.length} Items</span>
-                                    <span className="text-info">Subtotal: ${total}</span>
+                                    <span className="font-bold">Subtotal: ${total}</span>
                                     <div className="card-actions">
-                                        <Link to="/user/cart" className="btn btn-primary btn-block">View cart</Link>
+                                        <Link to="/user/cart" className="btn bg-golden btn-block">View cart</Link>
                                     </div>
                                 </div>
                             </div>
@@ -134,11 +137,17 @@ const UserNavbar = () => {
                                 role="button"
                                 className="btn btn-ghost btn-circle avatar hover:bg-gray-200 transition duration-300 ease-in-out"
                             >
-                                <div className="w-10 rounded-full">
-                                    <img
-                                        alt="Tailwind CSS Navbar component"
-                                        src={user && user.image} />
-                                </div>
+                                {
+                                    user
+                                        ? <>
+                                            <div className="w-10 rounded-full">
+                                                <img
+                                                    alt="Tailwind CSS Navbar component"
+                                                    src={user && user.image} />
+                                            </div>
+                                        </>
+                                        : <>Login</>
+                                }
                             </div>
                             <ul
                                 tabIndex={0}
@@ -153,7 +162,16 @@ const UserNavbar = () => {
                                 <li><Link to="/admin/dashboard" className='text-center'>Admin Page</Link></li>
                                 <li><Link to="/user/allOrders" className='text-center'>My Orders</Link></li>
                                 <li><Link to="/user/liked" className='text-center'>Liked</Link></li>
-                                <li><button onClick={() => logoutUser()} type="button" className="btn">Logout User</button></li>
+                                {
+                                    user
+                                        ? <>
+                                            <li><button onClick={() => logoutUser()} type="button" className="btn">Logout User</button></li>
+
+                                        </>
+                                        : <>
+                                            <li><button onClick={() => navigate("/user/login")} type="button" className="btn">Login</button></li>
+                                        </>
+                                }
                             </ul>
                         </div>
                     </div>
@@ -171,7 +189,7 @@ const UserNavbar = () => {
                     </div>
                     <div className="p-4 space-y-4">
                         <div className="flex flex-col space-y-2">
-                            {productItems.map((item, index) => (
+                            {productItems && productItems.map((item, index) => (
                                 <button
                                     key={index}
                                     onClick={() => handleItemClick('Products', item)}
@@ -182,39 +200,9 @@ const UserNavbar = () => {
                             ))}
                         </div>
 
-                        <div className="flex flex-col space-y-2">
-                            {babiesItems.map((item, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => handleItemClick('Babies', item)}
-                                    className="btn btn-ghost text-left"
-                                >
-                                    {item}
-                                </button>
-                            ))}
-                        </div>
-                        <div className="flex flex-col space-y-2">
-                            {goldItems.map((item, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => handleItemClick('Gold', item)}
-                                    className="btn btn-ghost text-left"
-                                >
-                                    {item}
-                                </button>
-                            ))}
-                        </div>
-                        <div className="flex flex-col space-y-2">
-                            {platinumItems.map((item, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => handleItemClick('Platinum', item)}
-                                    className="btn btn-ghost text-left"
-                                >
-                                    {item}
-                                </button>
-                            ))}
-                        </div>
+
+
+
                         <div className="flex flex-col space-y-2">
                             <div className="card border border-golden rounded-lg shadow-md p-4">
                                 <div className="card-body">

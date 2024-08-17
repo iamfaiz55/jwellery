@@ -20,6 +20,7 @@ router
     .get("/get-products", userController.getAllProduct)
     .get("/carousel", adminController.getAllCarousels)
     .get("/filter", userController.getFilteredProducts)
+    .get("/categories", userController.getAllCategory)
 
 
 

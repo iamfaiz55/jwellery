@@ -101,6 +101,62 @@ export const adminApi = createApi({
                 },
                 invalidatesTags: ["admin"]
             }),
+            blockUser: builder.mutation({
+                query: id => {
+                    return {
+                        url: `/block-user/${id}`,
+                        method: "PUT",
+                        // body: carouselData
+                    }
+                },
+                transformResponse:data => {
+                    const x = JSON.parse(localStorage.getItem("user"))
+                    console.log(x);
+                    
+                    if(x._id == data.result._id){    
+                        localStorage.setItem("user", JSON.stringify(data.result));
+                    }
+                },
+                invalidatesTags: ["admin"]
+            }),
+            unblockUser: builder.mutation({
+                query: id => {
+                    return {
+                        url: `/unblock-user/${id}`,
+                        method: "PUT",
+                        // body: carouselData
+                    }
+                },
+                transformResponse:data => {
+                    const x = JSON.parse(localStorage.getItem("user"))
+                    console.log(x);
+                    
+                    if(x._id == data.result._id){    
+                        localStorage.setItem("user", JSON.stringify(data.result));
+                    }
+                },
+                invalidatesTags: ["admin"]
+            }),
+            addCategory: builder.mutation({
+                query: categoryData => {
+                    return {
+                        url: `/add-category`,
+                        method: "POST",
+                        body: categoryData
+                    }
+                },
+                invalidatesTags: ["admin"]
+            }),
+            deleteCategory: builder.mutation({
+                query: id=> {
+                    return {
+                        url: `/delete-category/${id}`,
+                        method: "DELETE",
+                        // body: categoryData
+                    }
+                },
+                invalidatesTags: ["admin"]
+            }),
         
         }
     }
@@ -116,5 +172,9 @@ export const {
     useAddCarouselMutation,
     useDeleteCarouselMutation,
     useUpdateStatusMutation,
-    useUpdateCarouselMutation
+    useUpdateCarouselMutation,
+    useBlockUserMutation,
+    useUnblockUserMutation,
+    useAddCategoryMutation,
+    useDeleteCategoryMutation
 } = adminApi

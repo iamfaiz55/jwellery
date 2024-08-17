@@ -26,6 +26,16 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 providesTags: ["user"]
             }),
+            getAllCAtegories: builder.query({
+                query: (id) => {
+                    return {
+                        url: `/categories`,
+                        method: "GET"
+                    }
+                },
+                transformResponse:data => data.result,
+                providesTags: ["user"]
+            }),
             getLiked: builder.query({
                 query: (id) => {
                     return {
@@ -203,7 +213,7 @@ export const userApi = createApi({
                         // console.log(userProfile.image);
                         userProfile.image = data.result.image;
                         // console.log(userProfile.image);
-                        console.log(data);
+                        // console.log(data);
                         
                          
                         localStorage.setItem("user", JSON.stringify(userProfile));
@@ -234,6 +244,7 @@ export const {
     useUpdateProfileMutation,
     useLikeMutation,
     useDeleteLikeMutation,
-    useGetLikedQuery
+    useGetLikedQuery,
+    useGetAllCAtegoriesQuery
     
 } = userApi

@@ -3,17 +3,22 @@ const adminController = require("./../controllers/admin.controller")
 
 router
     .post("/add-product", adminController.addProduct)
-    .get("/all-orders", adminController.getAllOrders)
-    .get("/all-user", adminController.getAllUsers)
+    .put("/update-product/:pUId", adminController.updateProduct)
+    .put("/delete-products/:pDId", adminController.deleteProduct)
     
     .post("/add-carousel", adminController.addCarousel)
-   
-    .put("/update-product/:pUId", adminController.updateProduct)
     .post("/update-carousel", adminController.updateCarousel)
-    .put("/update-order-status", adminController.updateOrderStatus)
-    .put("/delete-products/:pDId", adminController.deleteProduct)
     .delete("/delete-carousel/:id", adminController.deleteCarousel)
     
+    .get("/all-orders", adminController.getAllOrders)
+    .put("/update-order-status", adminController.updateOrderStatus)
+    
+    .get("/all-user", adminController.getAllUsers)
+    .put("/block-user/:uId", adminController.blockUser)
+    .put("/unblock-user/:uId", adminController.unblockUser)
+
+    .post("/add-category", adminController.addCategory)
+    .delete("/delete-category/:cId", adminController.deleteCategory)
 
 
 module.exports = router
