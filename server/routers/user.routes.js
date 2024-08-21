@@ -4,7 +4,7 @@ const adminController = require("./../controllers/admin.controller")
 
 router
     .get("/get-orders/:userId", userController.getOrders)
-    .get("/details/:pId", userController.getDetails)
+    
     .post("/add-address", userController.addAddress)
     .get("/get-address/:id", userController.getAddresses)
     .get("/get-cart/:uid", userController.getAllCartItems)
@@ -17,7 +17,7 @@ router
     .delete("/delete-like/:id", userController.deleteLiked)
     .post("/like", userController.like)
     .get("/getLiked/:uid", userController.getAllLiked)
-    .get("/get-products", userController.getAllProduct)
+
     .get("/carousel", adminController.getAllCarousels)
     .get("/filter", userController.getFilteredProducts)
     .get("/categories", userController.getAllCategory)

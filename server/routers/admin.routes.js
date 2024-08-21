@@ -1,5 +1,6 @@
 const router = require("express").Router()
 const adminController = require("./../controllers/admin.controller")
+const userController = require("./../controllers/user.controller")
 
 router
     .post("/add-product", adminController.addProduct)
@@ -19,6 +20,8 @@ router
 
     .post("/add-category", adminController.addCategory)
     .delete("/delete-category/:cId", adminController.deleteCategory)
+
+    .get("/get-contact", userController.getContacts)
 
 
 module.exports = router

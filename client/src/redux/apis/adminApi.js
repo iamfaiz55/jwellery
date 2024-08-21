@@ -111,9 +111,13 @@ export const adminApi = createApi({
                 },
                 transformResponse:data => {
                     const x = JSON.parse(localStorage.getItem("user"))
-                    console.log(x);
+                //    console.log(x._id);
+                //    console.log(data.result._id);
+             
                     
-                    if(x._id == data.result._id){    
+                    if(x._id == data.result._id){   
+                        // console.log(x);
+                        // console.log(data.result); 
                         localStorage.setItem("user", JSON.stringify(data.result));
                     }
                 },
@@ -129,7 +133,7 @@ export const adminApi = createApi({
                 },
                 transformResponse:data => {
                     const x = JSON.parse(localStorage.getItem("user"))
-                    console.log(x);
+                    // console.log(x);
                     
                     if(x._id == data.result._id){    
                         localStorage.setItem("user", JSON.stringify(data.result));
@@ -158,6 +162,18 @@ export const adminApi = createApi({
                 invalidatesTags: ["admin"]
             }),
         
+            getAllContacts: builder.query({
+                query: id=> {
+                    return {
+                        url: `/get-contact`,
+                        method: "GET",
+                        // body: categoryData
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
+        
         }
     }
 })
@@ -176,5 +192,6 @@ export const {
     useBlockUserMutation,
     useUnblockUserMutation,
     useAddCategoryMutation,
-    useDeleteCategoryMutation
+    useDeleteCategoryMutation,
+    useGetAllContactsQuery
 } = adminApi

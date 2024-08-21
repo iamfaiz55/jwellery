@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 const AllOrders = () => {
     const { user } = useSelector(state => state.userData);
-    const { data } = useGetOrdersQuery(user._id);
+    const { data, error, isError } = useGetOrdersQuery(user._id);
     const [cancelOrder, { isSuccess }] = useCancelOrderMutation()
 
     useEffect(() => {
@@ -18,8 +18,8 @@ const AllOrders = () => {
     return (
         <div className="py-14 px-8 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto space-y-8 bg-light-golden">
             {
-                user.isBlock
-                    ? <div className='text-center'>  <h1 >You Are Blocked From Admin</h1></div>
+                isError
+                    ? <div className='text-center font-bold text-3xl'>{JSON.stringify(error.data.message)}</div>
                     : <>
                         {
                             data && data.map(order => {

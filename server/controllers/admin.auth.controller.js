@@ -90,15 +90,16 @@ exports.verifyOTP = asyncHandler(async (req, res) => {
         return res.status(401).json({ message: "Invalid OTP" })
     }
     const token = jwt.sign({ userId: result._id }, process.env.JWT_KEY, { expiresIn: "1d" })
-    // JWT
+
     res.cookie("admin", token, {
         maxAge: 86400000,
+        // maxAge: 60000,
         httpOnly: true,
-        sameSite: 'Lax', // or 'Strict'
-        secure: false,   // Set to false for HTTP
-        path: '/' 
+        // sameSite: 'Lax', 
+        secure: false,   
+
     });
-    // Cookie
+ 
     res.json({
         message: "OTP Verify Success.", result: {
             _id: result._id,

@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLogoutUserMutation } from '../redux/apis/userAuthApi';
 import { filterContext, usefilter } from '../App';
 import { useSelector } from 'react-redux';
-import { useGetAllCartItemsQuery, useGetAllCAtegoriesQuery } from '../redux/apis/userApi';
+import { useGetAllCartItemsQuery } from '../redux/apis/userApi';
+import { useGetAllCAtegoriesQuery } from '../redux/apis/openApi';
 
 const UserNavbar = () => {
     const navigate = useNavigate()
@@ -11,7 +12,35 @@ const UserNavbar = () => {
     const [logoutUser] = useLogoutUserMutation();
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const { user } = useSelector(state => state.userData)
-    const { data } = useGetAllCartItemsQuery(user && user._id)
+    const { data, isError, error } = useGetAllCartItemsQuery(user && user._id)
+    let err
+    if (isError) {
+        err = error.data.message
+    }
+    // console.log(error && error.status);
+    // console.log(error && error.data.message);
+    // useEffect(() => {
+    //     if (error && error.status == 406) {
+    //         logoutUser()
+    //     }
+    // }, [isError])
+    useEffect(() => {
+        if (error && error.status === 401) {
+            logoutUser()
+        }
+    }, [error && error.status === 401])
+    // console.log(error && error.status === 401);
+
+
+
+    // useEffect(() => {
+    //   if(error.){
+
+    //   }
+    // }, [isError])
+
+
+
     const total = data && data.reduce((acc, item) => acc + item.productId.price * item.quantity, 0);
     // console.log(total);
     const { data: categories, refetch } = useGetAllCAtegoriesQuery()
@@ -30,7 +59,7 @@ const UserNavbar = () => {
 
     return (
         <div className="bg-light-golden py-1">
-            <div className="m-5 z-20 relative">
+            <div className="m-5 z-20 relative ">
                 <div className="navbar rounded-lg bg-light-golden  border-2 border-black">
                     <div className="flex-1 flex items-center space-x-4">
                         <Link to="/">
@@ -61,10 +90,10 @@ const UserNavbar = () => {
                         </div>
                         <div className="hidden md:flex flex-1 space-x-4">
                             <div className="dropdown dropdown-hover relative">
-                                <div className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                <div className="btn btn-ghost hover:bg-gray-200 transition duration-1000 ease-in-out">
                                     Products
                                 </div>
-                                <div className="dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-[400px] p-2 shadow transition-all duration-300 ease-in-out">
+                                <div className="dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-[200px] p-2 shadow transition-all duration-1000 ease-in-out">
                                     {productItems && productItems.map((item, index) => (
                                         <div
                                             key={index}
@@ -77,10 +106,10 @@ const UserNavbar = () => {
                                 </div>
                             </div>
                             <div className="dropdown dropdown-hover relative">
-                                <div className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                <div className="btn btn-ghost hover:bg-gray-200 transition duration-1000 ease-in-out">
                                     About
                                 </div>
-                                <div className="dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-[400px] p-2 shadow transition-all duration-300 ease-in-out">
+                                <div className="dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-[200px] p-2 shadow transition-all duration-1000 ease-in-out">
                                     {aboutItems.map((item, index) => (
                                         <Link
                                             to={`/user/${item}`}
@@ -92,9 +121,12 @@ const UserNavbar = () => {
                                     ))}
                                 </div>
                             </div>
+                            <Link to="/user/contact" className="btn btn-ghost">
+                                Contact
+                            </Link>
+                            <div className='p-3  font-bold'>{err}</div>
                         </div>
                     </div>
-
                     <div className="flex-none">
                         <div className="dropdown dropdown-end">
                             <div
@@ -165,7 +197,7 @@ const UserNavbar = () => {
                                 {
                                     user
                                         ? <>
-                                            <li><button onClick={() => logoutUser()} type="button" className="btn">Logout User</button></li>
+                                            <li><button onClick={() => logoutUser(user._id)} type="button" className="btn">Logout User</button></li>
 
                                         </>
                                         : <>
@@ -214,7 +246,11 @@ const UserNavbar = () => {
                                         >
                                             {item}
                                         </Link>
+
                                     ))}
+                                    <Link to="/user/contact" className="btn btn-ghost">
+                                        Contact
+                                    </Link>
                                 </div>
                             </div>
                             {/* Other sections... */}

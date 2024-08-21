@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useAddAddressMutation, useGetAddressesQuery, useGetDetailsQuery } from '../redux/apis/userApi';
+import { useAddAddressMutation, useGetAddressesQuery } from '../redux/apis/userApi';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '../App';
+import { useGetDetailsQuery } from '../redux/apis/openApi';
 
 const CheckOut = () => {
     const { cartData, setCartData } = useCart();
@@ -13,9 +14,9 @@ const CheckOut = () => {
 
 
     const { user } = useSelector(state => state.userData);
-    const { data, error: addressError } = useGetAddressesQuery(user._id);
+    const { data, error: addressError } = useGetAddressesQuery(user && user._id);
     const { id } = useParams()
-    const { data: product, error } = useGetDetailsQuery(id)
+    const { data: product, error, isError } = useGetDetailsQuery(id)
     // console.log(product);
     const navigate = useNavigate()
     const handlePayNow = () => {
@@ -49,10 +50,10 @@ const CheckOut = () => {
         setSelectedAddress(addressId);
     };
     useEffect(() => {
-        if (error || addressError) {
-            console.error("Failed to fetch data:", { error, addressError });
+        if (error) {
+            toast.error(error.data.message);
         }
-    }, [error, addressError]);
+    }, [error]);
     return (
         <>
             <div className="h-screen grid grid-cols-3">
@@ -98,40 +99,47 @@ const CheckOut = () => {
                             </svg>
                         </div>
                     </div>
-                    <button className="btn bg-yellow-400 text-black hover:bg-yellow-500" onClick={() => document.getElementById('add').showModal()}>Add Address</button>
-                    <dialog id="add" className="modal">
-                        <div className="modal-box bg-yellow-50">
-                            <h3 className="font-bold text-lg text-yellow-800">Add Address</h3>
-                            <Form />
-                        </div>
-                    </dialog>
-                    {/* Address List with Checkbox */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-md">
-                        {data && data.map((item) => (
-                            <div key={item._id} className="overflow-hidden group relative rounded-lg p-1 flex justify-center items-center">
-                                <div className="hidden group-hover:block animate-gradient absolute top-0 left-0 w-full h-full bg-gradient-to-r from-yellow-300 via-yellow-100 to-yellow-500 rounded-lg shadow-xl"></div>
-                                <label className="relative z-10 w-full bg-white p-6 sm:p-8 rounded-lg flex items-center cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        className="form-checkbox h-5 w-5 text-yellow-500"
-                                        checked={selectedAddress === item._id}
-                                        onChange={() => handleAddressChange(item._id)}
-                                    />
-                                    <div className="ml-4">
-                                        <h3 className="text-xl font-bold text-gray-900">{item.addressType}</h3>
-                                        <p className="mt-2 text-sm text-gray-500">House {item.houseNo}</p>
-                                        <p className="mt-2 text-sm text-gray-500">Country {item.country}</p>
-                                        <p className="mt-2 text-sm text-gray-500">State {item.state}</p>
-                                        <p className="mt-2 text-sm text-gray-500">Pincode {item.pincode}</p>
-                                        <p className="mt-2 text-sm text-gray-500">Mobile {item.mobile}</p>
+                    {
+                        isError
+                            ? <><div className='text-center font-bold text-3xl'>{error.data.message}</div></>
+                            : <>
+                                <button className="btn bg-yellow-400 text-black hover:bg-yellow-500" onClick={() => document.getElementById('add').showModal()}>Add Address</button>
+                                <dialog id="add" className="modal">
+                                    <div className="modal-box bg-yellow-50">
+                                        <h3 className="font-bold text-lg text-yellow-800">Add Address</h3>
+                                        <Form />
                                     </div>
-                                </label>
-                            </div>
-                        ))}
-                    </div>
-                    <button onClick={handlePayNow} className="submit-button px-4 py-3 rounded-full bg-yellow-400 text-white w-full text-xl font-semibold transition-colors hover:bg-yellow-500">
-                        Pay Now
-                    </button>
+                                </dialog>
+                                {/* Address List with Checkbox */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-md">
+                                    {data && data.map((item) => (
+                                        <div key={item._id} className="overflow-hidden group relative rounded-lg p-1 flex justify-center items-center">
+                                            <div className="hidden group-hover:block animate-gradient absolute top-0 left-0 w-full h-full bg-gradient-to-r from-yellow-300 via-yellow-100 to-yellow-500 rounded-lg shadow-xl"></div>
+                                            <label className="relative z-10 w-full bg-white p-6 sm:p-8 rounded-lg flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-checkbox h-5 w-5 text-yellow-500"
+                                                    checked={selectedAddress === item._id}
+                                                    onChange={() => handleAddressChange(item._id)}
+                                                />
+                                                <div className="ml-4">
+                                                    <h3 className="text-xl font-bold text-gray-900">{item.addressType}</h3>
+                                                    <p className="mt-2 text-sm text-gray-500">House {item.houseNo}</p>
+                                                    <p className="mt-2 text-sm text-gray-500">Country {item.country}</p>
+                                                    <p className="mt-2 text-sm text-gray-500">State {item.state}</p>
+                                                    <p className="mt-2 text-sm text-gray-500">Pincode {item.pincode}</p>
+                                                    <p className="mt-2 text-sm text-gray-500">Mobile {item.mobile}</p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button onClick={handlePayNow} className="submit-button px-4 py-3 rounded-full bg-yellow-400 text-white w-full text-xl font-semibold transition-colors hover:bg-yellow-500">
+                                    Pay Now
+                                </button>
+                            </>
+
+                    }
                 </div>
 
                 <div className="col-span-1 bg-white lg:block hidden">
@@ -200,7 +208,7 @@ const CheckOut = () => {
 const Form = ({ edit }) => {
     const { user } = useSelector((state) => state.userData);
 
-    const [addAddress, { isSuccess, isLoading }] = useAddAddressMutation()
+    const [addAddress, { isSuccess, isLoading, isError, error }] = useAddAddressMutation()
     const formik = useFormik({
         enableReinitialize: true,
         initialValues: edit || {
@@ -239,6 +247,12 @@ const Form = ({ edit }) => {
     }, [isSuccess])
 
     // let isLoading = false
+    useEffect(() => {
+        if (isError) {
+            toast.error(error.data.message)
+        }
+    }, [isError])
+
     return <>
         {
             isLoading

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAddCategoryMutation, useDeleteCategoryMutation } from '../redux/apis/adminApi';
 import { toast } from 'sonner';
-import { useGetAllCAtegoriesQuery } from '../redux/apis/userApi';
+import { useGetAllCAtegoriesQuery } from '../redux/apis/openApi';
+// import { useGetAllCAtegoriesQuery } from '../redux/apis/userApi';
 
 const Categories = () => {
     const [categoryData, setCategoryData] = useState('');

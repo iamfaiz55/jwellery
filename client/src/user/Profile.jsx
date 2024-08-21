@@ -11,8 +11,8 @@ const Profile = () => {
     // const { setBlock, block } = useblock()
     const [updateProfile, { isSuccess, isLoading }] = useUpdateProfileMutation();
     const { user } = useSelector(state => state.userData);
-    const { data } = useGetAddressesQuery(user._id);
-    // console.log(block);
+    const { data, error, isError } = useGetAddressesQuery(user._id);
+    // console.log(isError);
 
 
     const fileInputRef = useRef();
@@ -47,7 +47,7 @@ const Profile = () => {
             {
                 user.isBlock
                     ? <>
-                        <h1>You Are Blocked From Admin</h1>
+                        <div className='text-3xl font-bold '>You Are Blocked From Admin</div>
                     </>
                     : <>
                         <div className="relative flex flex-col items-center rounded-2xl w-full max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-light-golden shadow-2xl p-6">
@@ -94,23 +94,29 @@ const Profile = () => {
                                 </dialog>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-                                {data && data.map((item, index) => (
-                                    <motion.div
-                                        key={index}
-                                        className="overflow-hidden group relative rounded-lg p-1 flex justify-center items-center"
-                                        whileHover={{ scale: 1.05 }}
-                                        transition={{ duration: 0.3 }}
-                                    >
-                                        <div className="hidden group-hover:block animate-gradient absolute top-0 left-0 w-full h-full bg-gradient-to-r from-zinc-900 via-gray-200/40 to-zinc-700 rounded-lg shadow-xl"></div>
-                                        <a className="relative z-10 w-full bg-white p-6 sm:p-8 rounded-lg">
-                                            <h3 className="text-xl font-bold text-gray-900">Home</h3>
-                                            <p className="mt-2 text-sm text-gray-500">House No: {item.houseNo}</p>
-                                            <p className="mt-2 text-sm text-gray-500">Country: {item.country}</p>
-                                            <p className="mt-2 text-sm text-gray-500">State: {item.state}</p>
-                                            <p className="mt-2 text-sm text-gray-500">Pincode: {item.pincode}</p>
-                                        </a>
-                                    </motion.div>
-                                ))}
+                                {
+                                    isError
+                                        ? <><div className='text-center font-bold text-3xl'>{JSON.stringify(error.data.message)}</div></>
+                                        : <>
+                                            {data && data.map((item, index) => (
+                                                <motion.div
+                                                    key={index}
+                                                    className="overflow-hidden group relative rounded-lg p-1 flex justify-center items-center"
+                                                    whileHover={{ scale: 1.05 }}
+                                                    transition={{ duration: 0.3 }}
+                                                >
+                                                    <div className="hidden group-hover:block animate-gradient absolute top-0 left-0 w-full h-full bg-gradient-to-r from-golden via-light-golden to-golden rounded-lg shadow-xl"></div>
+                                                    <a className="relative z-10 w-full bg-white p-6 sm:p-8 rounded-lg">
+                                                        <h3 className="text-xl font-bold text-gray-900">Home</h3>
+                                                        <p className="mt-2 text-sm text-gray-500">House No: {item.houseNo}</p>
+                                                        <p className="mt-2 text-sm text-gray-500">Country: {item.country}</p>
+                                                        <p className="mt-2 text-sm text-gray-500">State: {item.state}</p>
+                                                        <p className="mt-2 text-sm text-gray-500">Pincode: {item.pincode}</p>
+                                                    </a>
+                                                </motion.div>
+                                            ))}
+                                        </>
+                                }
                             </div>
                         </div>
                     </>

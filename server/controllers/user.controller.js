@@ -9,6 +9,7 @@ const upload = require("../utils/upload")
 const cloudinary = require("../utils/uploadCloud.config")
 const Liked = require("../models/Liked")
 const Categories = require("../models/Categories")
+const Contact = require("../models/Contact")
 // const Liked = require("../models/Liked")
 
 // const Ordre = require("../models/Ordre")
@@ -191,14 +192,22 @@ exports.getFilteredProducts = asyncHandler(async (req, res) => {
     const { productType } = req.query;
 
  
-    const validProductTypes = [
-        "rings", "earings", "necklace", "mangalsutra", "chain", "pendent", 
-        "nose-pin", "bangles", "forehead-ornament", "anklet", "coins"
-    ];
-    if (!validProductTypes.includes(productType)) {
+    // const validProductTypes = [
+    //     "rings", "earings", "necklace", "mangalsutra", "chain", "pendent", 
+    //     "nose-pin", "bangles", "forehead-ornament", "anklet", "coins"
+    // ];
+    // if (!validProductTypes.includes(productType)) {
+    //     return res.status(400).json({ message: "Invalid product type" });
+    // }
+    const result = await Categories.find()
+//    console.log(result);
+      const types = result.map(item => {
+          return item.category
+      })
+    //   console.log(types);
+        if (!types.includes(productType)) {
         return res.status(400).json({ message: "Invalid product type" });
     }
-
    
         const products = await Product.find({ productType });
 
@@ -244,3 +253,25 @@ exports.getAllCategory = asyncHandler(async(req, res)=> {
       const result = await Categories.find()
       res.json({message:"Categories Get Success", result })
     })
+
+
+
+exports.contact = asyncHandler(async(req, res)=> {
+    const {name, email, subject, message} = req.body
+    const {isError, error}= checkEmpty({name, email, subject, message})
+    
+    if(isError){
+        return res.status(400).json({message :"All Fields Required"})
+    }
+    await Contact.create({name, email, message, subject})
+
+    res.json({message:"Message Sent Success"})
+})
+
+exports.getContacts = asyncHandler(async(req, res)=> {
+    // const {name, email, subject, message} = req.body
+  
+    const result = await Contact.find()
+
+    res.json({message:"Messages Get Success", result})
+})

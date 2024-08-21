@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAddCarouselMutation, useDeleteCarouselMutation, useUpdateCarouselMutation } from '../redux/apis/adminApi';
 import { toast } from 'sonner';
-import { useGetCArouselQuery } from '../redux/apis/userApi';
+import { useGetCArouselQuery } from '../redux/apis/openApi';
+// import { useGetCArouselQuery } from '../redux/apis/userApi';
 
 const AddCarousel = () => {
     const [deleteCarousel, { isSuccess: carouselDelete, error: deleteError }] = useDeleteCarouselMutation();
@@ -97,7 +98,7 @@ const AddCarousel = () => {
 
     return (
         <>
-            <div className='bg-light-golden h-screen'>
+            <div className='bg-light-golden '>
                 <div className='p-4'>
                     <div className="text-end mb-4">
                         <button

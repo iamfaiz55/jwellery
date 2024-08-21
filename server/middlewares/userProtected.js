@@ -1,18 +1,31 @@
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-
-exports.userProtected = (req, res, next) => {
-    const { user } = req.cookies
+exports.userProtected = async (req, res, next) => {
+    const { user } = req.cookies;
     if (!user) {
-        return res.status(401).json({ message: "NO Cookie Found" })
+        return res.status(401).json({ message: "Session Expired Re Login Please" });
     }
-    jwt.verify(user, process.env.JWT_KEY, (err, decode) => {
+
+    jwt.verify(user, process.env.JWT_KEY, async (err, decode) => {
         if (err) {
             console.log(err);
-            return res.status(401).json({ message: "JWT Error", error: err.message });
+            return res.status(400).json({ message: "JWT Error", error: err.message });
         }
-        console.log(decode); // Check what decode contains
-        req.loggedInUser = decode.userId;
-        next();
+
+
+            const loggedInUser = await User.findById(decode.userId);
+
+            if (!loggedInUser) {
+                return res.status(405).json({ message: "User not found" });
+            }
+
+            if (loggedInUser.isBlock) {
+                return res.status(406).json({ message: "You are blocked From Admin" });
+            }
+
+            req.loggedInUser = loggedInUser._id;
+            next();
+  
     });
-}
+};

@@ -49,6 +49,7 @@ exports.loginUser = asyncHandler(async (req, res) => {
 
     res.cookie("user", token, {
         maxAge: 86400000,
+        // maxAge: 60000,
         httpOnly: true,
     })
 

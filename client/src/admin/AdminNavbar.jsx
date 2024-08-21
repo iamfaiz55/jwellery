@@ -3,8 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLogoutAdminMutation } from '../redux/apis/adminAuthApi';
 import { toast } from 'sonner';
 import { useSelector } from 'react-redux';
+// import { useGetCArouselQuery } from '../redux/apis/openApi';
+import { useGetAllOrdersQuery } from '../redux/apis/adminApi';
 
 const AdminNavbar = () => {
+    const { data, isError, error } = useGetAllOrdersQuery();
+
+
     const navigate = useNavigate();
     const [logoutAdmin, { isSuccess }] = useLogoutAdminMutation();
     const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -15,6 +20,13 @@ const AdminNavbar = () => {
             navigate("/admin/login");
         }
     }, [isSuccess]);
+    useEffect(() => {
+        if (error) {
+            logoutAdmin()
+            toast.error(error.data.message)
+        }
+    }, [isError])
+
 
     return (
         <div className="bg-light-golden py-1">
@@ -47,6 +59,9 @@ const AdminNavbar = () => {
                                     </Link>
                                     <Link to="/admin/categories" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
                                         Categories
+                                    </Link>
+                                    <Link to="/admin/get-contacts" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                        Contacts
                                     </Link>
                                 </div>
                                 {

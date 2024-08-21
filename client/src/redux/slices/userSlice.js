@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { userAuthApi } from "../apis/userAuthApi";
+import { useSelector } from "react-redux";
 
+// const  useSelector(state => state.userData)
 const userSlice= createSlice({
     name: "userSlice",
     initialState: {

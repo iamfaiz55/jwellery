@@ -26,16 +26,16 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 providesTags: ["user"]
             }),
-            getAllCAtegories: builder.query({
-                query: (id) => {
-                    return {
-                        url: `/categories`,
-                        method: "GET"
-                    }
-                },
-                transformResponse:data => data.result,
-                providesTags: ["user"]
-            }),
+            // getAllCAtegories: builder.query({
+            //     query: (id) => {
+            //         return {
+            //             url: `/categories`,
+            //             method: "GET"
+            //         }
+            //     },
+            //     transformResponse:data => data.result,
+            //     providesTags: ["user"]
+            // }),
             getLiked: builder.query({
                 query: (id) => {
                     return {
@@ -47,37 +47,37 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 providesTags: ["user"]
             }),
-            getFilteredData: builder.query({
-                query: (type) => {
-                    return {
-                        url: `/filter`,
-                        method: "GET",
-                         params:type
-                    }
-                },
-                transformResponse:data => data.result,
-                providesTags: ["user"]
-            }),
-            getCArousel: builder.query({
-                query: (id) => {
-                    return {
-                        url: `/carousel`,
-                        method: "GET"
-                    }
-                },
-                transformResponse:data => data.result,
-                providesTags: ["user"]
-            }),
-            getAllProducts: builder.query({
-                query: () => {
-                    return {
-                        url: "/get-products",
-                        method: "GET"
-                    }
-                },
-                transformResponse:data =>data.result,
-                providesTags: ["user"]
-            }),
+            // getFilteredData: builder.query({
+            //     query: (type) => {
+            //         return {
+            //             url: `/filter`,
+            //             method: "GET",
+            //              params:type
+            //         }
+            //     },
+            //     transformResponse:data => data.result,
+            //     providesTags: ["user"]
+            // }),
+            // getCArousel: builder.query({
+            //     query: (id) => {
+            //         return {
+            //             url: `/carousel`,
+            //             method: "GET"
+            //         }
+            //     },
+            //     transformResponse:data => data.result,
+            //     providesTags: ["user"]
+            // }),
+            // getAllProducts: builder.query({
+            //     query: () => {
+            //         return {
+            //             url: "/get-products",
+            //             method: "GET"
+            //         }
+            //     },
+            //     transformResponse:data =>data.result,
+            //     providesTags: ["user"]
+            // }),
             addAddress: builder.mutation({
                 query: addressData => {
                     return {
@@ -88,17 +88,17 @@ export const userApi = createApi({
                 },
                 invalidatesTags: ["user"]
             }),
-            getDetails: builder.query({
-                query: id => {
-                    return {
-                        url: `/details/${id}`,
-                        method: "GET",
-                        // body: addressData
-                    }
-                },
-                transformResponse:data => data.result,
-                providesTags: ["user"]
-            }),
+            // getDetails: builder.query({
+            //     query: id => {
+            //         return {
+            //             url: `/details/${id}`,
+            //             method: "GET",
+            //             // body: addressData
+            //         }
+            //     },
+            //     transformResponse:data => data.result,
+            //     providesTags: ["user"]
+            // }),
             getAddresses: builder.query({
                 query: id => {
                     return {
@@ -209,14 +209,9 @@ export const userApi = createApi({
                 transformResponse:data => {
                     const userProfile = JSON.parse(localStorage.getItem("user"));
         
-                    if (userProfile) {
-                        // console.log(userProfile.image);
-                        userProfile.image = data.result.image;
-                        // console.log(userProfile.image);
-                        // console.log(data);
-                        
-                         
-                        localStorage.setItem("user", JSON.stringify(userProfile));
+                    if (userProfile._id == data.result._id) {
+                        // userProfile.image = data.result.image;
+                        localStorage.setItem("user", JSON.stringify(data.result));
                     }   
                 },
                 invalidatesTags: ["user"]
@@ -229,22 +224,22 @@ export const userApi = createApi({
 export const { 
     useAddAddressMutation,
     useGetAddressesQuery,
-    useGetDetailsQuery,
+    // useGetDetailsQuery,
     useGetOrdersQuery,
     useAddCartMutation,
     useGetAllCartItemsQuery,
     useDeleteCArtItemMutation,
     useCreateOrderMutation,
     useDeleteFullCartMutation,
-    useGetAllProductsQuery,
+    // useGetAllProductsQuery,
     useCancelOrderMutation,
-    useGetCArouselQuery,
+    // useGetCArouselQuery,
     // useGetFilteredDataQuery,
-    useLazyGetFilteredDataQuery,
+    // useLazyGetFilteredDataQuery,
     useUpdateProfileMutation,
     useLikeMutation,
     useDeleteLikeMutation,
     useGetLikedQuery,
-    useGetAllCAtegoriesQuery
+    // useGetAllCAtegoriesQuery
     
 } = userApi

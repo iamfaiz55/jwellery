@@ -4,15 +4,20 @@ import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 import { useAddProductMutation, useDeleteProductMutation, useUpdateProdMutation } from '../redux/apis/adminApi'
-import { useGetAllProductsQuery } from '../redux/apis/userApi'
+import { useGetAllProductsQuery } from '../redux/apis/openApi'
+// import { useGetAllProductsQuery } from '../redux/apis/userApi'
 
 const Dashboard = () => {
   const [editData, setEditData] = useState({})
-  const { data, refetch } = useGetAllProductsQuery()
+  const { data, refetch, isError: isProdError, error: prodError } = useGetAllProductsQuery()
   const [deleteProduct, { isSuccess: deleteSuccess, isError, error }] = useDeleteProductMutation()
 
 
   const navigate = useNavigate()
+  // useEffect(() => {
+  //   is
+  // }, [isProdError])
+
 
   useEffect(() => {
     if (deleteSuccess) {

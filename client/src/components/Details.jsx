@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAddCartMutation, useGetDetailsQuery, useLikeMutation } from '../redux/apis/userApi';
+import { useAddCartMutation, useLikeMutation } from '../redux/apis/userApi';
 import { toast } from 'sonner';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
+import { useGetDetailsQuery } from '../redux/apis/openApi';
 
 const Details = () => {
     const { id } = useParams();
-    const { data } = useGetDetailsQuery(id);
+    const { data, isError: isDetailError, error: detailsError } = useGetDetailsQuery(id);
+    // console.log(id);
+
     const navigate = useNavigate();
-    const [addToCart, { isSuccess }] = useAddCartMutation();
+    const [addToCart, { isSuccess, isError: isAddError, error: addError }] = useAddCartMutation();
     const { user } = useSelector(state => state.userData);
     const [like, { isSuccess: likeSuccesss, isError, error }] = useLikeMutation()
 
@@ -28,6 +31,13 @@ const Details = () => {
             toast.error(JSON.stringify(error.data.message));
         }
     }, [isError]);
+    // console.log(detailsError);
+
+    useEffect(() => {
+        if (isAddError) {
+            toast.error(addError.data.message)
+        }
+    }, [isAddError])
 
     return (
         <section className="text-gray-700 body-font overflow-hidden bg-light-golden">

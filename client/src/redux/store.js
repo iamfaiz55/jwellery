@@ -5,6 +5,7 @@ import { adminApi } from "./apis/adminApi";
 import { userAuthApi } from "./apis/userAuthApi";
 import userSlice from "./slices/userSlice";
 import { userApi } from "./apis/userApi";
+import { openApi } from "./apis/openApi";
 
 
 const reduxStore = configureStore({
@@ -13,6 +14,7 @@ const reduxStore = configureStore({
         [adminApi.reducerPath]: adminApi.reducer,
         [userAuthApi.reducerPath]: userAuthApi.reducer,
         [userApi.reducerPath]: userApi.reducer,
+        [openApi.reducerPath]: openApi.reducer,
         adminData: adminSlice,
         userData:userSlice,
     },
@@ -21,7 +23,8 @@ const reduxStore = configureStore({
          adminAuthApi.middleware,
          adminApi.middleware,
          userAuthApi.middleware,
-         userApi.middleware
+         userApi.middleware,
+         openApi.middleware
         ]
 })
 

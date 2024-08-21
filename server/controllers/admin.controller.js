@@ -233,9 +233,6 @@ exports.updateCarousel = asyncHandler(async (req, res) => {
 })
 exports.blockUser = asyncHandler(async(req, res)=> {
   const {uId}= req.params
-
-
-
  const updated= await User.findByIdAndUpdate(uId, {isBlock:true})
   
   res.json({message:"User Blocked Success", result:{

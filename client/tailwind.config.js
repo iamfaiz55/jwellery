@@ -9,7 +9,18 @@ export default {
       colors: {
         'light-golden': '#f9f2e8', 
          "golden": '#f5c518',
-        'golden-dark': '#f4b400'
+        'golden-dark': '#f4b400',
+        'amber': {
+          100: '#fef3c7',
+          200: '#fde68a',
+          300: '#fcd34d',
+          400: '#fbbf24',
+          500: '#f59e0b',
+          600: '#eab308',
+          700: '#ca8a04',
+          800: '#a16207',
+          900: '#854d0e',
+        },
       },
     },
   },
