@@ -10,6 +10,8 @@ const cloudinary = require("../utils/uploadCloud.config")
 const Liked = require("../models/Liked")
 const Categories = require("../models/Categories")
 const Contact = require("../models/Contact")
+const { paymentRazorpay } = require("..")
+// const { payment } = require("..")
 // const Liked = require("../models/Liked")
 
 // const Ordre = require("../models/Ordre")
@@ -26,7 +28,11 @@ exports.createOrder = asyncHandler(async (req, res) => {
     const { cardDetails, deliveryAddressId, paymentMethod, orderItems, subtotal, userId } = req.body;
     
     // console.log(req.body);
-    
+    const options = {
+        amount: 50000,
+        currency:"INR"
+    }
+    // const orderPayment = await paymentRazorpay(options)
     const orderItems1 = orderItems.map(item => ({
         productId: item._id, 
         quantity: item.quantity || 1
@@ -218,7 +224,6 @@ exports.getFilteredProducts = asyncHandler(async (req, res) => {
 
 
 exports.updateProfile = asyncHandler(async (req, res) => {
-
     upload(req, res, async (err) => {
         if (err) {
             return res.status(500).json({ message: 'Error uploading file' });
@@ -230,8 +235,7 @@ exports.updateProfile = asyncHandler(async (req, res) => {
             if (user.image) {
                 const existing = user.image.split('/').pop().split('.')[0];
                     await cloudinary.uploader.destroy(existing);
-            }
-        
+            }  
         const {secure_url} = await cloudinary.uploader.upload(req.files[0].path);
         // console.log(req.body.userId);
         

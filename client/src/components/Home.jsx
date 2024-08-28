@@ -27,7 +27,6 @@ const Home = () => {
         }
     }, [isError])
 
-    // console.log(filteredData);
 
     const { data: products, isSuccess: mainData } = useGetAllProductsQuery();
     const { data: carousel = [] } = useGetCArouselQuery();

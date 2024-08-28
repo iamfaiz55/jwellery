@@ -14,9 +14,9 @@ const UserNavbar = () => {
     const { user } = useSelector(state => state.userData)
     const { data, isError, error } = useGetAllCartItemsQuery(user && user._id)
     let err
-    if (isError) {
-        err = error.data.message
-    }
+    // if (isError) {
+    //     err = error && error.data.message
+    // }
     // console.log(error && error.status);
     // console.log(error && error.data.message);
     // useEffect(() => {
