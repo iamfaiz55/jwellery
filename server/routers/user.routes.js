@@ -23,5 +23,9 @@ router
     .get("/categories", userController.getAllCategory)
 
 
+    .post("/razorpay", userController.razorpay)
+    .post("/verify-payment", userController.verifyPayment)
+
+
 
 module.exports = router

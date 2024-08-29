@@ -10,7 +10,11 @@ const cloudinary = require("../utils/uploadCloud.config")
 const Liked = require("../models/Liked")
 const Categories = require("../models/Categories")
 const Contact = require("../models/Contact")
-const { paymentRazorpay } = require("..")
+require("dotenv").config({path:""})
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
+const { v4: uuid } = require("uuid");
+
 // const { payment } = require("..")
 // const Liked = require("../models/Liked")
 
@@ -27,11 +31,7 @@ const {userId}=req.params
 exports.createOrder = asyncHandler(async (req, res) => {
     const { cardDetails, deliveryAddressId, paymentMethod, orderItems, subtotal, userId } = req.body;
     
-    // console.log(req.body);
-    const options = {
-        amount: 50000,
-        currency:"INR"
-    }
+   
     // const orderPayment = await paymentRazorpay(options)
     const orderItems1 = orderItems.map(item => ({
         productId: item._id, 
@@ -49,6 +49,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
 
     res.status(201).json({ message: "Order created successfully" });
 });
+
 
 
 exports.addAddress = asyncHandler(async(req, res)=> {
@@ -279,3 +280,50 @@ exports.getContacts = asyncHandler(async(req, res)=> {
 
     res.json({message:"Messages Get Success", result})
 })
+
+const razorpay = new Razorpay({
+    key_id:"rzp_test_8g7frJOzzN5wml",
+    key_secret:"TmMcFsowpC7bQCKy5wedym1W"
+})
+exports.razorpay = asyncHandler(async (req, res) => {
+
+       if(!req.body){
+           return res.status(400).json({message:"body me nhi aaya"})
+        }
+    const options = {amount:req.body.subtotal *100, receipt:req.body.receipt, currency:req.body.currency}
+    const order = await razorpay.orders.create(options)
+    res.json({message:"initiate ", result:order})
+});
+
+exports.verifyPayment = asyncHandler(async (req, res) => {
+//  console.log("req.body",req.body);
+const {razorpay_order_id, razorpay_payment_id, deliveryAddressId, paymentMethod, orderItems, subtotal, userId } = req.body;
+    
+   
+    const OrderItems2 = orderItems.map(item => ({
+        productId: item._id,
+        quantity: item.quantity || 1,
+    }));
+
+    const newOrder = await Order.create({
+        userId,
+        deliveryAddressId,
+        paymentMethod,
+        orderItems: OrderItems2,
+        total: subtotal,
+        razorpay_payment_id,
+        razorpay_order_id,
+    });
+console.log(newOrder);
+
+
+    const order2 = await razorpay.orders.create({
+        amount: subtotal * 100,
+        currency: "INR",
+        receipt: uuid(),
+    });
+
+// console.log("order2",order2);
+
+     res.json({message: "Payment verified and order Success"});
+});

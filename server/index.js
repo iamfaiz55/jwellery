@@ -4,15 +4,10 @@ const cors = require("cors")
 const cookieparser = require("cookie-parser")
 const { adminProtected } = require("./middlewares/admin.protected")
 const { userProtected } = require("./middlewares/userProtected")
-const Razorpay = require("razorpay")
+// const Razorpay = require("razorpay")
 // const { default: UserProtected } = require("../client/src/share/UserProtected")
 require("dotenv").config()
 
-// Admin.find().then()
-exports.paymentRazorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_API_KEY,
-    key_secret: process.env.RAZORPAY_API_SECRET
-})
 
 mongoose.connect(process.env.MONGO_URL)
 const app = express()

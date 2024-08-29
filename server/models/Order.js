@@ -45,6 +45,12 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ["delivered", "pending", "shipped", "cancelled", "dispatched"],
         default: "pending"
+    },
+    razorpay_payment_id:{
+        type:String
+    },
+    razorpay_order_id:{
+        type:String
     }
 }, { timestamps: true });
 

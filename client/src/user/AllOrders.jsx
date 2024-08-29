@@ -116,12 +116,7 @@ const AllOrders = () => {
                                                     <p className="text-lg md:text-xl dark:text-white font-semibold leading-6 xl:leading-5 text-gray-800 ">
                                                         {/* Order # */}
                                                     </p>
-                                                    <button
-                                                        onClick={e => cancelOrder(order._id)}
-                                                        className="btn bg-yellow-400 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition"
-                                                    >
-                                                        Cancel Order
-                                                    </button>
+
                                                 </div>
                                                 {order.orderItems.map((item) => (
                                                     <div

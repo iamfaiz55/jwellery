@@ -198,6 +198,28 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 invalidatesTags: ["user"]
             }),
+           razorpay: builder.mutation({
+                query: data => {
+                    return {
+                        url: `/razorpay`,
+                        method: "POST",
+                        body: data
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["user"]
+            }),
+          verifyPayment: builder.mutation({
+                query: verifydata => {
+                    return {
+                        url: `/verify-payment`,
+                        method: "POST",
+                        body: verifydata
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["user"]
+            }),
             updateProfile: builder.mutation({
                 query: data => {
                     return {
@@ -216,6 +238,7 @@ export const userApi = createApi({
                 },
                 invalidatesTags: ["user"]
             }),
+
         
         }
     }
@@ -240,6 +263,8 @@ export const {
     useLikeMutation,
     useDeleteLikeMutation,
     useGetLikedQuery,
-    // useGetAllCAtegoriesQuery
+    // useGetAllCAtegoriesQuery,
+    useRazorpayMutation,
+    useVerifyPaymentMutation
     
 } = userApi
