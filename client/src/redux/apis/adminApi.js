@@ -161,11 +161,43 @@ export const adminApi = createApi({
                 },
                 invalidatesTags: ["admin"]
             }),
+            unableMethod: builder.mutation({
+                query: id=> {
+                    return {
+                        url: `/enable-method/${id}`,
+                        method: "PUT",
+                        // body: categoryData
+                    }
+                },
+                invalidatesTags: ["admin"]
+            }),
+            disableMethod: builder.mutation({
+                query: id=> {
+                    return {
+                        url: `/disable-method/${id}`,
+                        method: "PUT",
+                        // body: categoryData
+                    }
+                },
+                invalidatesTags: ["admin"]
+            }),
         
             getAllContacts: builder.query({
                 query: id=> {
                     return {
                         url: `/get-contact`,
+                        method: "GET",
+                        // body: categoryData
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
+        
+            getAllPaymentMethod: builder.query({
+                query: id=> {
+                    return {
+                        url: `/get-all-payment-method`,
                         method: "GET",
                         // body: categoryData
                     }
@@ -193,5 +225,10 @@ export const {
     useUnblockUserMutation,
     useAddCategoryMutation,
     useDeleteCategoryMutation,
-    useGetAllContactsQuery
+    useGetAllContactsQuery,
+
+
+    useGetAllPaymentMethodQuery,
+  useUnableMethodMutation,
+  useDisableMethodMutation
 } = adminApi

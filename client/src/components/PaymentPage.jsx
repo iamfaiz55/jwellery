@@ -4,41 +4,26 @@ import { useCreateOrderMutation, useDeleteFullCartMutation, useRazorpayMutation,
 import { toast } from 'sonner';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useGetAllPaymentMethodQuery } from '../redux/apis/adminApi';
 
 const PaymentPage = () => {
     const [raz, { isSuccess: razSuccess, data }] = useRazorpayMutation();
-    // console.log(data);
-    const [initiate, { isSuccess: initiateSuccess }] = useVerifyPaymentMutation()
+    const { data: paymentMethods } = useGetAllPaymentMethodQuery();
+    const [initiate, { isSuccess: initiateSuccess }] = useVerifyPaymentMutation();
 
     const { user } = useSelector(state => state.userData);
     const [createOrder, { isSuccess }] = useCreateOrderMutation();
     const { cartData, setCartData } = useCart();
     const [deleteFull, { isSuccess: deleteSuccess }] = useDeleteFullCartMutation();
     const [paymentMethod, setPaymentMethod] = useState('');
-    const [cardDetails, setCardDetails] = useState({
-        cardHolder: '',
-        cardNumber: '',
-        expiryMonth: '',
-        expiryYear: '',
-        securityCode: '',
-    });
+
 
     const handlePaymentMethodChange = (event) => {
         setPaymentMethod(event.target.value);
     };
 
-    const handleCardDetailsChange = (event) => {
-        const { name, value } = event.target;
-        setCardDetails(prevDetails => ({
-            ...prevDetails,
-            [name]: value,
-        }));
-    };
 
-
-
-
-    let x = `${user._id}${user.name}`
+    let x = `${user._id}${user.name}`;
     const handleSubmit = (event) => {
         event.preventDefault();
 
@@ -50,7 +35,7 @@ const PaymentPage = () => {
                 _id: item.productId._id,
                 quantity: item.quantity
             })),
-            ...(paymentMethod === 'card' && { cardDetails })
+
         };
 
         if (paymentMethod === 'razorpay') {
@@ -63,7 +48,7 @@ const PaymentPage = () => {
             createOrder({ ...orderData, userId: user._id });
         }
     };
-    // deliveryAddressId, paymentMethod, orderItems,userID
+
     useEffect(() => {
         if (razSuccess) {
             const razor = new window.Razorpay({
@@ -91,14 +76,15 @@ const PaymentPage = () => {
                     })),
                     subtotal: cartData.subtotal
                 }),
-            })
+            });
             razor.on('payment.failed', (res) => {
-                console.log('Payment Failed: ' + res.error.description)
+                console.log('Payment Failed: ' + res.error.description);
             });
 
-            razor.open()
+            razor.open();
         }
-    }, [razSuccess, data])
+    }, [razSuccess, data]);
+
     const navigate = useNavigate();
     useEffect(() => {
         if (isSuccess) {
@@ -108,6 +94,7 @@ const PaymentPage = () => {
             localStorage.removeItem("cartData");
         }
     }, [isSuccess]);
+
     useEffect(() => {
         if (initiateSuccess) {
             toast.success("Order placed successfully! Thank you.");
@@ -116,15 +103,6 @@ const PaymentPage = () => {
             localStorage.removeItem("cartData");
         }
     }, [initiateSuccess]);
-
-    useEffect(() => {
-        if (razSuccess) {
-            toast.success("Payment nikal gai");
-            // deleteFull({ userId: user._id });
-            // setCartData({});
-            // localStorage.removeItem("cartData");
-        }
-    }, [razSuccess]);
 
     useEffect(() => {
         if (deleteSuccess) {
@@ -166,89 +144,7 @@ const PaymentPage = () => {
                             Payment Options
                         </h1>
                         <form onSubmit={handleSubmit}>
-                            {paymentMethod === 'card' && (
-                                <>
-                                    <div className="my-2">
-                                        <input
-                                            type="text"
-                                            name="cardHolder"
-                                            value={cardDetails.cardHolder}
-                                            onChange={handleCardDetailsChange}
-                                            className="block w-full px-4 py-2 border rounded-lg bg-white shadow-sm placeholder-gray-400 text-gray-700"
-                                            placeholder="Card holder"
-                                            maxLength="22"
-                                        />
-                                    </div>
-                                    <div className="my-2">
-                                        <input
-                                            type="text"
-                                            name="cardNumber"
-                                            value={cardDetails.cardNumber}
-                                            onChange={handleCardDetailsChange}
-                                            className="block w-full px-4 py-2 border rounded-lg bg-white shadow-sm placeholder-gray-400 text-gray-700"
-                                            placeholder="Card number"
-                                        />
-                                    </div>
-                                    <div className="my-2">
-                                        <label className="text-gray-700 text-sm block mb-1">Expired</label>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <select
-                                                name="expiryMonth"
-                                                value={cardDetails.expiryMonth}
-                                                onChange={handleCardDetailsChange}
-                                                className="form-select block w-full px-4 py-2 border rounded-lg bg-white shadow-sm placeholder-gray-400 text-gray-700"
-                                            >
-                                                <option value="" disabled>
-                                                    MM
-                                                </option>
-                                                {[...Array(12).keys()].map((i) => (
-                                                    <option key={i + 1} value={String(i + 1).padStart(2, '0')}>
-                                                        {String(i + 1).padStart(2, '0')}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <select
-                                                name="expiryYear"
-                                                value={cardDetails.expiryYear}
-                                                onChange={handleCardDetailsChange}
-                                                className="form-select block w-full px-4 py-2 border rounded-lg bg-white shadow-sm placeholder-gray-400 text-gray-700"
-                                            >
-                                                <option value="" disabled>
-                                                    YY
-                                                </option>
-                                                {[...Array(6).keys()].map((i) => (
-                                                    <option key={2021 + i} value={2021 + i}>
-                                                        {2021 + i}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <input
-                                                type="text"
-                                                name="securityCode"
-                                                value={cardDetails.securityCode}
-                                                onChange={handleCardDetailsChange}
-                                                className="block w-full px-4 py-2 border rounded-lg bg-white shadow-sm placeholder-gray-400 text-gray-700"
-                                                placeholder="Security code"
-                                            />
-                                        </div>
-                                    </div>
-                                </>
-                            )}
 
-                            <div className="my-4 flex items-center">
-                                <input
-                                    type="radio"
-                                    id="card"
-                                    name="paymentMethod"
-                                    value="card"
-                                    checked={paymentMethod === 'card'}
-                                    onChange={handlePaymentMethodChange}
-                                    className="form-radio size-6"
-                                />
-                                <label htmlFor="card" className="ml-2 text-gray-700 text-2xl">
-                                    Card Payment
-                                </label>
-                            </div>
                             <div className="my-4 flex items-center">
                                 <input
                                     type="radio"
@@ -258,9 +154,10 @@ const PaymentPage = () => {
                                     checked={paymentMethod === 'cod'}
                                     onChange={handlePaymentMethodChange}
                                     className="form-radio size-6"
+                                    disabled={!paymentMethods?.find(pm => pm.method === 'cod' && pm.active)}
                                 />
                                 <label htmlFor="cod" className="ml-2 text-gray-700 text-2xl">
-                                    Cash on Delivery (COD)
+                                    Cash On Delivery
                                 </label>
                             </div>
                             <div className="my-4 flex items-center">
@@ -272,15 +169,15 @@ const PaymentPage = () => {
                                     checked={paymentMethod === 'razorpay'}
                                     onChange={handlePaymentMethodChange}
                                     className="form-radio size-6"
+                                    disabled={!paymentMethods?.find(pm => pm.method === 'razorpay' && pm.active)}
                                 />
                                 <label htmlFor="razorpay" className="ml-2 text-gray-700 text-2xl">
                                     Razorpay
                                 </label>
                             </div>
-
                             <button
                                 type="submit"
-                                className="btn w-full bg-gray-400 text-white"
+                                className="w-full py-2 px-4 bg-light-golden text-golden font-semibold rounded-lg shadow-md"
                             >
                                 Pay Now
                             </button>

@@ -14,6 +14,11 @@ require("dotenv").config({path:""})
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const { v4: uuid } = require("uuid");
+const sendEmail = require("../utils/email")
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const path = require('path');
+const mongoose= require("mongoose")
 
 // const { payment } = require("..")
 // const Liked = require("../models/Liked")
@@ -29,7 +34,7 @@ const {userId}=req.params
 }) 
 
 exports.createOrder = asyncHandler(async (req, res) => {
-    const { cardDetails, deliveryAddressId, paymentMethod, orderItems, subtotal, userId } = req.body;
+    const { deliveryAddressId, paymentMethod, orderItems, subtotal, userId } = req.body;
     
    
     // const orderPayment = await paymentRazorpay(options)
@@ -44,7 +49,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
         paymentMethod,
         orderItems: orderItems1,
         total: subtotal,
-        cardDetails: paymentMethod === 'card' ? cardDetails : undefined,
+ 
     });
 
     res.status(201).json({ message: "Order created successfully" });

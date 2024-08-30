@@ -63,6 +63,9 @@ const AdminNavbar = () => {
                                     <Link to="/admin/get-contacts" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
                                         Contacts
                                     </Link>
+                                    <Link to="/admin/paymentMethod" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                        Payment Methods
+                                    </Link>
                                 </div>
                                 {
                                     admin && <div className="hidden md:block absolute right-5">

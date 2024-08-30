@@ -8,6 +8,7 @@ const cloudinary = require("../utils/uploadCloud.config")
 const User = require("../models/User")
 const Carousel = require("../models/Carousel")
 const Categories = require("../models/Categories")
+const PaymentMethod = require("../models/PaymentMethod")
 
 
 exports.addProduct = asyncHandler(async (req, res) => {
@@ -265,3 +266,33 @@ exports.deleteCategory = asyncHandler(async(req, res)=> {
   res.json({message:"Category Delete Success"})
 })
 
+exports.getPaymentMethods = asyncHandler(async(req, res)=> {
+    const result = await PaymentMethod.find()
+    res.json({message:"all Payment Methods Get Success ", result})
+})
+
+exports.disableMethod = asyncHandler(async(req, res)=> {
+    const {methodId}= req.params
+    const result = await PaymentMethod.findByIdAndUpdate(methodId, {active:false})
+    res.json({message:"Method Disabled Success"})
+})
+exports.enableMethod = asyncHandler(async(req, res)=> {
+    const {methodId}= req.params
+    const result = await PaymentMethod.findByIdAndUpdate(methodId, {active:true})
+    res.json({message:"Method Enabled Success"})
+})
+
+// exports.disableRazorpay = asyncHandler(async(req, res)=> {
+//     const {razId}= req.params
+//     const result = await PaymentMethod.findByIdAndUpdate(razId, {razorpay:false})
+//     res.json({message:"Razorpay Disabled Success"})
+// })
+
+
+
+// use nhi karna hai👇
+exports.createPaymentMethod = asyncHandler(async(req, res)=> {
+    // const {cod, razorpay}=req.body
+    await PaymentMethod.create(req.body)
+    res.json({message:"Payment Method Create Success"})
+})

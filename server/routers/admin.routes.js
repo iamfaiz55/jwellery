@@ -22,6 +22,10 @@ router
     .delete("/delete-category/:cId", adminController.deleteCategory)
 
     .get("/get-contact", userController.getContacts)
+    .post("/create-method", adminController.createPaymentMethod)
+    .put("/disable-method/:methodId", adminController.disableMethod)
+    .get("/get-all-payment-method", adminController.getPaymentMethods)
+    .put("/enable-method/:methodId", adminController.enableMethod)
 
 
 module.exports = router
