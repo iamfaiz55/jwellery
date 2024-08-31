@@ -56,7 +56,7 @@ const CheckOut = () => {
     }, [error]);
     return (
         <>
-            <div className="h-screen grid grid-cols-3">
+            <div className=" grid grid-cols-3">
                 <div className="lg:col-span-2 col-span-3 bg-yellow-50 space-y-8 px-12">
                     {/* Checkout Message */}
                     <div className="mt-8 p-4 relative flex flex-col sm:flex-row sm:items-center bg-white shadow rounded-md">
