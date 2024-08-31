@@ -15,7 +15,8 @@ const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const { v4: uuid } = require("uuid");
 const sendEmail = require("../utils/email")
-const PDFDocument = require('pdfkit');
+const PDFDocument = require('pdfkit-table');
+// require('pdfkit-table');
 const fs = require('fs');
 const path = require('path');
 const mongoose= require("mongoose")
@@ -300,11 +301,69 @@ exports.razorpay = asyncHandler(async (req, res) => {
     res.json({message:"initiate ", result:order})
 });
 
-exports.verifyPayment = asyncHandler(async (req, res) => {
-//  console.log("req.body",req.body);
-const {razorpay_order_id, razorpay_payment_id, deliveryAddressId, paymentMethod, orderItems, subtotal, userId } = req.body;
+// exports.verifyPayment = asyncHandler(async (req, res) => {
+// //  console.log("req.body",req.body);
+// const {razorpay_order_id, razorpay_payment_id, deliveryAddressId, paymentMethod, orderItems, subtotal, userId } = req.body;
     
    
+//     const OrderItems2 = orderItems.map(item => ({
+//         productId: item._id,
+//         quantity: item.quantity || 1,
+//     }));
+
+//     const newOrder = await Order.create({
+//         userId,
+//         deliveryAddressId,
+//         paymentMethod,
+//         orderItems: OrderItems2,
+//         total: subtotal,
+//         razorpay_payment_id,
+//         razorpay_order_id,
+//     });
+// console.log(newOrder);
+
+
+//     const order2 = await razorpay.orders.create({
+//         amount: subtotal * 100,
+//         currency: "INR",
+//         receipt: uuid(),
+//     });
+
+// // console.log("order2",order2);
+
+//      res.json({message: "Payment verified and order Success"});
+// });
+const getProductDetails = async (orderItems) => {
+    // Use Promise.all to fetch details concurrently
+    const productDetails = await Promise.all(orderItems.map(async (item) => {
+      try {
+        const product = await Product.findById(new mongoose.Types.ObjectId(item._id)); // Correctly instantiate ObjectId
+        if (!product) {
+          console.error(`Product not found for productId: ${item._id}`);
+          return null; // Or handle missing products as needed
+        }
+        return {
+          ...item,
+          product
+        };
+      } catch (error) {
+        console.error(`Error fetching product for productId: ${item._id}`, error);
+        return null; // Handle errors gracefully
+      }
+    }));
+  
+    return productDetails.filter(detail => detail !== null); // Filter out any null results
+  };
+
+
+
+  exports.verifyPayment = asyncHandler(async (req, res) => {
+    const { razorpay_order_id, razorpay_payment_id, deliveryAddressId, paymentMethod, orderItems, subtotal, userId } = req.body;
+
+    const productDetails = await getProductDetails(orderItems);
+    const userData = await User.findById(userId);
+    const deliveryAddressData = await UserAddress.findById(deliveryAddressId);
+
     const OrderItems2 = orderItems.map(item => ({
         productId: item._id,
         quantity: item.quantity || 1,
@@ -319,8 +378,6 @@ const {razorpay_order_id, razorpay_payment_id, deliveryAddressId, paymentMethod,
         razorpay_payment_id,
         razorpay_order_id,
     });
-console.log(newOrder);
-
 
     const order2 = await razorpay.orders.create({
         amount: subtotal * 100,
@@ -328,7 +385,92 @@ console.log(newOrder);
         receipt: uuid(),
     });
 
-// console.log("order2",order2);
+    const pdfPath = path.join(__dirname, '../pdfs',` OrderDetails-${uuid()}.pdf`);
+    const doc = new PDFDocument({ margin: 50 });
+    doc.pipe(fs.createWriteStream(pdfPath));
 
-     res.json({message: "Payment verified and order Success"});
+    // Title
+    doc.fontSize(20).text('Order Invoice', { align: 'center' });
+    doc.moveDown(1.5);
+
+    // Delivery Address and Order Information in separate sections
+    doc.fontSize(14).text('Delivery Address:', { align: 'left', underline: true });
+    doc.moveDown(0.5);
+
+    doc.fontSize(12).text(`${userData.name}`);
+    doc.text(`${deliveryAddressData.addressType}, ${deliveryAddressData.city}`);
+    doc.text(`${deliveryAddressData.state}, ${deliveryAddressData.country}, ${deliveryAddressData.pincode}`);
+    doc.text(`Mobile: ${deliveryAddressData.mobile}`);
+    doc.moveDown(1.5);
+
+    doc.fontSize(14).text('Order Information:', { align: 'left', underline: true });
+    doc.moveDown(0.5);
+
+    doc.fontSize(12).text(`Order ID: ${newOrder.razorpay_order_id}`);
+    doc.text(`Payment ID: ${newOrder.razorpay_payment_id}`);
+    doc.text(`Payment Method: ${newOrder.paymentMethod}`);
+    doc.text(`Order Status: ${newOrder.status}`);
+    doc.moveDown(2);
+
+    // Product Details Table
+    doc.fontSize(14).text('Product Details:', { align: 'left', underline: true });
+    doc.moveDown(0.5);
+
+    const tableData = {
+        headers: ['Product Name', 'Quantity', 'Material', 'Dimensions', 'Weight', 'Purity', 'Description', 'Price', 'Total'],
+        rows: productDetails.map(item => {
+            const product = item.product;
+            return [
+                product.name,
+                item.quantity,
+                product.material,
+               ` ${product.height} x ${product.width}`,
+                product.productWeight,
+                product.purity,
+                product.desc,
+                product.price,
+                product.price * item.quantity,
+            ];
+        }),
+    };
+
+    doc.table(tableData, {
+        prepareHeader: () => doc.fontSize(12).font('Helvetica-Bold').fillColor('black'),
+        prepareRow: (row, i) => doc.fontSize(10).font('Helvetica').fillColor(i % 2 === 0 ? 'black' : 'gray'),
+    });
+
+    doc.moveDown(1.5);
+
+    // Total Items and Price
+    doc.fontSize(14).text(`Total Items: ${orderItems.length}`, { align: 'right' });
+    doc.text(`Total Price: ₹${subtotal}`, { align: 'right' });
+    doc.moveDown(2);
+
+    // Thank You Message
+    doc.fontSize(16).text('Thank you for shopping with us!', { align: 'center' });
+    doc.fontSize(14).text('We hope to see you again soon!', { align: 'center' });
+
+    doc.end();
+
+    doc.on('end', async () => {
+        const emailSent = await sendEmail({
+            to: userData.email,
+            subject: 'Your Order Receipt',
+            message: '<p>Thank you for your order. Please find the attached receipt for your records.</p>',
+            attachments: [
+                {
+                    filename: path.basename(pdfPath),
+                    path: pdfPath,
+                },
+            ],
+        });
+
+        if (emailSent) {
+            console.log('Email sent successfully.');
+        } else {
+            console.log('Failed to send email.');
+        }
+    });
+
+    res.json({ message: "Payment verified, order successful, and receipt sent on email." });
 });

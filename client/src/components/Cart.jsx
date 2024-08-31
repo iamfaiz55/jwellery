@@ -56,7 +56,7 @@ const Cart = () => {
             {
                 isError
                     ? <>
-                        <div className='text-center font-bold text-3xl'>{JSON.stringify(error.data.message)}</div>
+                        <div className='text-center font-bold text-3xl'>{JSON.stringify(error && error.data.message && error.data.message)}</div>
                     </>
                     : <>
                         <h1 className="mb-10 text-center text-3xl font-extrabold ">Your Shopping Cart</h1>

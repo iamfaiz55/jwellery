@@ -59,7 +59,7 @@ const App = () => {
     <filterContext.Provider value={{ selectedType, setSelectedType }}>
       {/* <blockUnblock.Provider value={{ block, setBlock }}> */}
       <CartContext.Provider value={{ cartData, setCartData }}>
-        <Toaster richColors position="top-center" />
+        <Toaster richColors position="top-right" />
         <BrowserRouter>
           <Routes>
 
