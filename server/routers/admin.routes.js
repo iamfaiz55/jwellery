@@ -28,4 +28,10 @@ router
     .put("/enable-method/:methodId", adminController.enableMethod)
 
 
+
+    .post("/add-company-address", adminController.addAddress)
+    .put("/update-company-address/:id", adminController.updateCompanyAddress)
+    .get("/get-company-addresses", adminController.getCompanyAddress)
+
+
 module.exports = router

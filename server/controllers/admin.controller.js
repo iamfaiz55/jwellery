@@ -9,6 +9,7 @@ const User = require("../models/User")
 const Carousel = require("../models/Carousel")
 const Categories = require("../models/Categories")
 const PaymentMethod = require("../models/PaymentMethod")
+const CompanyAddress = require("../models/CompanyAddress")
 
 
 exports.addProduct = asyncHandler(async (req, res) => {
@@ -295,4 +296,30 @@ exports.createPaymentMethod = asyncHandler(async(req, res)=> {
     // const {cod, razorpay}=req.body
     await PaymentMethod.create(req.body)
     res.json({message:"Payment Method Create Success"})
+})
+
+exports.addAddress = asyncHandler(async(req, res)=> {
+    const {pincode,buildingNo,city,state,country,gst}=req.body
+   const {isError, error}=checkEmpty({pincode,buildingNo,city,state,country,gst})
+
+    if(isError){
+        return res.status(400).json({message :"All Fields Required", error})
+    }
+
+    await CompanyAddress.create(req.body)
+    res.json({message:"Address Create Success"})
+})
+ 
+exports.updateCompanyAddress = asyncHandler(async(req, res)=>{
+    const {id}=req.params
+
+    const result = await CompanyAddress.findByIdAndUpdate(id, req.body)
+
+    res.json({message:"address Update Success"})
+})
+
+exports.getCompanyAddress = asyncHandler(async(req, res)=> {
+    const result = await CompanyAddress.find()
+
+    res.json({message:"Company address get Success", result})
 })

@@ -191,7 +191,7 @@ export const adminApi = createApi({
                     }
                 },
                 transformResponse:data => data.result,
-                invalidatesTags: ["admin"]
+                providesTags: ["admin"]
             }),
         
             getAllPaymentMethod: builder.query({
@@ -200,6 +200,29 @@ export const adminApi = createApi({
                         url: `/get-all-payment-method`,
                         method: "GET",
                         // body: categoryData
+                    }
+                },
+                transformResponse:data => data.result,
+                providesTags: ["admin"]
+            }),
+        
+            getCompanyAddress: builder.query({
+                query: id=> {
+                    return {
+                        url: `/get-company-addresses`,
+                        method: "GET",
+                        // body: categoryData
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
+            updtaeCompanyAddress: builder.mutation({
+                query: addressData=> {
+                    return {
+                        url: `/update-company-address/${addressData._id}`,
+                        method: "PUT",
+                        body: addressData
                     }
                 },
                 transformResponse:data => data.result,
@@ -230,5 +253,8 @@ export const {
 
     useGetAllPaymentMethodQuery,
   useUnableMethodMutation,
-  useDisableMethodMutation
+  useDisableMethodMutation,
+
+  useGetCompanyAddressQuery,
+  useUpdtaeCompanyAddressMutation
 } = adminApi

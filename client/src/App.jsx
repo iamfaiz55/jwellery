@@ -33,6 +33,7 @@ import Categories from './admin/Categories';
 import Contact from './admin/Contact';
 import GetContacts from './admin/GetContacts';
 import PaymentMethod from './admin/PaymentMethod';
+import CompanyAddress from './admin/CompanyAddress';
 // import Cart from '../../server/models/Cart';
 
 
@@ -78,6 +79,7 @@ const App = () => {
                     <Route path="categories" element={<AdminProtected compo={<Categories />} />} />
                     <Route path="get-contacts" element={<AdminProtected compo={<GetContacts />} />} />
                     <Route path="allUsers" element={<AdminProtected compo={<AllUsers />} />} />
+                    <Route path="addresses" element={<AdminProtected compo={<CompanyAddress />} />} />
                     <Route path="paymentMethod" element={<AdminProtected compo={<PaymentMethod />} />} />
                     <Route path="addCarousel" element={<AdminProtected compo={<AddCarousel />} />} />
                     <Route path="allOrders" element={<AdminProtected compo={<AdminAllOrders />} />} />
@@ -97,7 +99,7 @@ const App = () => {
                     <Route path="about" element={<About />} />
                     <Route path="mission" element={<OurMission />} />
                     <Route path="vision" element={<Vision />} />
-                    <Route path="243627" element={<Contact />} />
+                    <Route path="contact" element={<Contact />} />
                     <Route path="team" element={<Team />} />
                     <Route path="cart" element={<><UserProtected compo={<Cart />} /></>} />
                     <Route path="cartCheckout" element={<><UserProtected compo={<CartCheckOut />} /></>} />
