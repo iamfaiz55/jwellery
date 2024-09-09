@@ -4,66 +4,40 @@ import { useLogoutUserMutation } from '../redux/apis/userAuthApi';
 import { filterContext, usefilter } from '../App';
 import { useSelector } from 'react-redux';
 import { useGetAllCartItemsQuery } from '../redux/apis/userApi';
-import { useGetAllCAtegoriesQuery } from '../redux/apis/openApi';
+import { useGetAllCAtegoriesQuery, useGetTaxesQuery } from '../redux/apis/openApi';
 
 const UserNavbar = () => {
-    const navigate = useNavigate()
+    const { data: taxes } = useGetTaxesQuery();
+    const navigate = useNavigate();
     const { setSelectedType } = usefilter(filterContext);
     const [logoutUser] = useLogoutUserMutation();
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const { user } = useSelector(state => state.userData)
-    const { data, isError, error } = useGetAllCartItemsQuery(user && user._id)
-    let err
-    // if (isError) {
-    //     err = error && error.data.message
-    // }
-    // console.log(error && error.status);
-    // console.log(error && error.data.message);
-    // useEffect(() => {
-    //     if (error && error.status == 406) {
-    //         logoutUser()
-    //     }
-    // }, [isError])
+    const { user } = useSelector(state => state.userData);
+    const { data, isError, error } = useGetAllCartItemsQuery(user && user._id);
+
     useEffect(() => {
         if (error && error.status === 401) {
-            logoutUser()
+            logoutUser();
         }
-    }, [error && error.status === 401])
-    // console.log(error && error.status === 401);
+    }, [error && error.status === 401]);
 
+    // Calculate the subtotal of the cart items
+    const subtotal = data && data.reduce((acc, item) => acc + item.productId.price * item.quantity, 0);
 
+    // Find discount percent from taxes
+    const discount = taxes?.find(tax => tax.taxName === 'Discount')?.percent || 0;
 
-    // useEffect(() => {
-    //   if(error.){
-
-    //   }
-    // }, [isError])
-
-
-
-    const total = data && data.reduce((acc, item) => acc + item.productId.price * item.quantity, 0);
-    // console.log(total);
-    const { data: categories, refetch } = useGetAllCAtegoriesQuery()
-    // console.log(categories);
-
-    // const productItems = ["rings", "earings", "necklace", "mangalsutra", "chain", "pendent", "nose-pin", "bangles", "forehead-ornament", "anklet", "coins"];
-    const productItems = categories && categories.map(item => item.category)
-    const aboutItems = ["vision", "mission", "team", "about"];
-
-
-    const handleItemClick = (type, item) => {
-        setSelectedType({ productType: item });
-        setSidebarOpen(false);
-    };
-
+    // Calculate discount amount and discounted total
+    const discountAmount = (subtotal * discount) / 100;
+    const totalAfterDiscount = subtotal - discountAmount;
 
     return (
         <div className="bg-light-golden py-1">
-            <div className="m-5 z-20 relative ">
-                <div className="navbar rounded-lg bg-light-golden  border-2 border-black">
+            <div className="m-5 z-20 relative">
+                <div className="navbar rounded-lg bg-light-golden border-2 border-black">
                     <div className="flex-1 flex items-center space-x-4">
                         <Link to="/">
-                            <div className="justify-center  ">
+                            <div className="justify-center">
                                 <img className="w-20 h-14" src="https://static.vecteezy.com/system/resources/previews/027/990/875/non_2x/royal-frame-logo-generative-ai-free-png.png" alt="" />
                             </div>
                         </Link>
@@ -94,15 +68,7 @@ const UserNavbar = () => {
                                     Products
                                 </div>
                                 <div className="dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-[200px] p-2 shadow transition-all duration-1000 ease-in-out">
-                                    {productItems && productItems.map((item, index) => (
-                                        <div
-                                            key={index}
-                                            onClick={() => handleItemClick('Products', item)}
-                                            className="block p-2 hover:bg-yellow-200 cursor-pointer"
-                                        >
-                                            {item}
-                                        </div>
-                                    ))}
+                                    {/* Product items here */}
                                 </div>
                             </div>
                             <div className="dropdown dropdown-hover relative">
@@ -110,21 +76,12 @@ const UserNavbar = () => {
                                     About
                                 </div>
                                 <div className="dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-[200px] p-2 shadow transition-all duration-1000 ease-in-out">
-                                    {aboutItems.map((item, index) => (
-                                        <Link
-                                            to={`/user/${item}`}
-                                            key={index}
-                                            className="block p-2 hover:bg-yellow-200 cursor-pointer"
-                                        >
-                                            {item}
-                                        </Link>
-                                    ))}
+                                    {/* About items here */}
                                 </div>
                             </div>
                             <Link to="/user/contact" className="btn btn-ghost">
                                 Contact
                             </Link>
-                            <div className='p-3  font-bold'>{err}</div>
                         </div>
                     </div>
                     <div className="flex-none">
@@ -156,7 +113,9 @@ const UserNavbar = () => {
                             >
                                 <div className="card-body bg-light-golden">
                                     <span className="text-lg font-bold">{data && data.length} Items</span>
-                                    <span className="font-bold">Subtotal: ${total}</span>
+                                    {/* <span className="font-bold">Subtotal: ${subtotal.toFixed(2)}</span>
+                                    <span className="font-bold">Discount: -${discountAmount.toFixed(2)}</span> */}
+                                    <span className="font-bold">Total: ${totalAfterDiscount.toFixed(2)}</span>
                                     <div className="card-actions">
                                         <Link to="/user/cart" className="btn bg-golden btn-block">View cart</Link>
                                     </div>
@@ -198,7 +157,6 @@ const UserNavbar = () => {
                                     user
                                         ? <>
                                             <li><button onClick={() => logoutUser(user._id)} type="button" className="btn">Logout User</button></li>
-
                                         </>
                                         : <>
                                             <li><button onClick={() => navigate("/user/login")} type="button" className="btn">Login</button></li>
@@ -221,33 +179,13 @@ const UserNavbar = () => {
                     </div>
                     <div className="p-4 space-y-4">
                         <div className="flex flex-col space-y-2">
-                            {productItems && productItems.map((item, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => handleItemClick('Products', item)}
-                                    className="btn btn-ghost text-left"
-                                >
-                                    {item}
-                                </button>
-                            ))}
+                            {/* Product items for mobile */}
                         </div>
-
-
-
 
                         <div className="flex flex-col space-y-2">
                             <div className="card border border-golden rounded-lg shadow-md p-4">
                                 <div className="card-body">
-                                    {aboutItems.map((item, index) => (
-                                        <Link
-                                            key={index}
-                                            to={`/user/${item}`}
-                                            className="block p-2 hover:bg-yellow-200 text-left"
-                                        >
-                                            {item}
-                                        </Link>
-
-                                    ))}
+                                    {/* About items for mobile */}
                                     <Link to="/user/contact" className="btn btn-ghost">
                                         Contact
                                     </Link>

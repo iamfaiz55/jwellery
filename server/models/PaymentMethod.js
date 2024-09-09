@@ -5,6 +5,18 @@ const paymentMethodSchema = new mongoose.Schema({
         type:String,
 
     },
+    salesTax: {
+        type:String,
+
+    },
+    makingCharges: {
+        type:String,
+
+    },
+    discount: {
+        type:String,
+
+    },
     active: {
         type:Boolean,
         default:true

@@ -247,23 +247,18 @@ export const userApi = createApi({
 export const { 
     useAddAddressMutation,
     useGetAddressesQuery,
-    // useGetDetailsQuery,
     useGetOrdersQuery,
     useAddCartMutation,
     useGetAllCartItemsQuery,
     useDeleteCArtItemMutation,
     useCreateOrderMutation,
     useDeleteFullCartMutation,
-    // useGetAllProductsQuery,
     useCancelOrderMutation,
-    // useGetCArouselQuery,
-    // useGetFilteredDataQuery,
-    // useLazyGetFilteredDataQuery,
+
     useUpdateProfileMutation,
     useLikeMutation,
     useDeleteLikeMutation,
     useGetLikedQuery,
-    // useGetAllCAtegoriesQuery,
     useRazorpayMutation,
     useVerifyPaymentMutation
     

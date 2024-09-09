@@ -10,6 +10,7 @@ const Carousel = require("../models/Carousel")
 const Categories = require("../models/Categories")
 const PaymentMethod = require("../models/PaymentMethod")
 const CompanyAddress = require("../models/CompanyAddress")
+const Tax = require("../models/Tax")
 
 
 exports.addProduct = asyncHandler(async (req, res) => {
@@ -283,6 +284,22 @@ exports.enableMethod = asyncHandler(async(req, res)=> {
     res.json({message:"Method Enabled Success"})
 })
 
+// single use only
+exports.createTax= asyncHandler(async(req, res)=> {
+// const {salesTax,makingCharges,discount}= req.body
+await Tax.create(req.body)
+res.json({message:"tax Added Success"})
+})
+exports.updateTax= asyncHandler(async(req, res)=> {
+const {taxId}= req.params
+await Tax.findByIdAndUpdate(taxId, req.body)
+res.json({message:"tax Update Success"})
+})
+exports.getTax = asyncHandler(async(req, res)=> {
+const result = await Tax.find()
+res.json({message:"All Taxes and Discount And Charges Fetch Succcess", result})
+})
+
 // exports.disableRazorpay = asyncHandler(async(req, res)=> {
 //     const {razId}= req.params
 //     const result = await PaymentMethod.findByIdAndUpdate(razId, {razorpay:false})
@@ -293,7 +310,6 @@ exports.enableMethod = asyncHandler(async(req, res)=> {
 
 // use nhi karna hai👇
 exports.createPaymentMethod = asyncHandler(async(req, res)=> {
-    // const {cod, razorpay}=req.body
     await PaymentMethod.create(req.body)
     res.json({message:"Payment Method Create Success"})
 })

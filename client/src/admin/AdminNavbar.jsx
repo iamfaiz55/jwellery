@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLogoutAdminMutation } from '../redux/apis/adminAuthApi';
 import { toast } from 'sonner';
 import { useSelector } from 'react-redux';
-// import { useGetCArouselQuery } from '../redux/apis/openApi';
 import { useGetAllOrdersQuery } from '../redux/apis/adminApi';
 
 const AdminNavbar = () => {
@@ -43,35 +42,36 @@ const AdminNavbar = () => {
                                     />
                                 </div>
                             </Link>
-                            <div className="flex justify-between">
-                                <div className="hidden md:flex flex-1 space-x-4">
-                                    <Link to="/admin/dashboard" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                            <div className="flex  ">
+                                <div className="hidden lg:flex ">
+                                    <Link to="/admin/dashboard" className="btn btn-ghost   hover:bg-gray-200 transition duration-300 ease-in-out">
                                         Dashboard
                                     </Link>
-                                    <Link to="/admin/allOrders" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                    <Link to="/admin/allOrders" className="btn btn-ghost  hover:bg-gray-200 transition duration-300 ease-in-out">
                                         All Orders
                                     </Link>
-                                    <Link to="/admin/allUsers" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                    <Link to="/admin/allUsers" className="btn btn-ghost  hover:bg-gray-200 transition duration-300 ease-in-out">
                                         All Users
                                     </Link>
-                                    <Link to="/admin/addCarousel" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                    <Link to="/admin/addCarousel" className="btn btn-ghost  hover:bg-gray-200 transition duration-300 ease-in-out">
                                         Carousel
                                     </Link>
-                                    <Link to="/admin/categories" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                    <Link to="/admin/categories" className="btn btn-ghost  hover:bg-gray-200 transition duration-300 ease-in-out">
                                         Categories
                                     </Link>
-                                    <Link to="/admin/get-contacts" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                    <Link to="/admin/get-contacts" className="btn btn-ghost  hover:bg-gray-200 transition duration-300 ease-in-out">
                                         Contacts
                                     </Link>
-                                    <Link to="/admin/paymentMethod" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
+                                    <Link to="/admin/paymentMethod" className="btn btn-ghost  hover:bg-gray-200 transition duration-300 ease-in-out">
                                         Payment Methods
                                     </Link>
-                                    <Link to="/admin/addresses" className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out">
-                                        Addresses
+                                    <Link to="/admin/addresses" className="btn btn-ghost  hover:bg-gray-200 transition duration-300 ease-in-out">
+                                        Addresses And Taxes
                                     </Link>
+
                                 </div>
                                 {
-                                    admin && <div className="hidden md:block absolute right-5">
+                                    admin && <div className="hidden lg:block absolute right-5">
                                         <button className="btn bg-golden hover:bg-yellow-600" onClick={e => logoutAdmin()}>Logout</button>
                                     </div>
 
@@ -80,7 +80,7 @@ const AdminNavbar = () => {
 
                         </div>
 
-                        <div className="md:hidden flex-none">
+                        <div className="lg:hidden flex-none">
                             <button
                                 onClick={() => setSidebarOpen(!isSidebarOpen)}
                                 className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out"
@@ -144,6 +144,18 @@ const AdminNavbar = () => {
                             <li>
                                 <Link to="/admin/categories" className="block p-2 hover:bg-yellow-200">Categories</Link>
                             </li>
+
+
+                            <li>
+                                <Link to="/admin/get-contacts" className="block p-2 hover:bg-yellow-200">Contact</Link>
+                            </li>
+                            <li>
+                                <Link to="/admin/paymentMethod" className="block p-2 hover:bg-yellow-200">Payment Method</Link>
+                            </li>
+                            <li>
+                                <Link to="/admin/addresses" className="block p-2 hover:bg-yellow-200">Address And Taxes</Link>
+                            </li>
+
                             <li>
                                 <button
                                     onClick={() => logoutAdmin()}

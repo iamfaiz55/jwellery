@@ -228,6 +228,17 @@ export const adminApi = createApi({
                 transformResponse:data => data.result,
                 invalidatesTags: ["admin"]
             }),
+            updateTax: builder.mutation({
+                query: taxData=> {
+                    return {
+                        url: `/update-tax/${taxData._id}`,
+                        method: "PUT",
+                        body: taxData
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
         
         }
     }
@@ -255,6 +266,8 @@ export const {
   useUnableMethodMutation,
   useDisableMethodMutation,
 
-  useGetCompanyAddressQuery,
-  useUpdtaeCompanyAddressMutation
+//   useGetCompanyAddressQuery,
+useLazyGetCompanyAddressQuery,
+  useUpdtaeCompanyAddressMutation,
+  useUpdateTaxMutation
 } = adminApi

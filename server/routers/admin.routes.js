@@ -33,5 +33,8 @@ router
     .put("/update-company-address/:id", adminController.updateCompanyAddress)
     .get("/get-company-addresses", adminController.getCompanyAddress)
 
+    .post("/add-tax", adminController.createTax)
+    .put("/update-tax/:taxId", adminController.updateTax)
+
 
 module.exports = router

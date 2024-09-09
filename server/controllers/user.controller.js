@@ -21,6 +21,7 @@ const fs = require('fs');
 const path = require('path');
 const mongoose= require("mongoose")
 const CompanyAddress = require("../models/CompanyAddress")
+const Tax = require("../models/Tax")
 
 // const { payment } = require("..")
 // const Liked = require("../models/Liked")
@@ -414,15 +415,30 @@ const getProductDetails = async (orderItems) => {
   
     return productDetails.filter(detail => detail !== null); // Filter out any null results
   };
-
-
   exports.verifyPayment = asyncHandler(async (req, res) => {
-    const { razorpay_order_id, razorpay_payment_id, deliveryAddressId, paymentMethod, orderItems, subtotal, userId } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, deliveryAddressId, paymentMethod, orderItems, userId } = req.body;
 
     const productDetails = await getProductDetails(orderItems);
     const userData = await User.findById(userId);
     const deliveryAddressData = await UserAddress.findById(deliveryAddressId);
-    const companyAddressData = await CompanyAddress.findOne(); 
+    const companyAddressData = await CompanyAddress.findOne();
+    const taxes = await Tax.find();
+
+    // Calculate subtotal
+    const subtotal = productDetails.reduce((tot, item) => {
+        return tot + (item.product.price * item.quantity);
+    }, 0);
+
+    // Calculate taxes and discount
+    const salesTax = taxes.find(tax => tax.taxName === "Sales Tax")?.percent || 0;
+    const makingCharges = taxes.find(tax => tax.taxName === "Making Charges")?.percent || 0;
+    const discount = taxes.find(tax => tax.taxName === "Discount")?.percent || 0;
+
+    // Apply taxes and discount
+    const salesTaxAmount = (salesTax / 100) * subtotal;
+    const makingChargesAmount = (makingCharges / 100) * subtotal;
+    const discountAmount = (discount / 100) * subtotal;
+    const total = subtotal + salesTaxAmount + makingChargesAmount - discountAmount;
 
     const OrderItems2 = orderItems.map(item => ({
         productId: item._id,
@@ -434,13 +450,13 @@ const getProductDetails = async (orderItems) => {
         deliveryAddressId,
         paymentMethod,
         orderItems: OrderItems2,
-        total: subtotal,
+        total,
         razorpay_payment_id,
         razorpay_order_id,
     });
 
     await razorpay.orders.create({
-        amount: subtotal * 100,
+        amount: total * 100,
         currency: "INR",
         receipt: uuid(),
     });
@@ -448,39 +464,53 @@ const getProductDetails = async (orderItems) => {
     const pdfPath = path.join(__dirname, '../pdfs', `OrderDetails-${uuid()}.pdf`);
     const doc = new PDFDocument({ margin: 50 });
     doc.pipe(fs.createWriteStream(pdfPath));
-
+    
+    // Title
     doc.fontSize(20).text('Order Invoice', { align: 'center' });
     doc.moveDown(1.5);
-
-    doc.fontSize(14).text('Company Address:', { align: 'left', underline: true });
+    
+    // Define initial X and Y positions for three-column layout
+    const startY = doc.y;  // Start Y position for all columns
+    const columnWidth = 180;  // Width for each column
+    const gap = 20;  // Gap between columns
+    
+    // Company Address Column
+    const companyAddressX = 50;  // X position for Company Address
+    doc.fontSize(14).text('Company Address:', companyAddressX, startY, { underline: true });
     doc.moveDown(0.5);
-    doc.fontSize(12).text(`${companyAddressData.buildingNo}`);
-    doc.text(`${companyAddressData.city}`);
-    doc.text(`${companyAddressData.state}, ${companyAddressData.country}, ${companyAddressData.pincode}`);
-    doc.text(`GST No: ${companyAddressData.gst}`);
-    doc.moveDown(1.5);
-
-    doc.fontSize(14).text('Delivery Address:', { align: 'left', underline: true });
+    doc.fontSize(12).text(`${companyAddressData.buildingNo}`, companyAddressX, doc.y);
+    doc.text(`${companyAddressData.city}`, companyAddressX, doc.y);
+    doc.text(`${companyAddressData.state}, ${companyAddressData.country}, ${companyAddressData.pincode}`, companyAddressX, doc.y);
+    doc.text(`GST No: ${companyAddressData.gst}`, companyAddressX, doc.y);
+    
+    // Delivery Address Column
+    const deliveryAddressX = companyAddressX + columnWidth + gap;  // X position for Delivery Address
+    doc.fontSize(14).text('Delivery Address:', deliveryAddressX, startY, { underline: true });
     doc.moveDown(0.5);
-    doc.fontSize(12).text(`${userData.name}`);
-    doc.text(`${deliveryAddressData.addressType}, ${deliveryAddressData.city}`);
-    doc.text(`${deliveryAddressData.state}, ${deliveryAddressData.country}, ${deliveryAddressData.pincode}`);
-    doc.text(`Mobile: ${deliveryAddressData.mobile}`);
-    doc.moveDown(1.5);
-
-    doc.fontSize(14).text('Order Information:', { align: 'left', underline: true });
+    doc.fontSize(12).text(`${userData.name}`, deliveryAddressX, doc.y);
+    doc.text(`${deliveryAddressData.addressType}, ${deliveryAddressData.city}`, deliveryAddressX, doc.y);
+    doc.text(`${deliveryAddressData.state}, ${deliveryAddressData.country}, ${deliveryAddressData.pincode}`, deliveryAddressX, doc.y);
+    doc.text(`Mobile: ${deliveryAddressData.mobile}`, deliveryAddressX, doc.y);
+    
+    // Order Information Column
+    const orderInfoX = deliveryAddressX + columnWidth + gap;  // X position for Order Information
+    doc.fontSize(14).text('Order Information:', orderInfoX, startY, { underline: true });
     doc.moveDown(0.5);
-    doc.fontSize(12).text(`Order ID: ${newOrder.razorpay_order_id}`);
-    doc.text(`Payment ID: ${newOrder.razorpay_payment_id}`);
-    doc.text(`Payment Method: ${newOrder.paymentMethod}`);
-    doc.text(`Order Status: ${newOrder.status}`);
+    doc.fontSize(12).text(`Order ID: ${newOrder.razorpay_order_id}`, orderInfoX, doc.y);
+    doc.text(`Payment ID: ${newOrder.razorpay_payment_id}`, orderInfoX, doc.y);
+    doc.text(`Payment Method: ${newOrder.paymentMethod}`, orderInfoX, doc.y);
+    doc.text(`Order Status: ${newOrder.status}`, orderInfoX, doc.y);
+    
+    // Reset the X position and move down to start the table on a new line
     doc.moveDown(2);
-
+    doc.text('', 50, doc.y);  // Ensure to reset X position before drawing the table
+    
+    // Product Table - Start after moving to a new line
     doc.fontSize(14).text('Product Details:', { align: 'left', underline: true });
     doc.moveDown(0.5);
-
+    
     const tableData = {
-        headers: ['Product Name', 'Quantity', 'Material', 'Dimensions', 'Weight', 'Purity', 'Description', 'Price', 'Total'],
+        headers: ['Name', 'Qty', 'Material', 'Dimensions', 'Weight', 'Purity', 'Desc', 'Price', 'Total'],
         rows: productDetails.map(item => {
             const product = item.product;
             return [
@@ -496,23 +526,38 @@ const getProductDetails = async (orderItems) => {
             ];
         }),
     };
-
+    
     doc.table(tableData, {
         prepareHeader: () => doc.fontSize(12).font('Helvetica-Bold').fillColor('black'),
         prepareRow: (row, i) => doc.fontSize(10).font('Helvetica').fillColor(i % 2 === 0 ? 'black' : 'gray'),
     });
-
+    
     doc.moveDown(1.5);
-
-    doc.fontSize(14).text(`Total Items: ${orderItems.length}`, { align: 'right' });
-    doc.text(`Total Price: ₹${subtotal}`, { align: 'right' });
-    doc.moveDown(2);
-
-    doc.fontSize(16).text('Thank you for shopping with us!', { align: 'center' });
-    doc.fontSize(14).text('We hope to see you again soon!', { align: 'center' });
-
+    
+    // Display Taxes, Discounts, and Totals
+    doc.fontSize(14).text(`Subtotal: ₹${subtotal.toFixed(2)}`, { align: 'right' });
+    doc.text(`Sales Tax (${salesTax}%): ₹${salesTaxAmount.toFixed(2)}`, { align: 'right' });
+    doc.text(`Making Charges (${makingCharges}%): ₹${makingChargesAmount.toFixed(2)}`, { align: 'right' });
+    doc.text(`Discount (${discount}%): -₹${discountAmount.toFixed(2)}`, { align: 'right' });
+    doc.text(`Total Items: ${orderItems.length}`, { align: 'right' });
+    doc.text(`Total Price: ₹${total.toFixed(2)}`, { align: 'right' });
+    doc.moveDown(2); // Move down for some spacing before the thank you note
+    
+    // Center "Thank you for shopping with us!" text
+    doc.fontSize(16).text('Thank you for shopping with us!', {
+        align: 'center',  // Center align
+        continued: false,  // End the current text block
+    });
+    
+    // Center "We hope to see you again soon!" text
+    doc.fontSize(14).text('We hope to see you again soon!', {
+        align: 'center',  // Center align
+        continued: false,  // End the current text block
+    });
+    
     doc.end();
-
+    
+    // Email Sending and Response
     doc.on('end', async () => {
         const emailSent = await sendEmail({
             to: userData.email,
@@ -525,13 +570,162 @@ const getProductDetails = async (orderItems) => {
                 },
             ],
         });
-
+    
         if (emailSent) {
             console.log('Email sent successfully.');
         } else {
             console.log('Failed to send email.');
         }
     });
-
+    
     res.json({ message: "Payment verified, order successful, and receipt sent on email." });
 });
+
+
+
+//   exports.verifyPayment = asyncHandler(async (req, res) => {
+//     const { razorpay_order_id, razorpay_payment_id, deliveryAddressId, paymentMethod, orderItems, userId } = req.body;
+
+//     const productDetails = await getProductDetails(orderItems);
+//     const userData = await User.findById(userId);
+//     const deliveryAddressData = await UserAddress.findById(deliveryAddressId);
+//     const companyAddressData = await CompanyAddress.findOne();
+//     const taxes = await Tax.find();
+
+//     // Calculate subtotal
+//     const subtotal = productDetails.reduce((tot, item) => {
+//         return tot + (item.product.price * item.quantity);
+//     }, 0);
+
+//     // Calculate taxes and discount
+//     const salesTax = taxes.find(tax => tax.taxName === "Sales Tax")?.percent || 0;
+//     const makingCharges = taxes.find(tax => tax.taxName === "Making Charges")?.percent || 0;
+//     const discount = taxes.find(tax => tax.taxName === "Discount")?.percent || 0;
+
+//     // Apply taxes and discount
+//     const salesTaxAmount = (salesTax / 100) * subtotal;
+//     const makingChargesAmount = (makingCharges / 100) * subtotal;
+//     const discountAmount = (discount / 100) * subtotal;
+//     const total = subtotal + salesTaxAmount + makingChargesAmount - discountAmount;
+
+//     const OrderItems2 = orderItems.map(item => ({
+//         productId: item._id,
+//         quantity: item.quantity || 1,
+//     }));
+
+//     const newOrder = await Order.create({
+//         userId,
+//         deliveryAddressId,
+//         paymentMethod,
+//         orderItems: OrderItems2,
+//         total,
+//         razorpay_payment_id,
+//         razorpay_order_id,
+//     });
+
+//     await razorpay.orders.create({
+//         amount: total * 100,
+//         currency: "INR",
+//         receipt: uuid(),
+//     });
+
+//     const pdfPath = path.join(__dirname, '../pdfs', `OrderDetails-${uuid()}.pdf`);
+//     const doc = new PDFDocument({ margin: 50 });
+//     doc.pipe(fs.createWriteStream(pdfPath));
+
+//     // Company Address
+//     doc.fontSize(20).text('Order Invoice', { align: 'center' });
+//     doc.moveDown(1.5);
+//     doc.fontSize(14).text('Company Address:', { align: 'left', underline: true });
+//     doc.moveDown(0.5);
+//     doc.fontSize(12).text(`${companyAddressData.buildingNo}`);
+//     doc.text(`${companyAddressData.city}`);
+//     doc.text(`${companyAddressData.state}, ${companyAddressData.country}, ${companyAddressData.pincode}`);
+//     doc.text(`GST No: ${companyAddressData.gst}`);
+//     doc.moveDown(1.5);
+
+//     doc.fontSize(14).text('Delivery Address:', { align: 'left', underline: true });
+//     doc.moveDown(0.5);
+//     doc.fontSize(12).text(`${userData.name}`);
+//     doc.text(`${deliveryAddressData.addressType}, ${deliveryAddressData.city}`);
+//     doc.text(`${deliveryAddressData.state}, ${deliveryAddressData.country}, ${deliveryAddressData.pincode}`);
+//     doc.text(`Mobile: ${deliveryAddressData.mobile}`);
+//     doc.moveDown(1.5);
+
+//     doc.fontSize(14).text('Order Information:', { align: 'left', underline: true });
+//     doc.moveDown(0.5);
+//     doc.fontSize(12).text(`Order ID: ${newOrder.razorpay_order_id}`);
+//     doc.text(`Payment ID: ${newOrder.razorpay_payment_id}`);
+//     doc.text(`Payment Method: ${newOrder.paymentMethod}`);
+//     doc.text(`Order Status: ${newOrder.status}`);
+//     doc.moveDown(2);
+
+ 
+//     // //////////////////
+// //   //////////////////
+//     doc.moveDown(2);
+
+//     doc.fontSize(16).text('Thank you for shopping with us!', { align: 'center' });
+//     doc.fontSize(14).text('We hope to see you again soon!', { align: 'center' });
+
+//     doc.end();
+
+//     doc.on('end', async () => {
+//         const emailSent = await sendEmail({
+//             to: userData.email,
+//             subject: 'Your Order Receipt',
+//             message: '<p>Thank you for your order. Please find the attached receipt for your records.</p>',
+//             attachments: [
+//                 {
+//                     filename: path.basename(pdfPath),
+//                     path: pdfPath,
+//                 },
+//             ],
+//         });
+
+//         if (emailSent) {
+//             console.log('Email sent successfully.');
+//         } else {
+//             console.log('Failed to send email.');
+//         }
+//     });
+
+//     res.json({ message: "Payment verified, order successful, and receipt sent on email." });
+// });
+
+
+  // doc.fontSize(14).text('Product Details:', { align: 'left', underline: true });
+    // doc.moveDown(0.5);
+
+    // const tableData = {
+    //     headers: ['Name', 'Qty', 'Material', 'Dimensions', 'Weight', 'Purity', 'Desc', 'Price', 'Total'],
+    //     rows: productDetails.map(item => {
+    //         const product = item.product;
+    //         return [
+    //             product.name,
+    //             item.quantity,
+    //             product.material,
+    //             `${product.height} x ${product.width}`,
+    //             product.productWeight,
+    //             product.purity,
+    //             product.desc,
+    //             product.price,
+    //             product.price * item.quantity,
+    //         ];
+    //     }),
+    // };
+
+    // doc.table(tableData, {
+    //     prepareHeader: () => doc.fontSize(12).font('Helvetica-Bold').fillColor('black'),
+    //     prepareRow: (row, i) => doc.fontSize(10).font('Helvetica').fillColor(i % 2 === 0 ? 'black' : 'gray'),
+    // });
+
+    // doc.moveDown(1.5);
+
+    // // Display Taxes, Discounts, and Totals
+    // doc.fontSize(14).text(`Subtotal: ₹${subtotal.toFixed(2)}`, { align: 'right' });
+    // doc.text(`Sales Tax (${salesTax}%): ₹${salesTaxAmount.toFixed(2)}`, { align: 'right' });
+    // doc.text(`Making Charges (${makingCharges}%): ₹${makingChargesAmount.toFixed(2)}`, { align: 'right' });
+    // doc.text(`Discount (${discount}%): -₹${discountAmount.toFixed(2)}`, { align: 'right' });
+    // doc.text(`Total Items: ${orderItems.length}`, { align: 'right' });
+    // doc.text(`Total Price: ₹${total.toFixed(2)}`, { align: 'right' });

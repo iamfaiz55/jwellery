@@ -6,28 +6,39 @@ import * as yup from 'yup';
 import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '../App';
-import { useGetDetailsQuery } from '../redux/apis/openApi';
+import { useGetDetailsQuery, useGetTaxesQuery } from '../redux/apis/openApi';
 
 const CheckOut = () => {
     const { cartData, setCartData } = useCart();
     const [selectedAddress, setSelectedAddress] = useState(null);
-
-
+    const { data: taxes } = useGetTaxesQuery();
     const { user } = useSelector(state => state.userData);
-    const { data, error: addressError } = useGetAddressesQuery(user && user._id);
-    const { id } = useParams()
-    const { data: product, error, isError } = useGetDetailsQuery(id)
-    // console.log(product);
-    const navigate = useNavigate()
+    const { data: addresses, error: addressError } = useGetAddressesQuery(user && user._id);
+    const { id } = useParams();
+    const { data: product, error, isError } = useGetDetailsQuery(id);
+    const navigate = useNavigate();
+
+    const [quantity, setQuantity] = useState(1);
+    const discount = taxes && taxes.find(tax => tax.taxName === 'Discount');
+    const salesTax = taxes && taxes.find(tax => tax.taxName === 'Sales Tax');
+    const makingCharges = taxes && taxes.find(tax => tax.taxName === 'Making Charges');
+
+    const originalPrice = product ? parseFloat(product.price) : 0;
+    const discountPercent = discount ? discount.percent : 0;
+    const salesTaxPercent = salesTax ? salesTax.percent : 0;
+    const makingChargesAmount = makingCharges ? originalPrice * (makingCharges.percent / 100) : 0;
+
+    const discountedPrice = product ? originalPrice * (1 - discountPercent / 100) : 0;
+    const subtotal = quantity * discountedPrice;
+    const total = subtotal + makingChargesAmount + (subtotal * salesTaxPercent / 100);
+
     const handlePayNow = () => {
         if (selectedAddress) {
-            // Update the cart data with the selected address
             setCartData({
                 ...cartData,
                 deliveryAddressId: selectedAddress,
-                subtotal: product.price * quantity,
-                cartItems: [{ productId: product, quantity }]
-
+                subtotal,
+                cartItems: [{ productId: product, quantity }],
             });
             navigate("/user/payment");
         } else {
@@ -35,269 +46,252 @@ const CheckOut = () => {
         }
     };
 
+    const plus = () => setQuantity(prev => prev + 1);
+    const minus = () => setQuantity(prevQuantity => (prevQuantity > 1 ? prevQuantity - 1 : 1));
 
-    const [quantity, setQuantity] = useState(1);
+    const handleAddressChange = (addressId) => setSelectedAddress(addressId);
 
-    const plus = () => {
-        setQuantity(pre => pre + 1);
-    };
-
-    const minus = () => {
-        setQuantity(prevQuantity => (prevQuantity > 1 ? prevQuantity - 1 : 1));
-    };
-
-    const handleAddressChange = (addressId) => {
-        setSelectedAddress(addressId);
-    };
     useEffect(() => {
         if (error) {
             toast.error(error.data.message);
         }
     }, [error]);
+
     return (
         <>
-            <div className=" grid grid-cols-3">
-                <div className="lg:col-span-2 col-span-3 bg-yellow-50 space-y-8 px-12">
-                    {/* Checkout Message */}
-                    <div className="mt-8 p-4 relative flex flex-col sm:flex-row sm:items-center bg-white shadow rounded-md">
-                        <div className="flex flex-row items-center border-b sm:border-b-0 w-full sm:w-auto pb-4 sm:pb-0">
-                            <div className="text-yellow-500">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="w-6 sm:w-5 h-6 sm:h-5"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                </svg>
-                            </div>
-                            <div className="text-sm font-medium ml-3 text-yellow-800">Checkout</div>
-                        </div>
-                        <div className="text-sm tracking-wide text-gray-500 mt-4 sm:mt-0 sm:ml-4">
-                            Complete your shipping and payment details below.
-                        </div>
-                        <div className="absolute sm:relative sm:top-auto sm:right-auto ml-auto right-4 top-4 text-gray-400 hover:text-gray-800 cursor-pointer">
-                            <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                ></path>
-                            </svg>
-                        </div>
-                    </div>
-                    {
-                        isError
-                            ? <><div className='text-center font-bold text-3xl'>{error.data.message}</div></>
-                            : <>
-                                <button className="btn bg-yellow-400 text-black hover:bg-yellow-500" onClick={() => document.getElementById('add').showModal()}>Add Address</button>
-                                <dialog id="add" className="modal">
-                                    <div className="modal-box bg-yellow-50">
-                                        <h3 className="font-bold text-lg text-yellow-800">Add Address</h3>
-                                        <Form />
-                                    </div>
-                                </dialog>
-                                {/* Address List with Checkbox */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-md">
-                                    {data && data.map((item) => (
-                                        <div key={item._id} className="overflow-hidden group relative rounded-lg p-1 flex justify-center items-center">
-                                            <div className="hidden group-hover:block animate-gradient absolute top-0 left-0 w-full h-full bg-gradient-to-r from-yellow-300 via-yellow-100 to-yellow-500 rounded-lg shadow-xl"></div>
-                                            <label className="relative z-10 w-full bg-white p-6 sm:p-8 rounded-lg flex items-center cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    className="form-checkbox h-5 w-5 text-yellow-500"
-                                                    checked={selectedAddress === item._id}
-                                                    onChange={() => handleAddressChange(item._id)}
-                                                />
-                                                <div className="ml-4">
-                                                    <h3 className="text-xl font-bold text-gray-900">{item.addressType}</h3>
-                                                    <p className="mt-2 text-sm text-gray-500">House {item.houseNo}</p>
-                                                    <p className="mt-2 text-sm text-gray-500">Country {item.country}</p>
-                                                    <p className="mt-2 text-sm text-gray-500">State {item.state}</p>
-                                                    <p className="mt-2 text-sm text-gray-500">Pincode {item.pincode}</p>
-                                                    <p className="mt-2 text-sm text-gray-500">Mobile {item.mobile}</p>
-                                                </div>
-                                            </label>
-                                        </div>
-                                    ))}
-                                </div>
-                                <button onClick={handlePayNow} className="submit-button px-4 py-3 rounded-full bg-yellow-400 text-white w-full text-xl font-semibold transition-colors hover:bg-yellow-500">
-                                    Pay Now
-                                </button>
-                            </>
-
-                    }
-                </div>
-
-                <div className="col-span-1 bg-white lg:block hidden">
-                    <h1 className="py-6 border-b-2 text-xl text-yellow-800 px-8">Order Summary</h1>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+                {/* Order Summary on Small Screens */}
+                <div className="md:hidden col-span-1 bg-white p-4">
+                    <h1 className="py-6 border-b-2 text-xl text-yellow-800">Order Summary</h1>
                     {product && (
                         <>
-                            <ul className="py-6 border-b space-y-6 px-8">
-                                <li className="grid grid-cols-6 gap-2 border-b-1">
-                                    <div className="col-span-1 self-center">
-                                        <img
-                                            src={product.image}
-                                            alt={product.name}
-                                            className="rounded w-full"
-                                        />
+                            <ul className="py-6 border-b space-y-6">
+                                <li className="flex items-center space-x-4 border-b pb-4">
+                                    <div className="w-24">
+                                        <img src={product.image} alt={product.name} className="rounded w-full" />
                                     </div>
-                                    <div className="flex flex-col col-span-3 pt-2">
+                                    <div className="flex flex-col flex-grow">
                                         <span className="text-gray-600 text-md font-semibold">{product.name}</span>
-                                        <span className="text-gray-400 text-sm inline-block pt-2">{product.productType}</span>
+                                        <span className="text-gray-400 text-sm">{product.productType}</span>
                                     </div>
-                                    <div className="col-span-2 pt-3">
-                                        <div className="flex items-center space-x-2 text-sm justify-between">
-                                            <span className="text-gray-400">1 x {product.price}</span>
-                                            <div className="flex items-center ml-6">
-                                                <button
-                                                    onClick={minus}
-                                                    className="bg-gray-200 text-gray-600 border-0 py-1 px-3 focus:outline-none hover:bg-gray-300 rounded-l"
-                                                >
-                                                    -
-                                                </button>
-                                                <span className="text-gray-900 px-3">{quantity}</span>
-                                                <button
-                                                    onClick={plus}
-                                                    className="bg-gray-200 text-gray-600 border-0 py-1 px-3 focus:outline-none hover:bg-gray-300 rounded-r"
-                                                >
-                                                    +
-                                                </button>
-                                            </div>
-                                        </div>
+                                    <div className="flex items-center space-x-2">
+                                        <button onClick={minus} className="bg-gray-200 text-gray-600 border-0 py-1 px-3 rounded-l">-</button>
+                                        <span className="text-gray-900 px-3">{quantity}</span>
+                                        <button onClick={plus} className="bg-gray-200 text-gray-600 border-0 py-1 px-3 rounded-r">+</button>
                                     </div>
                                 </li>
                             </ul>
+                            <div className=" pt-4">
+                                <div className="flex justify-between py-2 text-gray-600">
+                                    <span>Price</span>
+                                    <span className="font-semibold text-gray-500">{originalPrice.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between py-2 text-gray-600">
+                                    <span>Discount</span>
+                                    <span className="font-semibold text-gray-500">{discountPercent}%</span>
+                                </div>
+                                <div className="flex justify-between py-2 text-gray-600">
+                                    <span>Making Charges</span>
+                                    <span className="font-semibold text-gray-500">{makingChargesAmount.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between py-2 text-gray-600">
+                                    <span>Sales Tax</span>
+                                    <span className="font-semibold text-gray-500">{salesTaxPercent}%</span>
+                                </div>
+                                <div className="font-semibold text-xl flex justify-between py-4 text-gray-600">
+                                    <span>Total</span>
+                                    <span>{total.toFixed(2)}</span>
+                                </div>
+                            </div>
                         </>
                     )}
-                    <div className="px-8 border-b">
-                        <div className="flex justify-between py-4 text-gray-600">
-                            <span>Subtotal</span>
-                            <span className="font-semibold text-gray-500">{product ? quantity * product.price : 0}</span>
+                </div>
+
+                <div className="md:col-span-2 bg-yellow-50 p-4 space-y-8">
+                    {/* Checkout Message */}
+                    <div className="p-4 bg-white shadow rounded-md">
+                        <div className="flex items-center border-b pb-4">
+                            <div className="text-yellow-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div className="ml-3 text-sm font-medium text-yellow-800">Checkout</div>
                         </div>
-                        <div className="flex justify-between py-4 text-gray-600">
-                            <span>Shipping</span>
-                            <span className="font-semibold text-gray-500">Free</span>
-                        </div>
+                        <div className="text-sm mt-4 text-gray-500">Complete your shipping and payment details below.</div>
                     </div>
-                    <div className="font-semibold text-xl px-8 flex justify-between py-8 text-gray-600">
-                        <span>Total</span>
-                        <span>{product ? quantity * product.price : 0}</span>
-                    </div>
+
+                    {isError ? (
+                        <div className='text-center font-bold text-3xl'>{error.data.message}</div>
+                    ) : (
+                        <>
+                            <button className="btn bg-yellow-400 text-black hover:bg-yellow-500" onClick={() => document.getElementById('add').showModal()}>
+                                Add Address
+                            </button>
+                            <dialog id="add" className="modal">
+                                <div className="modal-box bg-yellow-50">
+                                    <h3 className="font-bold text-lg text-yellow-800">Add Address</h3>
+                                    <Form />
+                                </div>
+                            </dialog>
+                            {/* Address List with Checkbox */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                {addresses && addresses.map((item) => (
+                                    <div key={item._id} className="overflow-hidden group relative rounded-lg p-1 flex justify-center items-center">
+                                        <label className="relative z-10 w-full bg-white p-6 rounded-lg flex items-center cursor-pointer">
+                                            <input type="checkbox" className="form-checkbox h-5 w-5 text-yellow-500" checked={selectedAddress === item._id} onChange={() => handleAddressChange(item._id)} />
+                                            <div className="ml-4">
+                                                <h3 className="text-xl font-bold text-gray-900">{item.addressType}</h3>
+                                                <p className="mt-2 text-sm text-gray-500">House {item.houseNo}</p>
+                                                <p className="mt-2 text-sm text-gray-500">Country {item.country}</p>
+                                                <p className="mt-2 text-sm text-gray-500">State {item.state}</p>
+                                                <p className="mt-2 text-sm text-gray-500">Pincode {item.pincode}</p>
+                                                <p className="mt-2 text-sm text-gray-500">Mobile {item.mobile}</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                            <button onClick={handlePayNow} className="submit-button px-4 py-3 rounded-full bg-yellow-400 text-white w-full text-xl font-semibold transition-colors hover:bg-yellow-500 mt-4">
+                                Pay Now
+                            </button>
+                        </>
+                    )}
+                </div>
+
+                {/* Order Summary on Large Screens */}
+                <div className="hidden md:block md:col-span-1 bg-white p-4">
+                    <h1 className="py-6 border-b-2 text-xl text-yellow-800">Order Summary</h1>
+                    {product && (
+                        <>
+                            <ul className="py-6 border-b space-y-6">
+                                <li className="flex items-center space-x-4 border-b pb-4">
+                                    <div className="w-24">
+                                        <img src={product.image} alt={product.name} className="rounded w-full" />
+                                    </div>
+                                    <div className="flex flex-col flex-grow">
+                                        <span className="text-gray-600 text-md font-semibold">{product.name}</span>
+                                        <span className="text-gray-400 text-sm">{product.productType}</span>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <button onClick={minus} className="bg-gray-200 text-gray-600 border-0 py-1 px-3 rounded-l">-</button>
+                                        <span className="text-gray-900 px-3">{quantity}</span>
+                                        <button onClick={plus} className="bg-gray-200 text-gray-600 border-0 py-1 px-3 rounded-r">+</button>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div className="border-t pt-4">
+                                <div className="flex justify-between py-2 text-gray-600">
+                                    <span>Price</span>
+                                    <span className="font-semibold text-gray-500">{originalPrice.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between py-2 text-gray-600">
+                                    <span>Discount</span>
+                                    <span className="font-semibold text-gray-500">{discountPercent}%</span>
+                                </div>
+                                <div className="flex justify-between py-2 text-gray-600">
+                                    <span>Making Charges</span>
+                                    <span className="font-semibold text-gray-500">{makingChargesAmount.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between py-2 text-gray-600">
+                                    <span>Sales Tax</span>
+                                    <span className="font-semibold text-gray-500">{salesTaxPercent}%</span>
+                                </div>
+                                <div className="font-semibold text-xl flex justify-between py-4 text-gray-600">
+                                    <span>Total</span>
+                                    <span>{total.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </>
     );
 };
 
-
-
 const Form = ({ edit }) => {
     const { user } = useSelector((state) => state.userData);
+    const [addAddress, { isSuccess, isLoading, isError, error }] = useAddAddressMutation();
 
-    const [addAddress, { isSuccess, isLoading, isError, error }] = useAddAddressMutation()
     const formik = useFormik({
         enableReinitialize: true,
-        initialValues: edit || {
-            pincode: "",
-            houseNo: "",
-            city: "",
-            state: "",
-            country: "",
-            addressType: "",
-            mobile: "",
-
+        initialValues: {
+            addressType: edit ? edit.addressType : '',
+            houseNo: edit ? edit.houseNo : '',
+            country: edit ? edit.country : '',
+            state: edit ? edit.state : '',
+            pincode: edit ? edit.pincode : '',
+            mobile: edit ? edit.mobile : '',
         },
         validationSchema: yup.object({
-            pincode: yup.string().required(),
-            houseNo: yup.string().required("Enter houseNo"),
-            city: yup.string().required("Enter city"),
-            state: yup.string().required("Enter state"),
-            country: yup.string().required("Enter country"),
-            addressType: yup.string().required("Enter addressType"),
-            mobile: yup.string().required("Enter mobile"),
-
+            addressType: yup.string().required(),
+            houseNo: yup.string().required(),
+            country: yup.string().required(),
+            state: yup.string().required(),
+            pincode: yup.number().required(),
+            mobile: yup.number().required(),
         }),
-        onSubmit: (values, { resetForm }) => {
-            addAddress({ ...values, userId: user._id })
-            console.log(values);
-
-            resetForm();
+        onSubmit: async (values) => {
+            await addAddress({ ...values, userId: user._id });
         },
     });
+
     useEffect(() => {
         if (isSuccess) {
-            toast.success("Address Add Success")
-            document.getElementById("add").close()
-            // btnRef.current.click()
+            toast.success("Address added successfully");
+            formik.resetForm();
         }
-    }, [isSuccess])
-
-    // let isLoading = false
-    useEffect(() => {
         if (isError) {
-            toast.error(error.data.message)
+            toast.error(error?.data.message);
         }
-    }, [isError])
+    }, [isSuccess, isError]);
 
-    return <>
-        {
-            isLoading
-                ? <>
-                    <div class="flex items-center justify-center min-h-screen p-5 bg-gray-100 min-w-screen">
+    return (
+        <form onSubmit={formik.handleSubmit}>
+            <div className="mt-4">
+                <label htmlFor="addressType" className="block text-sm font-medium text-gray-700">
+                    Address Type
+                </label>
+                <input type="text" {...formik.getFieldProps('addressType')} className="mt-1 p-2 w-full rounded-md border border-gray-300" />
+            </div>
+            <div className="mt-4">
+                <label htmlFor="houseNo" className="block text-sm font-medium text-gray-700">
+                    House No
+                </label>
+                <input type="text" {...formik.getFieldProps('houseNo')} className="mt-1 p-2 w-full rounded-md border border-gray-300" />
+            </div>
+            <div className="mt-4">
+                <label htmlFor="country" className="block text-sm font-medium text-gray-700">
+                    Country
+                </label>
+                <input type="text" {...formik.getFieldProps('country')} className="mt-1 p-2 w-full rounded-md border border-gray-300" />
+            </div>
+            <div className="mt-4">
+                <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+                    State
+                </label>
+                <input type="text" {...formik.getFieldProps('state')} className="mt-1 p-2 w-full rounded-md border border-gray-300" />
+            </div>
+            <div className="mt-4">
+                <label htmlFor="pincode" className="block text-sm font-medium text-gray-700">
+                    Pincode
+                </label>
+                <input type="number" {...formik.getFieldProps('pincode')} className="mt-1 p-2 w-full rounded-md border border-gray-300" />
+            </div>
+            <div className="mt-4">
+                <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">
+                    Mobile
+                </label>
+                <input type="number" {...formik.getFieldProps('mobile')} className="mt-1 p-2 w-full rounded-md border border-gray-300" />
+            </div>
+            <div className="mt-6">
+                <button type="submit" disabled={isLoading} className="submit-button px-4 py-2 rounded-md bg-yellow-400 text-white w-full text-md font-semibold transition-colors hover:bg-yellow-500">
+                    {isLoading ? "Adding..." : "Add Address"}
+                </button>
+            </div>
+        </form>
+    );
+};
 
-                        <div class="flex space-x-2 animate-pulse">
-                            <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
-                            <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
-                            <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
-                        </div>
-
-                    </div>
-                </>
-                : <>
-                    <form onSubmit={formik.handleSubmit}>
-                        {/* <pre>{JSON.stringify(formik.values, null, 2)}</pre> */}
-                        <input {...formik.getFieldProps("houseNo")} type="text" placeholder="Type House No." className="input w-full my-2" />
-                        <input {...formik.getFieldProps("state")} type="text" placeholder="Type State" className="input w-full my-2" />
-                        <input {...formik.getFieldProps("city")} type="text" placeholder="Type City" className="input w-full my-2" />
-                        <input {...formik.getFieldProps("pincode")} type="number" placeholder="Type pincode" className="input w-full my-2" />
-                        <input {...formik.getFieldProps("country")} type="text" placeholder="Type Country" className="input w-full my-2" />
-                        <input {...formik.getFieldProps("mobile")} type="number" placeholder="Type Mobile" className="input w-full my-2" />
-                        {/* <input type="text" placeholder="Type here" className="input w-full my-2" /> */}
-                        <select {...formik.getFieldProps("addressType")} className="select select-bordered w-full my-2">
-                            <option selected >Select Address Type</option>
-                            <option value="home">Home</option>
-                            <option value="office">Office</option>
-                        </select>
-                        <div className="modal-action">
-                            <button type="submit" className="btn bg-gray-400 text-black">
-                                {edit ? "Update" : "Add"} Address
-                            </button>
-                            <button type="button" onClick={() => document.getElementById(edit ? "update" : "add").close()} className="btn">
-                                Close
-                            </button>
-                        </div>
-                    </form>
-                </>
-        }
-
-
-
-
-
-    </>
-}
 export default CheckOut;

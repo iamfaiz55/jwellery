@@ -6,13 +6,27 @@ import * as yup from 'yup';
 import { toast } from 'sonner';
 import { useCart } from '../App';
 import { useNavigate } from 'react-router-dom';
+import { useGetTaxesQuery } from '../redux/apis/openApi';
 
 const CartCheckOut = () => {
     const { cartData, setCartData } = useCart();
     const { user } = useSelector(state => state.userData);
-    const { data } = useGetAddressesQuery(user._id);
+    const { data: addresses } = useGetAddressesQuery(user._id);
     const [selectedAddress, setSelectedAddress] = useState(null);
     const navigate = useNavigate();
+    const { data: taxes } = useGetTaxesQuery();
+
+    // Extracting tax details
+    const salesTax = taxes?.find(tax => tax.taxName === 'Sales Tax')?.percent || 0;
+    const discount = taxes?.find(tax => tax.taxName === 'Discount')?.percent || 0;
+    const makingCharges = taxes?.find(tax => tax.taxName === 'Making Charges')?.percent || 0;
+
+    // Calculations for order summary
+    const subtotal = cartData.cartItems.reduce((acc, item) => acc + item.quantity * Number(item.productId.price), 0);
+    const discountAmount = subtotal * (discount / 100);
+    const subtotalAfterDiscount = subtotal - discountAmount;
+    const salesTaxAmount = subtotalAfterDiscount * (salesTax / 100);
+    const total = subtotalAfterDiscount + salesTaxAmount + makingCharges;
 
     const handleAddressChange = (addressId) => {
         setSelectedAddress(addressId);
@@ -20,7 +34,6 @@ const CartCheckOut = () => {
 
     const handlePayNow = () => {
         if (selectedAddress) {
-            // Update the cart data with the selected address
             setCartData(prevData => ({
                 ...prevData,
                 deliveryAddressId: selectedAddress
@@ -85,8 +98,8 @@ const CartCheckOut = () => {
                     </dialog>
                     {/* Address List with Checkbox */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-md">
-                        {data &&
-                            data.map((item) => (
+                        {addresses &&
+                            addresses.map((item) => (
                                 <div key={item._id} className="overflow-hidden group relative rounded-lg p-1 flex justify-center items-center">
                                     <div className="hidden group-hover:block animate-gradient absolute top-0 left-0 w-full h-full bg-gradient-to-r from-zinc-900 via-gray-200/40 to-zinc-700 rounded-lg shadow-xl"></div>
                                     <label className="relative z-10 w-full bg-white p-6 sm:p-8 rounded-lg flex items-center cursor-pointer">
@@ -130,9 +143,10 @@ const CartCheckOut = () => {
                                     <span className="text-gray-600 text-md font-semi-bold">{item.name}</span>
                                     <span className="text-gray-400 text-sm inline-block pt-2">{item.productType}</span>
                                 </div>
-                                <div className="col-span-2 ml-12 pt-3">
-                                    <div className="flex items-center space-x-2 text-sm justify-between">
-                                        <h1 className="text-gray-400">{item.quantity} x {item.productId.price}</h1>
+                                <div className=" ml-10 pt-3">
+                                    <div className="flex items-center  text-sm justify-between">
+                                        <h1 className="text-gray-400">{item.quantity} x {Number(item.productId.price).toFixed(2)}</h1>
+                                        <span className="font-semibold text-gray-600">{(item.quantity * Number(item.productId.price)).toFixed(2)}</span>
                                     </div>
                                 </div>
                             </li>
@@ -142,16 +156,24 @@ const CartCheckOut = () => {
                     <div className="px-8 border-b">
                         <div className="flex justify-between py-4 text-gray-600">
                             <span>Subtotal</span>
-                            <span className="font-semibold text-gray-500">{cartData.subtotal}</span>
+                            <span className="font-semibold text-gray-500">{subtotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between py-4 text-gray-600">
-                            <span>Shipping</span>
-                            <span className="font-semibold text-gray-500">Free</span>
+                            <span>Discount</span>
+                            <span className="font-semibold text-gray-500">-{discountAmount.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between py-4 text-gray-600">
+                            <span>Making Charges</span>
+                            <span className="font-semibold text-gray-500">{makingCharges.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between py-4 text-gray-600">
+                            <span>Sales Tax</span>
+                            <span className="font-semibold text-gray-500">{salesTaxAmount.toFixed(2)}</span>
                         </div>
                     </div>
                     <div className="font-semibold text-xl px-8 flex justify-between py-8 text-gray-600">
                         <span>Total</span>
-                        <span>{cartData.subtotal}</span>
+                        <span>{total.toFixed(2)}</span>
                     </div>
                 </div>
             </div>

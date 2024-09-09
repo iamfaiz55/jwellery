@@ -5,11 +5,14 @@ import { toast } from 'sonner';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useGetAllPaymentMethodQuery } from '../redux/apis/adminApi';
+import { useGetTaxesQuery } from '../redux/apis/openApi';
 
 const PaymentPage = () => {
     const [raz, { isSuccess: razSuccess, data }] = useRazorpayMutation();
     const { data: paymentMethods } = useGetAllPaymentMethodQuery();
     const [initiate, { isSuccess: initiateSuccess }] = useVerifyPaymentMutation();
+    const { data: taxes } = useGetTaxesQuery()
+    // console.log(taxes);
 
     const { user } = useSelector(state => state.userData);
     const [createOrder, { isSuccess }] = useCreateOrderMutation();
@@ -74,7 +77,6 @@ const PaymentPage = () => {
                         _id: item.productId._id,
                         quantity: item.quantity
                     })),
-                    subtotal: cartData.subtotal
                 }),
             });
             razor.on('payment.failed', (res) => {

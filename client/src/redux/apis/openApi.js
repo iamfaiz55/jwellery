@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 export const openApi = createApi({
     reducerPath: "openApi",
     baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:5000/api/open" }),
-    tagTypes: ["open"],
+    tagTypes: ["open", "admin"],
     endpoints: (builder) => {
         return {
             getAllCAtegories: builder.query({
@@ -59,6 +59,17 @@ export const openApi = createApi({
                 transformResponse:data => data.result,
                 providesTags: ["user"]
             }),
+            getTaxes: builder.query({
+                query: id => {
+                    return {
+                        url: `/get-tax`,
+                        method: "GET",
+                        // body: addressData
+                    }
+                },
+                transformResponse:data => data.result,
+                providesTags: ["user"]
+            }),
             postContact: builder.mutation({
                 query: contactData => {
                     return {
@@ -82,7 +93,10 @@ export const {
     useGetCArouselQuery,
     useGetDetailsQuery,
     // usePostContactQuery
-    usePostContactMutation
+    usePostContactMutation,
+    // useGetTaxesQuery,
+    useLazyGetTaxesQuery,
+    useGetTaxesQuery
 } = openApi
 
 // useAddAddressMutation,

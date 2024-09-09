@@ -4,20 +4,22 @@ import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../App';
+import { useGetTaxesQuery } from '../redux/apis/openApi';
 
 const Cart = () => {
     const { user } = useSelector(state => state.userData);
-
+    const { data: taxes } = useGetTaxesQuery();
     const { data, isError, error } = useGetAllCartItemsQuery(user._id);
-    // console.log(data.length);
-
     const [cartItems, setCartItems] = useState([]);
-    console.log(cartItems.length);
-
     const [subtotal, setSubtotal] = useState(0);
-    const [deleteItem, { isSuccess }] = useDeleteCArtItemMutation()
-    const { cartData, setCartData } = useContext(CartContext)
-    const navigate = useNavigate()
+    const [discount, setDiscount] = useState(0);
+    const [makingCharges, setMakingCharges] = useState(0);
+    const [salesTax, setSalesTax] = useState(0);
+
+    const [deleteItem, { isSuccess }] = useDeleteCArtItemMutation();
+    const { cartData, setCartData } = useContext(CartContext);
+    const navigate = useNavigate();
+
     useEffect(() => {
         if (data) {
             setCartItems(data);
@@ -25,10 +27,26 @@ const Cart = () => {
         }
     }, [data]);
 
+    useEffect(() => {
+        if (taxes) {
+            setDiscount(taxes.find(tax => tax.taxName === 'Discount')?.percent || 0);
+            setMakingCharges(taxes.find(tax => tax.taxName === 'Making Charges')?.percent || 0);
+            setSalesTax(taxes.find(tax => tax.taxName === 'Sales Tax')?.percent || 0);
+        }
+    }, [taxes]);
+
     const calculateSubtotal = (items) => {
         const total = items.reduce((acc, item) => acc + item.productId.price * item.quantity, 0);
         setSubtotal(total);
     };
+
+    const calculateDiscount = (amount) => amount * (discount / 100);
+    const calculateSalesTax = (amount) => amount * (salesTax / 100);
+    const calculateMakingCharges = (amount) => amount * (makingCharges / 100);
+
+    const totalAfterDiscount = subtotal - calculateDiscount(subtotal);
+    const totalAfterCharges = totalAfterDiscount + calculateMakingCharges(totalAfterDiscount);
+    const totalWithTax = totalAfterCharges + calculateSalesTax(totalAfterCharges);
 
     const handleQuantityChange = (id, delta) => {
         const updatedItems = cartItems.map(item => {
@@ -46,20 +64,17 @@ const Cart = () => {
 
     useEffect(() => {
         if (isSuccess) {
-            toast.success("Cart Item Delete Success")
+            toast.success("Cart Item Deleted Successfully");
         }
-    }, [isSuccess])
-
+    }, [isSuccess]);
 
     return (
-        <div className="min-h-screen  pt-20 bg-light-golden">
+        <div className="min-h-screen pt-20 bg-light-golden">
             {
                 isError
-                    ? <>
-                        <div className='text-center font-bold text-3xl'>{JSON.stringify(error && error.data.message && error.data.message)}</div>
-                    </>
+                    ? <div className='text-center font-bold text-3xl'>{JSON.stringify(error?.data?.message)}</div>
                     : <>
-                        <h1 className="mb-10 text-center text-3xl font-extrabold ">Your Shopping Cart</h1>
+                        <h1 className="mb-10 text-center text-3xl font-extrabold">Your Shopping Cart</h1>
                         {
                             cartItems.length > 0 ? <>
                                 <div className="mx-auto max-w-5xl px-6 md:flex md:space-x-6 xl:px-0">
@@ -71,8 +86,8 @@ const Cart = () => {
                                                     <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
                                                         <div className="mt-5 sm:mt-0">
                                                             <h2 className="text-xl font-semibold text-gray-800">{item.productId.name}</h2>
-                                                            <p>Price :{item.productId.price}</p>
-                                                            <p className="mt-1  text-gray-600">{item.productId.desc}</p>
+                                                            <p>Price: ₹{item.productId.price}</p>
+                                                            <p className="mt-1 text-gray-600">{item.productId.desc}</p>
                                                         </div>
                                                         <div className="mt-4 flex justify-between sm:mt-0 sm:space-x-6">
                                                             <div className="flex items-center">
@@ -92,7 +107,7 @@ const Cart = () => {
                                                             </div>
                                                             <div className="flex items-center space-x-4">
                                                                 <p className="text-lg font-semibold text-gray-800">₹{(item.productId.price * item.quantity).toFixed(2)}</p>
-                                                                <button onClick={e => deleteItem(item._id)}>
+                                                                <button onClick={() => deleteItem(item._id)}>
                                                                     <svg
                                                                         xmlns="http://www.w3.org/2000/svg"
                                                                         fill="none"
@@ -121,15 +136,23 @@ const Cart = () => {
                                             <p className="text-gray-700">₹{subtotal.toFixed(2)}</p>
                                         </div>
                                         <div className="flex justify-between border-b py-4">
-                                            <p className="text-gray-700">Shipping</p>
-                                            <p className="text-gray-700">FREE</p>
+                                            <p className="text-gray-700">Discount ({discount}%)</p>
+                                            <p className="text-gray-700">-₹{calculateDiscount(subtotal).toFixed(2)}</p>
+                                        </div>
+                                        <div className="flex justify-between border-b py-4">
+                                            <p className="text-gray-700">Making Charges ({makingCharges}%)</p>
+                                            <p className="text-gray-700">+₹{calculateMakingCharges(totalAfterDiscount).toFixed(2)}</p>
+                                        </div>
+                                        <div className="flex justify-between border-b py-4">
+                                            <p className="text-gray-700">Sales Tax ({salesTax}%)</p>
+                                            <p className="text-gray-700">+₹{calculateSalesTax(totalAfterCharges).toFixed(2)}</p>
                                         </div>
                                         <div className="flex justify-between border-b py-4">
                                             <p className="text-lg font-semibold text-gray-800">Total</p>
-                                            <p className="text-lg font-semibold text-gray-800">₹{subtotal.toFixed(2)}</p>
+                                            <p className="text-lg font-semibold text-gray-800">₹{totalWithTax.toFixed(2)}</p>
                                         </div>
-                                        <button onClick={e => {
-                                            setCartData({ cartItems, subtotal });
+                                        <button onClick={() => {
+                                            setCartData({ cartItems, subtotal: totalWithTax });
                                             navigate('/user/cartCheckout');
                                         }} className="mt-6 w-full rounded-md bg-yellow-500 py-2 text-lg font-semibold text-white transition-transform duration-200 hover:scale-105 hover:bg-pink-600">
                                             Proceed to Checkout
@@ -137,9 +160,7 @@ const Cart = () => {
                                     </div>
                                 </div>
                             </>
-                                : <>
-                                    <div className='text-3xl font-extrabold text-center'>Empty</div>
-                                </>
+                                : <div className='text-3xl font-extrabold text-center'>Empty</div>
                         }
                     </>
             }

@@ -11,5 +11,7 @@ router
     .post("/post-contact", userController.contact)
     .get("/details/:pId", userController.getDetails)
 
+    .get("/get-tax", adminController.getTax)
+
 
 module.exports = router
