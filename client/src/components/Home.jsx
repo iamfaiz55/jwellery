@@ -9,7 +9,7 @@ const Home = () => {
     const { selectedType } = usefilter();
     const [allProducts, setAllProducts] = useState([]);
     const { data: taxes } = useGetTaxesQuery();
-    console.log(taxes);
+    // console.log(taxes);
 
     let [filter, { data: filteredData, isSuccess, isError, error }] = useLazyGetFilteredDataQuery();
 

@@ -23,6 +23,10 @@ const CheckOut = () => {
     const salesTax = taxes && taxes.find(tax => tax.taxName === 'Sales Tax');
     const makingCharges = taxes && taxes.find(tax => tax.taxName === 'Making Charges');
 
+    // console.log("discount", discount.percent);
+    // console.log("sales Tax", salesTax.percent);
+    // console.log("making charges", makingCharges.percent);
+
     const originalPrice = product ? parseFloat(product.price) : 0;
     const discountPercent = discount ? discount.percent : 0;
     const salesTaxPercent = salesTax ? salesTax.percent : 0;
@@ -37,7 +41,7 @@ const CheckOut = () => {
             setCartData({
                 ...cartData,
                 deliveryAddressId: selectedAddress,
-                subtotal,
+                subtotal: originalPrice,
                 cartItems: [{ productId: product, quantity }],
             });
             navigate("/user/payment");

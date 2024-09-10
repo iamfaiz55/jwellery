@@ -13,6 +13,13 @@ const PaymentPage = () => {
     const [initiate, { isSuccess: initiateSuccess }] = useVerifyPaymentMutation();
     const { data: taxes } = useGetTaxesQuery()
     // console.log(taxes);
+    const discount = taxes && taxes.find(tax => tax.taxName === 'Discount');
+    const salesTax = taxes && taxes.find(tax => tax.taxName === 'Sales Tax');
+    const makingCharges = taxes && taxes.find(tax => tax.taxName === 'Making Charges');
+
+    // console.log("discount", discount && discount.percent);
+    // console.log("sales Tax", salesTax && salesTax.percent);
+    // console.log("making charges", makingCharges && makingCharges.percent);
 
     const { user } = useSelector(state => state.userData);
     const [createOrder, { isSuccess }] = useCreateOrderMutation();
@@ -20,15 +27,16 @@ const PaymentPage = () => {
     const [deleteFull, { isSuccess: deleteSuccess }] = useDeleteFullCartMutation();
     const [paymentMethod, setPaymentMethod] = useState('');
 
+    // console.log("cart Data", cartData);
 
-    const handlePaymentMethodChange = (event) => {
-        setPaymentMethod(event.target.value);
+    const handlePaymentMethodChange = (e) => {
+        setPaymentMethod(e.target.value);
     };
 
 
     let x = `${user._id}${user.name}`;
-    const handleSubmit = (event) => {
-        event.preventDefault();
+    const handleSubmit = (e) => {
+        e.preventDefault();
 
         const orderData = {
             deliveryAddressId: cartData.deliveryAddressId,
@@ -40,17 +48,26 @@ const PaymentPage = () => {
             })),
 
         };
+        const discountAmount = discount ? (cartData.subtotal * discount.percent) / 100 : 0;
+        const salesTaxAmount = salesTax ? (cartData.subtotal * salesTax.percent) / 100 : 0;
+        const makingChargesAmount = makingCharges ? (cartData.subtotal * makingCharges.percent) / 100 : 0;
 
+        const totalAmount = cartData.subtotal - discountAmount + salesTaxAmount + makingChargesAmount;
+
+
+        const roundedTotalAmount = Math.round(totalAmount * 100) / 100;
         if (paymentMethod === 'razorpay') {
             raz({
                 ...orderData, userId: user._id, currency: "INR",
-                receipt: x
+                receipt: x,
+                subtotal: roundedTotalAmount
             });
 
         } else {
             createOrder({ ...orderData, userId: user._id });
         }
     };
+
 
     useEffect(() => {
         if (razSuccess) {
