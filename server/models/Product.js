@@ -17,6 +17,7 @@ const productSchema = new mongoose.Schema({
       },
       desc:{type:String,},
       purity:{type:String},
+      rating:{type:Number, default:1},
       isDelete:{
             type:Boolean,
             default: false

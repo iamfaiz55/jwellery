@@ -7,81 +7,78 @@ export const openApi = createApi({
     endpoints: (builder) => {
         return {
             getAllCAtegories: builder.query({
-                query: (id) => {
-                    return {
-                        url: `/categories`,
-                        method: "GET"
-                    }
-                },
-                transformResponse:data => data.result,
+                query: () => ({
+                    url: `/categories`,
+                    method: "GET"
+                }),
+                transformResponse: (data) => data.result,
                 providesTags: ["user"]
             }),
 
             getFilteredData: builder.query({
-                query: (type) => {
-                    return {
-                        url: `/filter`,
-                        method: "GET",
-                         params:type
-                    }
-                },
-                transformResponse:data => data.result,
+                query: (type) => ({
+                    url: `/filter`,
+                    method: "GET",
+                    params: type
+                }),
+                transformResponse: (data) => data.result,
                 providesTags: ["user"]
             }),
+
             getCArousel: builder.query({
-                query: (id) => {
-                    return {
-                        url: `/carousel`,
-                        method: "GET"
-                    }
-                },
-                transformResponse:data => data.result,
+                query: () => ({
+                    url: `/carousel`,
+                    method: "GET"
+                }),
+                transformResponse: (data) => data.result,
                 providesTags: ["user"]
             }),
+
             getAllProducts: builder.query({
-                query: () => {
-                    return {
-                        url: "/get-products",
-                        method: "GET"
-                    }
-                },
-                transformResponse:data =>data.result,
+                query: ({ page = 1, limit = 12, type } = {}) => ({
+                    url: "/get-products",
+                    method: "GET",
+                    params: { page, limit, type }  
+                }),
+                // transformResponse: (data) => data.result,
                 providesTags: ["user"]
             }),
+
             getDetails: builder.query({
-                query: id => {
-                    return {
-                        url: `/details/${id}`,
-                        method: "GET",
-                        // body: addressData
-                    }
-                },
-                transformResponse:data => data.result,
+                query: (id) => ({
+                    url: `/details/${id}`,
+                    method: "GET"
+                }),
+                transformResponse: (data) => data.result,
                 providesTags: ["user"]
             }),
+            getCompanyDetails: builder.query({
+                query: (id) => ({
+                    url: `/get-company`,
+                    method: "GET"
+                }),
+                transformResponse: (data) => data.result,
+                providesTags: ["user"]
+            }),
+
             getTaxes: builder.query({
-                query: id => {
-                    return {
-                        url: `/get-tax`,
-                        method: "GET",
-                        // body: addressData
-                    }
-                },
-                transformResponse:data => data.result,
+                query: () => ({
+                    url: `/get-tax`,
+                    method: "GET"
+                }),
+                transformResponse: (data) => data.result,
                 providesTags: ["user"]
             }),
+
             postContact: builder.mutation({
-                query: contactData => {
-                    return {
-                        url: `post-contact`,
-                        method: "POST",
-                        body: contactData
-                    }
-                },
-                transformResponse:data => data.result,
+                query: (contactData) => ({
+                    url: `post-contact`,
+                    method: "POST",
+                    body: contactData
+                }),
+                transformResponse: (data) => data.result,
                 providesTags: ["user"]
-            }),
-        
+            })
         }
     }
 })
@@ -90,14 +87,15 @@ export const {
     useGetAllCAtegoriesQuery,
     useLazyGetFilteredDataQuery,
     useGetAllProductsQuery,
+    useLazyGetAllProductsQuery,  
     useGetCArouselQuery,
     useGetDetailsQuery,
-    // usePostContactQuery
     usePostContactMutation,
-    // useGetTaxesQuery,
+    useGetTaxesQuery,
     useLazyGetTaxesQuery,
-    useGetTaxesQuery
-} = openApi
+    useGetCompanyDetailsQuery
+} = openApi;
+
 
 // useAddAddressMutation,
 // useGetAddressesQuery,

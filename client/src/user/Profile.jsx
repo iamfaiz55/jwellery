@@ -1,20 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { useAddAddressMutation, useGetAddressesQuery, useUpdateProfileMutation } from '../redux/apis/userApi';
 import * as yup from 'yup';
+import {
+    useAddAddressMutation,
+    useDeleteAddressMutation,
+    useGetAddressesQuery,
+    useUpdateProfileMutation
+} from '../redux/apis/userApi';
 import { useFormik } from 'formik';
-// import { useblock } from '../App';
 
 const Profile = () => {
-    // const { setBlock, block } = useblock()
+    const [currentSection, setCurrentSection] = useState('profile');
     const [updateProfile, { isSuccess, isLoading }] = useUpdateProfileMutation();
-    const { user } = useSelector(state => state.userData);
+    const { user } = useSelector((state) => state.userData);
     const { data, error, isError } = useGetAddressesQuery(user._id);
-    // console.log(isError);
-
-
+    const [deleteAdress, { isSuccess: addressDeleteSuccess }] = useDeleteAddressMutation();
     const fileInputRef = useRef();
 
     const handleClick = () => {
@@ -26,104 +28,195 @@ const Profile = () => {
         const fd = new FormData();
         fd.append('image', file);
         fd.append('userId', user._id);
-        updateProfile(fd)
+        updateProfile(fd);
     };
 
     useEffect(() => {
         if (isSuccess) {
-            toast.success("Profile Update Success")
-            window.location.reload();
+            toast.success('Profile Update Success');
+            location.reload()
         }
-    }, [isSuccess])
-    // useEffect(() => {
-    //     if (user) {
-    //         window.location.reload();
-    //     }
-    // }, [user]);
+    }, [isSuccess]);
 
+    useEffect(() => {
+        if (addressDeleteSuccess) {
+            toast.success('Your Address Was Deleted Successfully');
+        }
+    }, [addressDeleteSuccess]);
 
     return (
-        <div className="flex flex-col justify-center items-center min-h-screen bg-light-golden">
-            {
-                user.isBlock
-                    ? <>
-                        <div className='text-3xl font-bold '>You Are Blocked From Admin</div>
-                    </>
-                    : <>
-                        <div className="relative flex flex-col items-center rounded-2xl w-full max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-light-golden shadow-2xl p-6">
-                            <div className="mt-4 mb-8 w-full text-center">
-                                <div className="relative flex justify-center items-center">
-                                    {
-                                        isLoading
-                                            ? <>
-                                                <svg aria-hidden="true" class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
-                                                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
-                                                </svg>
-                                            </>
-                                            : <>
-                                                <motion.img
-                                                    src={user.image}
-                                                    className="w-24 h-24 rounded-full border-4 border-golden cursor-pointer"
-                                                    onClick={handleClick}
-                                                    whileHover={{ scale: 1.1 }}
-                                                    transition={{ duration: 0.3 }}
-                                                />
-                                            </>
-                                    }
+        <div className="flex h-screen bg-light-golden">
+            {/* Sidebar */}
+            <div className=" inset-y-0 left-0 z-30 w-64 overflow-y-auto bg-golden rounded-lg m-2 ">
+                <div className="flex flex-col items-center mt-8">
+                    <h2 className="text-2xl font-bold text-white">Hi, {user.name}</h2>
+                </div>
 
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        onChange={handleInput}
-                                        className="hidden"
-                                    />
-                                </div>
-                                <h4 className="text-2xl font-bold text-navy-700 mt-2">
-                                    Hi, {user && user.name}
-                                </h4>
-                                <p className="text-sm text-gray-500 mt-2">{user && user.email}</p>
-                            </div>
-                            <div className="mb-5">
-                                <button className="btn bg-gray-400" onClick={() => document.getElementById('add').showModal()}>Add Address</button>
-                                <dialog id="add" className="modal">
-                                    <div className="modal-box">
-                                        <h3 className="font-bold text-lg">Add New Address</h3>
-                                        <Form />
+                <nav className="mt-10">
+                    <button
+                        onClick={() => setCurrentSection('profile')}
+                        className={`flex items-center px-6 py-2 mt-4 text-gray-100 transition-colors duration-200 ${currentSection === 'profile' ? 'bg-gray-700' : 'bg-transparent'
+                            }`}
+                    >
+                        <svg
+                            className="w-6 h-6"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"
+                            />
+                        </svg>
+                        <span className="mx-3">Profile</span>
+                    </button>
+
+                    <button
+                        onClick={() => setCurrentSection('addresses')}
+                        className={`flex items-center px-6 py-2 mt-4 text-gray-100 transition-colors duration-200 ${currentSection === 'addresses' ? 'bg-gray-700' : 'bg-transparent'
+                            }`}
+                    >
+                        <svg
+                            className="w-6 h-6"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M5 12h14M12 5l7 7-7 7"
+                            />
+                        </svg>
+                        <span className="mx-3">Addresses</span>
+                    </button>
+                </nav>
+            </div>
+
+            <div className="flex flex-col flex-1 p-6  overflow-hidden">
+
+
+                <main className="flex-1 overflow-auto mt-6">
+                    {currentSection === 'profile' && (
+                        <div className="p-4 bg-white rounded-lg shadow-md">
+                            <div className="flex flex-col items-center">
+                                {isLoading ? (
+                                    <div className="w-24 h-24 flex items-center justify-center">
+                                        <svg
+                                            className="animate-spin h-10 w-10 text-golden"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            />
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                            />
+                                        </svg>
                                     </div>
-                                </dialog>
+                                ) : (
+                                    <motion.img
+                                        src={user.image}
+                                        className="w-24 h-24 rounded-full border-4 border-golden cursor-pointer"
+                                        onClick={handleClick}
+                                        whileHover={{ scale: 1.1 }}
+                                        transition={{ duration: 0.3 }}
+                                    />
+                                )}
+
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleInput}
+                                    className="hidden"
+                                />
+
+                                <h4 className="text-2xl font-bold mt-4">Hi, {user.name}</h4>
+                                <p className="text-gray-500">{user.email}</p>
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-                                {
-                                    isError
-                                        ? <><div className='text-center font-bold text-3xl'>{JSON.stringify(error.data.message)}</div></>
-                                        : <>
-                                            {data && data.map((item, index) => (
+                        </div>
+                    )}
+
+                    {
+                        currentSection === "addresses" && <>
+                            <div className="p-4 bg-white rounded-lg shadow-md">
+                                <div className="mb-5">
+                                    <button className="btn bg-gray-400" onClick={() => document.getElementById('add').showModal()}>Add Address</button>
+                                    <dialog id="add" className="modal">
+                                        <div className="modal-box">
+                                            <h3 className="font-bold text-lg">Add New Address</h3>
+                                            <Form />
+                                        </div>
+                                    </dialog>
+                                </div>
+
+                                {isError ? (
+                                    <div className="text-center text-red-500">{error.data.message}</div>
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {data &&
+                                            data.map((item, index) => (
                                                 <motion.div
                                                     key={index}
-                                                    className="overflow-hidden group relative rounded-lg p-1 flex justify-center items-center"
+                                                    className="relative p-4 bg-gray-100 rounded-lg shadow-md"
                                                     whileHover={{ scale: 1.05 }}
                                                     transition={{ duration: 0.3 }}
                                                 >
-                                                    <div className="hidden group-hover:block animate-gradient absolute top-0 left-0 w-full h-full bg-gradient-to-r from-golden via-light-golden to-golden rounded-lg shadow-xl"></div>
-                                                    <a className="relative z-10 w-full bg-white p-6 sm:p-8 rounded-lg">
-                                                        <h3 className="text-xl font-bold text-gray-900">Home</h3>
-                                                        <p className="mt-2 text-sm text-gray-500">House No: {item.houseNo}</p>
-                                                        <p className="mt-2 text-sm text-gray-500">Country: {item.country}</p>
-                                                        <p className="mt-2 text-sm text-gray-500">State: {item.state}</p>
-                                                        <p className="mt-2 text-sm text-gray-500">Pincode: {item.pincode}</p>
-                                                    </a>
+                                                    <button
+                                                        onClick={() => deleteAdress(item._id)}
+                                                        className="absolute top-2 right-2 p-2 bg-red-200 rounded-full"
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            className="h-5 w-5 text-red-500"
+                                                            viewBox="0 0 30 30"
+                                                        >
+                                                            <path d="M14.984 2.486a1 1 0 0 0-.984 1.014V4H8.5A1 1 0 0 0 7.486 5H6a1 1 0 1 0 0 2h18a1 1 0 1 0 0-2h-1.487A1 1 0 0 0 21.5 4h-5.5v-.514a1 1 0 0 0-1.016-1.014zM6 9h1.793L9.777 24.234C9.911 25.241 10.763 26 11.777 26h8.445c1.014 0 1.867-.759 1.988-1.766L22.207 9H6z" />
+                                                        </svg>
+                                                    </button>
+                                                    <h3 className="text-xl font-semibold">Home</h3>
+                                                    <p>
+                                                        <span className="font-medium">House No:</span> {item.houseNo}
+                                                    </p>
+                                                    <p>
+                                                        <span className="font-medium">Country:</span> {item.country}
+                                                    </p>
+                                                    <p>
+                                                        <span className="font-medium">State:</span> {item.state}
+                                                    </p>
+                                                    <p>
+                                                        <span className="font-medium">Pincode:</span> {item.pincode}
+                                                    </p>
                                                 </motion.div>
                                             ))}
-                                        </>
-                                }
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                    </>
-            }
+                        </>
+                    }
+                </main>
+            </div>
         </div>
     );
 };
+
+
+
 
 const Form = ({ edit }) => {
     const { user } = useSelector((state) => state.userData);

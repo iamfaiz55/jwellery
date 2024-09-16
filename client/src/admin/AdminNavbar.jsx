@@ -22,7 +22,7 @@ const AdminNavbar = () => {
     useEffect(() => {
         if (error) {
             logoutAdmin()
-            toast.error(error.data.message)
+            toast.error(error && error.data.message)
         }
     }, [isError])
 

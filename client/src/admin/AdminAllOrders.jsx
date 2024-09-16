@@ -77,10 +77,10 @@ const AdminAllOrders = () => {
                             </td>
                             <td className="px-6 py-4 hidden md:table-cell">
                                 <div className="text-sm">
-                                    <div className="font-medium text-gray-700">{order.deliveryAddressId.addressType}</div>
-                                    <div className="text-gray-400">{order.deliveryAddressId.city}, {order.deliveryAddressId.state}</div>
-                                    <div className="text-gray-400">{order.deliveryAddressId.country} - {order.deliveryAddressId.pincode}</div>
-                                    <div className="text-gray-400">Mobile: {order.deliveryAddressId.mobile}</div>
+                                    <div className="font-medium text-gray-700">{order.deliveryAddressId && order.deliveryAddressId.addressType}</div>
+                                    <div className="text-gray-400">{order.deliveryAddressId && order.deliveryAddressId.city}, {order.deliveryAddressId && order.deliveryAddressId.state}</div>
+                                    <div className="text-gray-400">{order.deliveryAddressId && order.deliveryAddressId.country} - {order.deliveryAddressId && order.deliveryAddressId.pincode}</div>
+                                    <div className="text-gray-400">Mobile: {order.deliveryAddressId && order.deliveryAddressId.mobile}</div>
                                 </div>
                             </td>
                             <td className="px-6 py-4 hidden md:table-cell">

@@ -5,7 +5,8 @@ import { useLazyGetTaxesQuery } from '../redux/apis/openApi'
 
 const CompanyAddress = () => {
     const [getAddresses, { data }] = useLazyGetCompanyAddressQuery()
-    // console.log(data);
+    console.log(data);
+
     const [getTax, { data: taxes }] = useLazyGetTaxesQuery()
 
 
@@ -48,6 +49,7 @@ const CompanyAddress = () => {
                             <th scope="col" className="px-6 py-4 font-bold text-gray-900">Country</th>
                             <th scope="col" className="px-6 py-4 font-bold text-gray-900">Pincode</th>
                             <th scope="col" className="px-6 py-4 font-bold text-gray-900">GST No</th>
+                            <th scope="col" className="px-6 py-4 font-bold text-gray-900">Logo</th>
                             <th scope="col" className="px-6 py-4 font-bold text-gray-900">Action</th>
                         </tr>
                     </thead>
@@ -60,6 +62,9 @@ const CompanyAddress = () => {
                                 <td className="px-6 py-4 text-gray-900">{item.country}</td>
                                 <td className="px-6 py-4 text-gray-900">{item.pincode}</td>
                                 <td className="px-6 py-4 text-gray-900">{item.gst}</td>
+                                <td className="px-6 py-4 text-gray-900">
+                                    <img src={item.logo} width={50} alt="" />
+                                </td>
                                 <td className="px-6 py-4 text-gray-900">
                                     <button onClick={e => {
                                         setAddressData(item)
@@ -139,69 +144,106 @@ const CompanyAddress = () => {
                 <div className="modal-box bg-yellow-50 border border-yellow-200 rounded-lg">
                     <h3 className="font-bold text-xl text-yellow-600">Edit Address</h3>
 
-                    <div>
-                        <div className="mb-4">
-                            <label htmlFor="buildingNo" className="block text-gray-700 m-1">Building No:</label>
-                            <input type="text"
-                                onChange={e => setAddressData({ ...addressData, buildingNo: e.target.value })}
-                                id="buildingNo"
-                                value={addressData.buildingNo}
-                                name="buildingNo"
-                                className="input w-full bg-yellow-50 border border-yellow-300 rounded-lg px-4 py-2 text-gray-700"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="city" className="block text-gray-700">City:</label>
-                            <input type="text"
-                                onChange={e => setAddressData({ ...addressData, city: e.target.value })}
-                                id="city"
-                                value={addressData.city}
-                                name="city"
-                                className="input w-full bg-yellow-50 border border-yellow-300 rounded-lg px-4 py-2 text-gray-700"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="state" className="block text-gray-700">State:</label>
-                            <input type="text"
-                                onChange={e => setAddressData({ ...addressData, state: e.target.value })}
-                                id="state"
-                                name="state"
-                                value={addressData.state}
-                                className="input w-full bg-yellow-50 border border-yellow-300 rounded-lg px-4 py-2 text-gray-700"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="country" className="block text-gray-700">Country:</label>
-                            <input type="text"
-                                onChange={e => setAddressData({ ...addressData, country: e.target.value })}
-                                id="country"
-                                name="country"
-                                value={addressData.country}
-                                className="input w-full bg-yellow-50 border border-yellow-300 rounded-lg px-4 py-2 text-gray-700"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="pincode" className="block text-gray-700">Pincode:</label>
-                            <input type="text"
-                                onChange={e => setAddressData({ ...addressData, pincode: e.target.value })}
-                                id="pincode"
-                                value={addressData.pincode}
-                                name="pincode"
-                                className="input w-full bg-yellow-50 border border-yellow-300 rounded-lg px-4 py-2 text-gray-700"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="gst" className="block text-gray-700">GST No:</label>
-                            <input type="text"
-                                onChange={e => setAddressData({ ...addressData, gst: e.target.value })}
-                                id="gst"
-                                name="gst"
-                                value={addressData.gst}
-                                className="input w-full bg-yellow-50 border border-yellow-300 rounded-lg px-4 py-2 text-gray-700"
-                            />
-                        </div>
-                        <button onClick={e => updateAddress(addressData)} className="bg-yellow-500 my-5 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">Update</button>
-                    </div>
+                    {
+                        isLoading
+                            ? <>
+                                <div class="flex items-center justify-center min-h-screen p-5 bg-light-golden min-w-screen">
+
+                                    <div class="flex space-x-2 animate-pulse">
+                                        <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
+                                        <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
+                                        <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
+                                    </div>
+
+                                </div>
+                            </>
+                            : <>
+                                <div>
+                                    <div className="mb-4">
+                                        <label htmlFor="buildingNo" className="block text-gray-700 m-1">Building No:</label>
+                                        <input type="text"
+                                            onChange={e => setAddressData({ ...addressData, buildingNo: e.target.value })}
+                                            id="buildingNo"
+                                            value={addressData.buildingNo}
+                                            name="buildingNo"
+                                            className="input w-full bg-yellow-50 border border-yellow-300 rounded-lg px-4 py-2 text-gray-700"
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="city" className="block text-gray-700">City:</label>
+                                        <input type="text"
+                                            onChange={e => setAddressData({ ...addressData, city: e.target.value })}
+                                            id="city"
+                                            value={addressData.city}
+                                            name="city"
+                                            className="input w-full bg-yellow-50 border border-yellow-300 rounded-lg px-4 py-2 text-gray-700"
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="state" className="block text-gray-700">State:</label>
+                                        <input type="text"
+                                            onChange={e => setAddressData({ ...addressData, state: e.target.value })}
+                                            id="state"
+                                            name="state"
+                                            value={addressData.state}
+                                            className="input w-full bg-yellow-50 border border-yellow-300 rounded-lg px-4 py-2 text-gray-700"
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="country" className="block text-gray-700">Country:</label>
+                                        <input type="text"
+                                            onChange={e => setAddressData({ ...addressData, country: e.target.value })}
+                                            id="country"
+                                            name="country"
+                                            value={addressData.country}
+                                            className="input w-full bg-yellow-50 border border-yellow-300 rounded-lg px-4 py-2 text-gray-700"
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="pincode" className="block text-gray-700">Pincode:</label>
+                                        <input type="text"
+                                            onChange={e => setAddressData({ ...addressData, pincode: e.target.value })}
+                                            id="pincode"
+                                            value={addressData.pincode}
+                                            name="pincode"
+                                            className="input w-full bg-yellow-50 border border-yellow-300 rounded-lg px-4 py-2 text-gray-700"
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="gst" className="block text-gray-700">GST No:</label>
+                                        <input type="text"
+                                            onChange={e => setAddressData({ ...addressData, gst: e.target.value })}
+                                            id="gst"
+                                            name="gst"
+                                            value={addressData.gst}
+                                            className="input w-full bg-yellow-50 border border-yellow-300 rounded-lg px-4 py-2 text-gray-700"
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="logo" className="block text-gray-700">logo </label>
+                                        <input type="file"
+                                            onChange={e => setAddressData({ ...addressData, logo: e.target.files[0] })}
+                                            id="logo"
+                                            name="logo"
+                                            // value={addressData.logo}
+                                            className="file-input file-input-bordered file-input-warning w-full "
+                                        />
+                                    </div>
+                                    <button onClick={e => {
+                                        const fd = new FormData()
+                                        fd.append("pincode", addressData.pincode)
+                                        fd.append("buildingNo", addressData.buildingNo)
+                                        fd.append("city", addressData.city)
+                                        fd.append("state", addressData.state)
+                                        fd.append("country", addressData.country)
+                                        fd.append("gst", addressData.gst)
+                                        fd.append("image", addressData.logo)
+
+                                        updateAddress({ ...addressData, fd })
+                                    }} className="bg-yellow-500 my-5 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">Update</button>
+                                </div>
+                            </>
+                    }
 
                     <div className="modal-action">
                         <form method="dialog">

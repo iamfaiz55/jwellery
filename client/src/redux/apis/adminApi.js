@@ -217,12 +217,23 @@ export const adminApi = createApi({
                 transformResponse:data => data.result,
                 invalidatesTags: ["admin"]
             }),
+            getAllProductsAdmin: builder.query({
+                query: id=> {
+                    return {
+                        url: `/get-all-products`,
+                        method: "GET",
+                        // body: categoryData
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
             updtaeCompanyAddress: builder.mutation({
                 query: addressData=> {
                     return {
                         url: `/update-company-address/${addressData._id}`,
                         method: "PUT",
-                        body: addressData
+                        body: addressData.fd
                     }
                 },
                 transformResponse:data => data.result,
@@ -269,5 +280,6 @@ export const {
 //   useGetCompanyAddressQuery,
 useLazyGetCompanyAddressQuery,
   useUpdtaeCompanyAddressMutation,
-  useUpdateTaxMutation
+  useUpdateTaxMutation,
+  useGetAllProductsAdminQuery
 } = adminApi

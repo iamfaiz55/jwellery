@@ -22,6 +22,8 @@ const path = require('path');
 const mongoose= require("mongoose")
 const CompanyAddress = require("../models/CompanyAddress")
 const Tax = require("../models/Tax")
+const Review = require("../models/Review")
+const PaymentMethod = require("../models/PaymentMethod")
 
 // const { payment } = require("..")
 // const Liked = require("../models/Liked")
@@ -36,146 +38,190 @@ const {userId}=req.params
     res.json({message:"All Orders Fetch Success", result})
 }) 
 
-
 exports.createOrder = asyncHandler(async (req, res) => {
-    const { deliveryAddressId, paymentMethod, orderItems, userId } = req.body;
 
-    const productDetails = await getProductDetails(orderItems);
-    const userData = await User.findById(userId);
-    const deliveryAddressData = await UserAddress.findById(deliveryAddressId);
-    const companyAddressData = await CompanyAddress.findOne();
-    const taxes = await Tax.find();
+        const { deliveryAddressId, paymentMethod, orderItems, userId } = req.body;
 
-    const subtotal = productDetails.reduce((total, item) => total + (item.product.price * item.quantity), 0);
 
-    const salesTax = taxes.find(tax => tax.taxName === "Sales Tax")?.percent || 0;
-    const makingCharges = taxes.find(tax => tax.taxName === "Making Charges")?.percent || 0;
-    const discount = taxes.find(tax => tax.taxName === "Discount")?.percent || 0;
+        const {isError, error}= checkEmpty( { deliveryAddressId, paymentMethod, orderItems, userId })
+       if (isError) {
+            return res.status(400).json({ message: 'All fields Required.',error });
+        }
 
-    const salesTaxAmount = (salesTax / 100) * subtotal;
-    const makingChargesAmount = (makingCharges / 100) * subtotal;
-    const discountAmount = (discount / 100) * subtotal;
-    const total = subtotal + salesTaxAmount + makingChargesAmount - discountAmount;
+        const productDetails = await getProductDetails(orderItems);
+        if (!productDetails || productDetails.length === 0) {
+            return res.status(404).json({ message: 'Products not found.' });
+        }
 
-    const orderItems1 = orderItems.map(item => ({
-        productId: item._id,
-        quantity: item.quantity || 1
-    }));
+        const userData = await User.findById(userId);
+        const deliveryAddressData = await UserAddress.findById(deliveryAddressId);
+        const companyAddressData = await CompanyAddress.findOne();
+        const taxes = await Tax.find();
 
-    const newOrder = await Order.create({
-        userId,
-        deliveryAddressId,
-        paymentMethod,
-        orderItems: orderItems1,
-        total,
-    });
+        if (!userData || !deliveryAddressData || !companyAddressData) {
+            return res.status(404).json({ message: 'User or address data not found.' });
+        }
 
-    const notoSansFontPath = path.join(__dirname, '..', 'font', 'font.ttf');
-    const pdfPath = path.join(__dirname, '../pdfs', `OrderDetails-${uuid()}.pdf`);
-    const doc = new PDFDocument({ margin: 50 });
-    
-    doc.pipe(fs.createWriteStream(pdfPath));
-    doc.registerFont('NotoSans', notoSansFontPath);
-    
-    doc.font('NotoSans');
-    doc.fontSize(20).text('Order Invoice', { align: 'center' });
-    doc.moveDown(1.5);
+        const salesTax = taxes.find(tax => tax.taxName === "Sales Tax")?.percent || 0;
+        const makingCharges = taxes.find(tax => tax.taxName === "Making Charges")?.percent || 0;
+        const discount = taxes.find(tax => tax.taxName === "Discount")?.percent || 0;
 
-    const startY = doc.y;  
-    const columnWidth = 180; 
-    const gap = 20; 
-    
-    const companyAddressX = 50;  
-    doc.fontSize(12).text('Billing Address:', companyAddressX, startY, { underline: true });
-    doc.moveDown(0.5);
-    doc.fontSize(10).text(`${companyAddressData.buildingNo}`, companyAddressX, doc.y);
-    doc.text(`${companyAddressData.city}`, companyAddressX, doc.y);
-    doc.text(`${companyAddressData.state}, ${companyAddressData.country}, ${companyAddressData.pincode}`, companyAddressX, doc.y);
-    doc.text(`GST No: ${companyAddressData.gst}`, companyAddressX, doc.y);
-    
-    const deliveryAddressX = companyAddressX + columnWidth + gap; 
-    doc.fontSize(12).text('Shipping Address:', deliveryAddressX, startY, { underline: true });
-    doc.moveDown(0.5);
-    doc.fontSize(10).text(`${userData.name}`, deliveryAddressX, doc.y);
-    doc.text(`${deliveryAddressData.addressType}, ${deliveryAddressData.city}`, deliveryAddressX, doc.y);
-    doc.text(`${deliveryAddressData.state}, ${deliveryAddressData.country}, ${deliveryAddressData.pincode}`, deliveryAddressX, doc.y);
-    doc.text(`Mobile: ${deliveryAddressData.mobile}`, deliveryAddressX, doc.y);
-    
-    const orderInfoX = deliveryAddressX + columnWidth + gap; 
-    doc.fontSize(12).text('Order Information:', orderInfoX, startY, { underline: true });
-    doc.moveDown(0.5);
-    doc.fontSize(10).text(`Order Tracking ID: ${newOrder._id}`, orderInfoX, doc.y);
-    // doc.text(`Payment ID: ${newOrder.razorpay_payment_id}`, orderInfoX, doc.y);
-    doc.text(`Payment Method: ${newOrder.paymentMethod}`, orderInfoX, doc.y);
-    doc.text(`Order Date: ${newOrder.createdAt.toDateString()}`, orderInfoX, doc.y); 
-    
-    doc.moveDown(2);
-    doc.text('', 50, doc.y);  
-    
-    doc.fontSize(14).text('Product Details:', { align: 'left', underline: true });
-    doc.moveDown(0.5);
-    
-    const tableData = {
-        headers: ['Name', 'Title',  'Material', 'Size', 'Weight', 'Purity','Qty', 'Price', 'Total'],
-        rows: productDetails.map(item => {
-            const product = item.product;
-            return [
-                product.name,
-                product.desc,
-                product.material,
-                `${product.height} x ${product.width}`,
-                product.prductWeight,
-                product.purity,
-                item.quantity,
-                product.price,
-                product.price * item.quantity,
-            ];
-        }),
-    };
-    
-    doc.table(tableData, {
-        prepareHeader: () => doc.fontSize(10).font('Helvetica-Bold').fillColor('black'),
-        prepareRow: (row, i) => doc.fontSize(10).font('Helvetica').fillColor(i % 2 === 0 ? 'black' : 'gray'),
-    });
-    
-    
-    doc.moveDown(1.5);
+        let subtotal = 0;
+        let totalDiscountAmount = 0;
+        let totalSalesTaxAmount = 0;
+        let totalMakingChargesAmount = 0;
 
-    doc.fontSize(12).font('NotoSans').text(`Subtotal: ₹${subtotal.toFixed(2)}`, { align: 'right' });
-    doc.text(`Sales Tax (${salesTax}%): ₹${salesTaxAmount.toFixed(2)}`, { align: 'right' });
-    doc.text(`Making Charges (${makingCharges}%): ₹${makingChargesAmount.toFixed(2)}`, { align: 'right' });
-    doc.text(`Discount (${discount}%): -₹${discountAmount.toFixed(2)}`, { align: 'right' });
-    doc.text(`Total Items: ${orderItems.length}`, { align: 'right' });
-    doc.text(`Total Price: ₹${total.toFixed(2)}`, { align: 'right' });
-    doc.moveDown(2);
+        const discountedProducts = productDetails.map(item => {
+            const originalPrice = item.product.price;
+            const discountAmount = (discount / 100) * originalPrice;
+            const discountedPrice = originalPrice - discountAmount;
 
-    doc.fontSize(16).text('Thank you for shopping with us!', { align: 'center' });
-    doc.fontSize(14).text('We hope to see you again soon!', { align: 'center' });
+            const makingChargesAmount = (makingCharges / 100) * discountedPrice;
+            const salesTaxAmount = (salesTax / 100) * discountedPrice;
 
-    doc.end();
+            const totalPrice = discountedPrice * item.quantity;
 
-    doc.on('end', async () => {
-        const emailSent = await sendEmail({
-            to: userData.email,
-            subject: 'Your Order Receipt',
-            message: '<p>Thank you for your order. Please find the attached receipt for your records.</p>',
-            attachments: [
-                {
-                    filename: path.basename(pdfPath),
-                    path: pdfPath,
-                },
-            ],
+            subtotal += totalPrice;
+            totalDiscountAmount += discountAmount * item.quantity;
+            totalSalesTaxAmount += salesTaxAmount * item.quantity;
+            totalMakingChargesAmount += makingChargesAmount * item.quantity;
+
+            return {
+                ...item,
+                discountedPrice,
+                makingChargesAmount,
+                salesTaxAmount,
+                totalPrice
+            };
         });
 
-        if (emailSent) {
-            console.log('Email sent successfully.');
-        } else {
-            console.log('Failed to send email.');
-        }
-    });
+        const total = Math.round((subtotal + totalMakingChargesAmount + totalSalesTaxAmount) * 100);
 
-    res.status(201).json({ message: "Order created successfully and PDF sent to email." });
+        const orderItemsFormatted = orderItems.map(item => ({
+            productId: item._id,
+            quantity: item.quantity || 1
+        }));
+
+        const newOrder = await Order.create({
+            userId,
+            deliveryAddressId,
+            paymentMethod,
+            orderItems: orderItemsFormatted,
+            total,
+            razorpay_payment_id: req.body.razorpay_payment_id,
+            razorpay_order_id: req.body.razorpay_order_id
+        });
+
+        const notoSansFontPath = path.join(__dirname, '..', 'font', 'font.ttf');
+        const pdfPath = path.join(__dirname, '../pdfs', `OrderDetails-${uuid()}.pdf`);
+        const doc = new PDFDocument({ margin: 50 });
+
+        doc.pipe(fs.createWriteStream(pdfPath));
+        doc.registerFont('NotoSans', notoSansFontPath);
+
+        doc.font('NotoSans');
+        doc.fontSize(20).text('Order Invoice', { align: 'center' });
+        doc.moveDown(1.5);
+
+        const startY = doc.y;
+        const columnWidth = 180;
+        const gap = 20;
+
+        const companyAddressX = 50;
+        doc.fontSize(12).text('Billing Address:', companyAddressX, startY, { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(10).text(`${companyAddressData.buildingNo}`, companyAddressX, doc.y);
+        doc.text(`${companyAddressData.city}`, companyAddressX, doc.y);
+        doc.text(`${companyAddressData.state}, ${companyAddressData.country}, ${companyAddressData.pincode}`, companyAddressX, doc.y);
+        doc.text(`GST No: ${companyAddressData.gst}`, companyAddressX, doc.y);
+
+        const deliveryAddressX = companyAddressX + columnWidth + gap;
+        doc.fontSize(12).text('Shipping Address:', deliveryAddressX, startY, { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(10).text(`${userData.name}`, deliveryAddressX, doc.y);
+        doc.text(`${deliveryAddressData.addressType}, ${deliveryAddressData.city}`, deliveryAddressX, doc.y);
+        doc.text(`${deliveryAddressData.state}, ${deliveryAddressData.country}, ${deliveryAddressData.pincode}`, deliveryAddressX, doc.y);
+        doc.text(`Mobile: ${deliveryAddressData.mobile}`, deliveryAddressX, doc.y);
+
+        const orderInfoX = deliveryAddressX + columnWidth + gap;
+        doc.fontSize(12).text('Order Information:', orderInfoX, startY, { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(10).text(`Order Tracking ID: ${newOrder.razorpay_order_id}`, orderInfoX, doc.y);
+        doc.text(`Payment ID: ${newOrder.razorpay_payment_id}`, orderInfoX, doc.y);
+        doc.text(`Payment Method: ${newOrder.paymentMethod}`, orderInfoX, doc.y);
+        doc.text(`Order Date: ${newOrder.createdAt.toDateString()}`, orderInfoX, doc.y);
+
+        doc.moveDown(2);
+        doc.text('', 50, doc.y);
+
+        doc.fontSize(14).text('Product Details:', { align: 'left', underline: true });
+        doc.moveDown(0.5);
+
+        const tableData = {
+            headers: ['Name', 'Title', 'Material', 'Size', 'Weight', 'Purity', 'Qty', 'Price', 'Discounted Price', 'Total'],
+            rows: discountedProducts.map(item => [
+                item.product.name,
+                item.product.desc,
+                item.product.material,
+                `${item.product.height} x ${item.product.width}`,
+                item.product.productWeight,
+                item.product.purity,
+                item.quantity,
+                item.product.price,
+                item.discountedPrice,
+                item.totalPrice
+            ])
+        };
+
+        doc.table(tableData, {
+            prepareHeader: () => doc.fontSize(10).font('Helvetica-Bold').fillColor('black'),
+            prepareRow: (row, i) => doc.fontSize(10).font('Helvetica').fillColor(i % 2 === 0 ? 'black' : 'gray'),
+        });
+
+        doc.moveDown(1.5);
+
+        doc.fontSize(12).font('NotoSans').text(`Subtotal: ₹${(subtotal ).toFixed(2)}`, { align: 'right' });
+        // doc.text(`Discount (${discount}%): -₹${totalDiscountAmount.toFixed(2)}`, { align: 'right' });
+        doc.text(`Making Charges (${makingCharges}%): ₹${totalMakingChargesAmount.toFixed(2)}`, { align: 'right' });
+        doc.text(`Sales Tax (${salesTax}%): ₹${totalSalesTaxAmount.toFixed(2)}`, { align: 'right' });
+        doc.text(`Total Items: ${orderItems.length}`, { align: 'right' });
+        doc.text(`Total Price: ₹${(total / 100).toFixed(2)}`, { align: 'right' });
+        doc.moveDown(2);
+
+        doc.fontSize(16).text('Thank you for shopping with us!', { align: 'center' });
+        doc.fontSize(14).text('We hope to see you again soon!', { align: 'center' });
+
+        doc.end();
+
+        // Send email with PDF attachment
+        doc.on('end', async () => {
+            try {
+                const emailSent = await sendEmail({
+                    to: userData.email,
+                    subject: 'Your Order Receipt',
+                    message: '<p>Thank you for your order. Please find the attached receipt for your records.</p>',
+                    attachments: [
+                        {
+                            filename: path.basename(pdfPath),
+                            path: pdfPath
+                        }
+                    ]
+                });
+
+                if (emailSent) {
+                    console.log('Email sent successfully.');
+                } else {
+                    console.log('Failed to send email.');
+                }
+            } catch (error) {
+                console.error('Error sending email:', error);
+            }
+        });
+
+        res.json({ message: "Order created successfully, payment verified, and receipt sent to email." });
+   
 });
+
 
 
 
@@ -225,6 +271,12 @@ exports.getAddresses = asyncHandler(async(req, res)=> {
     // console.log(result, id);
     
     res.json({message:"All Addresses Fetch Success", result})
+})
+
+exports.deleteAddress = asyncHandler(async(req, res)=> {
+    const {addressId}=req.params
+    await UserAddress.findByIdAndDelete(addressId)
+    res.json({message:"Address Delete Success"})
 })
 exports.getDetails = asyncHandler(async(req, res)=>{
     const {pId}= req.params
@@ -310,11 +362,38 @@ exports.deleteAllCart = asyncHandler(async(req, res)=> {
 
     res.status(200).json({ message: "All cart items deleted successfully" });
 })
-exports.getAllProduct = asyncHandler(async(req, res)=> {
-    const result = await Product.find()
+exports.getAllProduct = asyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page) || 1;  
+    const limit = parseInt(req.query.limit) || 12;
+    const skip = (page - 1) * limit;  
 
-    res.json({message:"All Products Fetch Success", result})
-})
+    // Assuming you are receiving filter type as a query parameter
+    const filterType = req.query.type; // Adjust as per your frontend filter parameters
+
+    let query = {};
+    if (filterType) {
+        query.type = filterType; // Adjust your query filter conditions
+    }
+
+    const result = await Product.find(query).skip(skip).limit(limit);
+
+    const totalProducts = await Product.countDocuments(query); // Use the same filter for counting
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    res.json({
+        message: "All Products Fetch Success",
+        result,
+        pagination: {
+            currentPage: page,
+            totalPages,
+            totalProducts,
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1,
+            nextPage: page < totalPages ? page + 1 : null,
+            prevPage: page > 1 ? page - 1 : null
+        }
+    });
+});
 
 exports.cancelOrder = asyncHandler(async(req, res)=> {
     const {id}= req.params
@@ -326,12 +405,15 @@ exports.getFilteredProducts = asyncHandler(async (req, res) => {
     const { productType } = req.query;
 
  
+console.log("product type",productType);
 
-    const result = await Categories.find()
+const result = await Categories.find()
 //    console.log(result);
-      const types = result.map(item => {
-          return item.category
-      })
+const types = result.map(item => {
+    return item.category
+})
+console.log("types",types);
+
     //   console.log(types);
         if (!types.includes(productType)) {
         return res.status(400).json({ message: "Invalid product type" });
@@ -420,9 +502,11 @@ exports.razorpay = asyncHandler(async (req, res) => {
 
 
 const getProductDetails = async (orderItems) => {
+   
+    
     const productDetails = await Promise.all(orderItems.map(async (item) => {
       try {
-        const product = await Product.findById(new mongoose.Types.ObjectId(item._id)); // Correctly instantiate ObjectId
+        const product = await Product.findById(new mongoose.Types.ObjectId(item._id));
         if (!product) {
           console.error(`Product not found for productId: ${item._id}`);
           return null;
@@ -439,7 +523,10 @@ const getProductDetails = async (orderItems) => {
   
     return productDetails.filter(detail => detail !== null); // Filter out any null results
   };
-  exports.verifyPayment = asyncHandler(async (req, res) => {
+
+
+
+exports.verifyPayment = asyncHandler(async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, deliveryAddressId, paymentMethod, orderItems, userId } = req.body;
 
     const productDetails = await getProductDetails(orderItems);
@@ -448,18 +535,37 @@ const getProductDetails = async (orderItems) => {
     const companyAddressData = await CompanyAddress.findOne();
     const taxes = await Tax.find();
 
-    const subtotal = productDetails.reduce((tot, item) => {
-        return tot + (item.product.price * item.quantity);
-    }, 0);
-
     const salesTax = taxes.find(tax => tax.taxName === "Sales Tax")?.percent || 0;
     const makingCharges = taxes.find(tax => tax.taxName === "Making Charges")?.percent || 0;
     const discount = taxes.find(tax => tax.taxName === "Discount")?.percent || 0;
 
-    const salesTaxAmount = (salesTax / 100) * subtotal;
-    const makingChargesAmount = (makingCharges / 100) * subtotal;
-    const discountAmount = (discount / 100) * subtotal;
-    const total = subtotal + salesTaxAmount + makingChargesAmount - discountAmount;
+    let subtotal = 0;
+    let totalDiscountAmount = 0;
+    let totalSalesTaxAmount = 0;
+    let totalMakingChargesAmount = 0;
+
+    const discountedProducts = productDetails.map(item => {
+        const originalPrice = item.product.price;
+        const discountAmount = (discount / 100) * originalPrice;
+        const discountedPrice = originalPrice - discountAmount;
+
+        const makingChargesAmount = (makingCharges / 100) * discountedPrice;
+        const salesTaxAmount = (salesTax / 100) * discountedPrice;
+
+        subtotal += discountedPrice * item.quantity;
+        totalDiscountAmount += discountAmount * item.quantity;
+        totalSalesTaxAmount += salesTaxAmount * item.quantity;
+        totalMakingChargesAmount += makingChargesAmount * item.quantity;
+
+        return {
+            ...item,
+            discountedPrice,
+            makingChargesAmount,
+            salesTaxAmount,
+        };
+    });
+
+    const total = Math.round((subtotal + totalMakingChargesAmount + totalSalesTaxAmount) * 100); 
 
     const OrderItems2 = orderItems.map(item => ({
         productId: item._id,
@@ -477,96 +583,94 @@ const getProductDetails = async (orderItems) => {
     });
 
     await razorpay.orders.create({
-        amount: total * 100,
+        amount: total,
         currency: "INR",
         receipt: uuid(),
     });
 
     const notoSansFontPath = path.join(__dirname, '..', 'font', 'font.ttf');
-
     const pdfPath = path.join(__dirname, '../pdfs', `OrderDetails-${uuid()}.pdf`);
     const doc = new PDFDocument({ margin: 50 });
-  
+
     doc.pipe(fs.createWriteStream(pdfPath));
     doc.registerFont('NotoSans', notoSansFontPath);
-    
+
     doc.font('NotoSans');
     doc.fontSize(20).text('Order Invoice', { align: 'center' });
     doc.moveDown(1.5);
-    
-    const startY = doc.y;  
-    const columnWidth = 180; 
-    const gap = 20; 
-    
-    const companyAddressX = 50;  
+
+    const startY = doc.y;
+    const columnWidth = 180;
+    const gap = 20;
+
+    const companyAddressX = 50;
     doc.fontSize(12).text('Billing Address:', companyAddressX, startY, { underline: true });
     doc.moveDown(0.5);
     doc.fontSize(10).text(`${companyAddressData.buildingNo}`, companyAddressX, doc.y);
     doc.text(`${companyAddressData.city}`, companyAddressX, doc.y);
     doc.text(`${companyAddressData.state}, ${companyAddressData.country}, ${companyAddressData.pincode}`, companyAddressX, doc.y);
     doc.text(`GST No: ${companyAddressData.gst}`, companyAddressX, doc.y);
-    
-    const deliveryAddressX = companyAddressX + columnWidth + gap; 
+
+    const deliveryAddressX = companyAddressX + columnWidth + gap;
     doc.fontSize(12).text('Shipping Address:', deliveryAddressX, startY, { underline: true });
     doc.moveDown(0.5);
     doc.fontSize(10).text(`${userData.name}`, deliveryAddressX, doc.y);
     doc.text(`${deliveryAddressData.addressType}, ${deliveryAddressData.city}`, deliveryAddressX, doc.y);
     doc.text(`${deliveryAddressData.state}, ${deliveryAddressData.country}, ${deliveryAddressData.pincode}`, deliveryAddressX, doc.y);
     doc.text(`Mobile: ${deliveryAddressData.mobile}`, deliveryAddressX, doc.y);
-    
-    const orderInfoX = deliveryAddressX + columnWidth + gap; 
+
+    const orderInfoX = deliveryAddressX + columnWidth + gap;
     doc.fontSize(12).text('Order Information:', orderInfoX, startY, { underline: true });
     doc.moveDown(0.5);
     doc.fontSize(10).text(`Order Tracking ID: ${newOrder.razorpay_order_id}`, orderInfoX, doc.y);
     doc.text(`Payment ID: ${newOrder.razorpay_payment_id}`, orderInfoX, doc.y);
     doc.text(`Payment Method: ${newOrder.paymentMethod}`, orderInfoX, doc.y);
-    doc.text(`Order Date: ${newOrder.createdAt.toDateString()}`, orderInfoX, doc.y); 
-    
+    doc.text(`Order Date: ${newOrder.createdAt.toDateString()}`, orderInfoX, doc.y);
+
     doc.moveDown(2);
-    doc.text('', 50, doc.y);  
-    
+    doc.text('', 50, doc.y);
+
     doc.fontSize(14).text('Product Details:', { align: 'left', underline: true });
     doc.moveDown(0.5);
-    
+
     const tableData = {
-        headers: ['Name', 'Title',  'Material', 'Size', 'Weight', 'Purity','Qty', 'Price', 'Total'],
-        rows: productDetails.map(item => {
-            const product = item.product;
+        headers: ['Name', 'Title', 'Material', 'Size', 'Weight', 'Purity', 'Qty', 'Price', 'Discounted Price', 'Total'],
+        rows: discountedProducts.map(item => {
             return [
-                product.name,
-                product.desc,
-                product.material,
-                `${product.height} x ${product.width}`,
-                product.prductWeight,
-                product.purity,
+                item.product.name,
+                item.product.desc,
+                item.product.material,
+                `${item.product.height} x ${item.product.width}`,
+                item.product.prductWeight,
+                item.product.purity,
                 item.quantity,
-                product.price,
-                product.price * item.quantity,
+                item.product.price,
+                item.discountedPrice,
+                item.discountedPrice * item.quantity,
             ];
         }),
     };
-    
+
     doc.table(tableData, {
         prepareHeader: () => doc.fontSize(10).font('Helvetica-Bold').fillColor('black'),
         prepareRow: (row, i) => doc.fontSize(10).font('Helvetica').fillColor(i % 2 === 0 ? 'black' : 'gray'),
     });
-    
+
     doc.moveDown(1.5);
-    
-    // Apply the custom font for rupee symbol and amount
-    doc.fontSize(12).font('NotoSans').text(`Subtotal: ₹${subtotal.toFixed(2)}`, { align: 'right' });
-    doc.text(`Sales Tax (${salesTax}%): ₹${salesTaxAmount.toFixed(2)}`, { align: 'right' });
-    doc.text(`Making Charges (${makingCharges}%): ₹${makingChargesAmount.toFixed(2)}`, { align: 'right' });
-    doc.text(`Discount (${discount}%): -₹${discountAmount.toFixed(2)}`, { align: 'right' });
+
+    doc.fontSize(12).font('NotoSans').text(`Subtotal: ₹${(subtotal ).toFixed(2)}`, { align: 'right' });
+    // doc.text(`Discount (${discount}%): -₹${(totalDiscountAmount ).toFixed(2)}`, { align: 'right' });
+    doc.text(`Making Charges (${makingCharges}%): ₹${(totalMakingChargesAmount).toFixed(2)}`, { align: 'right' });
+    doc.text(`Sales Tax (${salesTax}%): ₹${(totalSalesTaxAmount ).toFixed(2)}`, { align: 'right' });
     doc.text(`Total Items: ${orderItems.length}`, { align: 'right' });
-    doc.text(`Total Price: ₹${total.toFixed(2)}`, { align: 'right' });
-    doc.moveDown(2);    
-    
+    doc.text(`Total Price: ₹${(total / 100).toFixed(2)}`, { align: 'right' });
+    doc.moveDown(2);
+
     doc.fontSize(16).text('Thank you for shopping with us!', { align: 'center' });
     doc.fontSize(14).text('We hope to see you again soon!', { align: 'center' });
-    
+
     doc.end();
-    
+
     doc.on('end', async () => {
         const emailSent = await sendEmail({
             to: userData.email,
@@ -579,14 +683,35 @@ const getProductDetails = async (orderItems) => {
                 },
             ],
         });
-    
+
         if (emailSent) {
             console.log('Email sent successfully.');
         } else {
             console.log('Failed to send email.');
         }
     });
-    
+
     res.json({ message: "Payment verified, order successful, and receipt sent on email." });
 });
 
+exports.postReview = asyncHandler(async(req, res)=>{
+    const {rating, review, pId, uId} = req.body
+    await Review.create({rating, review, pId, uId})
+    res.json({message:"Review Create Success"})
+})
+
+exports.getReviews = asyncHandler(async(req, res)=>{
+    const {id} = req.params
+    const result = await Review.find({pId:id}).populate("uId")
+    res.json({message:"All Reviews Fetch Success", result})
+})
+
+exports.getPaymentMethodsUser = asyncHandler(async(req, res)=> {
+    const result = await PaymentMethod.find()
+    res.json({message:"all Payment Methods Get Success ", result})
+})
+exports.getCompanyDetails = asyncHandler(async(req, res)=> {
+    const result = await CompanyAddress.findOne()
+    res.json({message:"Company Details Fetch Success", result})
+
+})

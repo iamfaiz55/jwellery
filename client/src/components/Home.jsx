@@ -3,43 +3,31 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { usefilter } from '../App';
 import { toast } from 'sonner';
-import { useGetAllProductsQuery, useGetCArouselQuery, useGetTaxesQuery, useLazyGetFilteredDataQuery } from '../redux/apis/openApi';
+import { useGetCArouselQuery, useGetTaxesQuery, useLazyGetFilteredDataQuery, useLazyGetAllProductsQuery } from '../redux/apis/openApi';
 
 const Home = () => {
     const { selectedType } = usefilter();
+
     const [allProducts, setAllProducts] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const productsPerPage = 8;
+
     const { data: taxes } = useGetTaxesQuery();
-    // console.log(taxes);
+    const [filter, { data: filteredData, isSuccess: isFilterSuccess, isError: isFilterError, error: filterError }] = useLazyGetFilteredDataQuery();
+    const [fetchProducts, { data: productsData, isSuccess: isProductsSuccess, isError: isProductsError, error: productsError }] = useLazyGetAllProductsQuery();
 
-    let [filter, { data: filteredData, isSuccess, isError, error }] = useLazyGetFilteredDataQuery();
-
-    useEffect(() => {
-        if (selectedType) {
-            filter(selectedType);
-        }
-    }, [selectedType, filter]);
-
-    useEffect(() => {
-        if (isError) {
-            toast.error(error);
-        }
-    }, [isError]);
-
-    const { data: products, isSuccess: mainData } = useGetAllProductsQuery();
     const { data: carousel = [] } = useGetCArouselQuery();
-
     const [currentSlide, setCurrentSlide] = useState(0);
 
-    // Get the discount percentage from the taxes array
-    const discountTax = taxes && taxes.find(tax => tax.taxName === "Discount");
+    const discountTax = taxes?.find(tax => tax.taxName === "Discount");
 
-    // Apply discount if available
     const applyDiscount = (price) => {
         if (discountTax) {
             const discountAmount = (price * discountTax.percent) / 100;
             return price - discountAmount;
         }
-        return price; // No discount applied
+        return price;
     };
 
     useEffect(() => {
@@ -52,22 +40,51 @@ const Home = () => {
     }, [carousel]);
 
     useEffect(() => {
-        if (isSuccess) {
-            setAllProducts(filteredData);
+        if (selectedType) {
+            filter({ productType: selectedType });
         }
-    }, [isSuccess, filteredData]);
+    }, [selectedType, filter]);
 
     useEffect(() => {
-        if (mainData) {
-            setAllProducts(products);
+        if (isFilterError) {
+            toast.error(filterError?.message || 'An error occurred while filtering.');
         }
-    }, [mainData]);
+    }, [isFilterError, filterError]);
+
+    useEffect(() => {
+        if (!selectedType) {
+            fetchProducts({ page: currentPage, limit: productsPerPage });
+        }
+    }, [fetchProducts, currentPage, selectedType]);
+
+    useEffect(() => {
+        if (isFilterSuccess && filteredData) {
+            setAllProducts(filteredData || []);
+            setTotalPages(1); // Assume single page for filtered data
+        }
+    }, [isFilterSuccess, filteredData]);
+
+    useEffect(() => {
+        if (isProductsSuccess && productsData) {
+            setAllProducts(productsData.result);
+            setTotalPages(productsData.pagination?.totalPages || 1);
+        }
+    }, [isProductsSuccess, productsData]);
+
+    useEffect(() => {
+        if (isProductsError) {
+            toast.error(productsError?.message || 'An error occurred while fetching products.');
+        }
+    }, [isProductsError, productsError]);
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
 
     return (
         <div className='bg-light-golden'>
             <div className='mx-3'>
                 <div className="relative w-full h-80 overflow-hidden rounded-md">
-                    {/* Carousel container */}
                     <div className="relative w-full h-full">
                         {carousel.map((item, index) => (
                             <motion.div
@@ -102,8 +119,18 @@ const Home = () => {
 
                 <section>
                     <div className="container mx-auto flex flex-col items-center px-6 py-4">
+                        {/* Animated Heading */}
+                        <motion.h2
+                            className="text-3xl font-bold text-gray-900 mb-8"
+                            initial={{ opacity: 0, y: -50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, ease: 'easeOut' }}
+                        >
+                            Recommended for You
+                        </motion.h2>
+
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-8">
-                            {allProducts && allProducts.map(item => (
+                            {allProducts.map(item => (
                                 <Link
                                     key={item._id}
                                     to={`/details/${item._id}`}
@@ -122,6 +149,20 @@ const Home = () => {
                                 </Link>
                             ))}
                         </div>
+
+                        {!selectedType && (
+                            <div className="flex justify-center mt-8">
+                                {Array.from({ length: totalPages }, (_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => handlePageChange(index + 1)}
+                                        className={`mx-1 px-4 py-2 rounded-md ${currentPage === index + 1 ? 'bg-golden text-white' : 'bg-white text-black border'}`}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </section>
             </div>

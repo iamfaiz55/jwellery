@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { json, Link } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 import { toast } from 'sonner'
@@ -12,8 +12,10 @@ const AdminLogin = () => {
     const [otpData, setOtpData] = useState()
     const btnRef = useRef()
     const { email } = useSelector(state => state.adminData)
-    const [verify, { isSuccess: verified }] = useVerifyOTPMutation()
+    const [verify, { isSuccess: verified, error: verifyError }] = useVerifyOTPMutation()
+
     const [loginAdmin, { isSuccess: sendSuccess, isLoading, isError, error }] = useLoginAdminMutation()
+    console.log(error && error.data.message);
     const formik = useFormik({
         initialValues: {
             email: "",
@@ -45,7 +47,7 @@ const AdminLogin = () => {
 
     useEffect(() => {
         if (isError) {
-            toast.error(error)
+            toast.error(error.data.message)
         }
     }, [isError])
 

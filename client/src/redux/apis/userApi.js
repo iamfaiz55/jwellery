@@ -88,6 +88,16 @@ export const userApi = createApi({
                 },
                 invalidatesTags: ["user"]
             }),
+            deleteAddress: builder.mutation({
+                query: id => {
+                    return {
+                        url: `/delete-address/${id}`,
+                        method: "DELETE",
+                        // body: addressData
+                    }
+                },
+                invalidatesTags: ["user"]
+            }),
             // getDetails: builder.query({
             //     query: id => {
             //         return {
@@ -220,6 +230,30 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 invalidatesTags: ["user"]
             }),
+          postReview: builder.mutation({
+                query:reviewData => {
+                    return {
+                        url: `/post-review`,
+                        method: "POST",
+                        body: reviewData
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["user"]
+            }),
+            // updateProfile: builder.mutation({
+          getReviews: builder.query({
+                query:(id) => {
+                    return {
+                        url: `/get-all-reviews/${id}`,
+                        method: "GET",
+                        // body: reviewData
+                    }
+                },
+                transformResponse:data => data.result,
+                providesTags: ["user"]
+            }),
+
             updateProfile: builder.mutation({
                 query: data => {
                     return {
@@ -238,7 +272,18 @@ export const userApi = createApi({
                 },
                 invalidatesTags: ["user"]
             }),
-
+            getAllPaymentMethodUser: builder.query({
+                query: id=> {
+                    return {
+                        url: `/get-all-payment-method`,
+                        method: "GET",
+                        // body: categoryData
+                    }
+                },
+                transformResponse:data => data.result,
+                providesTags: ["user"]
+            }),
+        
         
         }
     }
@@ -247,6 +292,7 @@ export const userApi = createApi({
 export const { 
     useAddAddressMutation,
     useGetAddressesQuery,
+    useDeleteAddressMutation,
     useGetOrdersQuery,
     useAddCartMutation,
     useGetAllCartItemsQuery,
@@ -260,6 +306,10 @@ export const {
     useDeleteLikeMutation,
     useGetLikedQuery,
     useRazorpayMutation,
-    useVerifyPaymentMutation
+    useVerifyPaymentMutation,
+    // useGetReviewsMutation,
+    usePostReviewMutation,
+    useGetReviewsQuery,
+    useGetAllPaymentMethodUserQuery
     
 } = userApi

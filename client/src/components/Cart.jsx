@@ -41,12 +41,16 @@ const Cart = () => {
     };
 
     const calculateDiscount = (amount) => amount * (discount / 100);
-    const calculateSalesTax = (amount) => amount * (salesTax / 100);
     const calculateMakingCharges = (amount) => amount * (makingCharges / 100);
+    const calculateSalesTax = (amount) => amount * (salesTax / 100);
 
     const totalAfterDiscount = subtotal - calculateDiscount(subtotal);
-    const totalAfterCharges = totalAfterDiscount + calculateMakingCharges(totalAfterDiscount);
-    const totalWithTax = totalAfterCharges + calculateSalesTax(totalAfterCharges);
+
+    const makingChargesAmount = calculateMakingCharges(totalAfterDiscount);
+
+    const salesTaxAmount = calculateSalesTax(totalAfterDiscount);
+
+    const totalWithTaxAndCharges = totalAfterDiscount + makingChargesAmount + salesTaxAmount;
 
     const handleQuantityChange = (id, delta) => {
         const updatedItems = cartItems.map(item => {
@@ -62,6 +66,7 @@ const Cart = () => {
         calculateSubtotal(updatedItems);
     };
 
+    // Handle success notification on item deletion
     useEffect(() => {
         if (isSuccess) {
             toast.success("Cart Item Deleted Successfully");
@@ -76,7 +81,7 @@ const Cart = () => {
                     : <>
                         <h1 className="mb-10 text-center text-3xl font-extrabold">Your Shopping Cart</h1>
                         {
-                            cartItems.length > 0 ? <>
+                            cartItems.length > 0 ? (
                                 <div className="mx-auto max-w-5xl px-6 md:flex md:space-x-6 xl:px-0">
                                     <div className="md:w-2/3">
                                         {cartItems.map(item => (
@@ -141,26 +146,27 @@ const Cart = () => {
                                         </div>
                                         <div className="flex justify-between border-b py-4">
                                             <p className="text-gray-700">Making Charges ({makingCharges}%)</p>
-                                            <p className="text-gray-700">+₹{calculateMakingCharges(totalAfterDiscount).toFixed(2)}</p>
+                                            <p className="text-gray-700">+₹{makingChargesAmount.toFixed(2)}</p>
                                         </div>
                                         <div className="flex justify-between border-b py-4">
                                             <p className="text-gray-700">Sales Tax ({salesTax}%)</p>
-                                            <p className="text-gray-700">+₹{calculateSalesTax(totalAfterCharges).toFixed(2)}</p>
+                                            <p className="text-gray-700">+₹{salesTaxAmount.toFixed(2)}</p>
                                         </div>
                                         <div className="flex justify-between border-b py-4">
                                             <p className="text-lg font-semibold text-gray-800">Total</p>
-                                            <p className="text-lg font-semibold text-gray-800">₹{totalWithTax.toFixed(2)}</p>
+                                            <p className="text-lg font-semibold text-gray-800">₹{totalWithTaxAndCharges.toFixed(2)}</p>
                                         </div>
                                         <button onClick={() => {
-                                            setCartData({ cartItems, subtotal: totalWithTax });
+                                            setCartData({ cartItems, subtotal: totalWithTaxAndCharges });
                                             navigate('/user/cartCheckout');
                                         }} className="mt-6 w-full rounded-md bg-yellow-500 py-2 text-lg font-semibold text-white transition-transform duration-200 hover:scale-105 hover:bg-pink-600">
                                             Proceed to Checkout
                                         </button>
                                     </div>
                                 </div>
-                            </>
-                                : <div className='text-3xl font-extrabold text-center'>Empty</div>
+                            ) : (
+                                <div className='text-3xl font-extrabold text-center'>Empty</div>
+                            )
                         }
                     </>
             }

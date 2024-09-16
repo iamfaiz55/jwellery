@@ -306,6 +306,11 @@ res.json({message:"All Taxes and Discount And Charges Fetch Succcess", result})
 //     res.json({message:"Razorpay Disabled Success"})
 // })
 
+exports.getAllProductsAdmin = asyncHandler(async(req, res)=> {
+    const result = await Product.find()
+    res.json({message:"All Products Get Success For Admin", result})
+
+})
 
 
 // use nhi karna hai👇
@@ -314,25 +319,68 @@ exports.createPaymentMethod = asyncHandler(async(req, res)=> {
     res.json({message:"Payment Method Create Success"})
 })
 
-exports.addAddress = asyncHandler(async(req, res)=> {
-    const {pincode,buildingNo,city,state,country,gst}=req.body
-   const {isError, error}=checkEmpty({pincode,buildingNo,city,state,country,gst})
 
-    if(isError){
-        return res.status(400).json({message :"All Fields Required", error})
+
+exports.addAddress = asyncHandler(async (req, res) => {
+    upload(req, res, async (err) => {
+    if (err) {
+        return res.status(400).json({ message: "File upload failed", error: err.message });
+    }
+    const { pincode, buildingNo, city, state, country, gst } = req.body;
+
+    const { isError, error } = checkEmpty({ pincode, buildingNo, city, state, country, gst });
+    if (isError) {
+        return res.status(400).json({ message: "All Fields Required", error });
     }
 
-    await CompanyAddress.create(req.body)
-    res.json({message:"Address Create Success"})
-})
- 
-exports.updateCompanyAddress = asyncHandler(async(req, res)=>{
-    const {id}=req.params
+    const {secure_url} = await cloudinary.uploader.upload(req.files[0].path);
+          
+        await CompanyAddress.create({
+            ...req.body,
+            logo: secure_url, 
+        });
+        res.json({ message: "Address Created Successfully" });
+   })
 
-    const result = await CompanyAddress.findByIdAndUpdate(id, req.body)
+});
 
-    res.json({message:"address Update Success"})
-})
+
+
+exports.updateCompanyAddress = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    upload(req, res, async (err) => {
+        console.log(req.files[0]);
+        console.log(req.body);
+        
+        if (err) {
+            return res.status(400).json({ message: "File upload failed", error: err.message });
+        }
+
+        let currentLogoUrl 
+            const company = await CompanyAddress.findById(id);
+            if (!company) {
+                return res.status(404).json({ message: "company not found" });
+            }
+            currentLogoUrl = company.logo;
+    
+
+        if (currentLogoUrl) {
+            const x = currentLogoUrl.split('/').pop().split('.')[0]; 
+            await cloudinary.uploader.destroy(x);
+        }
+
+        let secure_url 
+        if (req.files[0]) {
+                const uploadResult = await cloudinary.uploader.upload(req.files[0].path);
+                secure_url = uploadResult.secure_url;  
+        }
+          await CompanyAddress.findByIdAndUpdate(id, {...req.body,logo: secure_url});
+          res.json({ message: "Company Details updated successfully" });
+     
+    });
+});
+
 
 exports.getCompanyAddress = asyncHandler(async(req, res)=> {
     const result = await CompanyAddress.find()

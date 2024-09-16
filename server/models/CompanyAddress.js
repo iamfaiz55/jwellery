@@ -23,6 +23,9 @@ const companyAddressSchema = new mongoose.Schema({
     gst:{
         type:String,
     },
+    logo:{
+        type:String,
+    },
 
     
 

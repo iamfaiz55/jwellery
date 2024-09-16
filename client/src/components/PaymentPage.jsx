@@ -1,25 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useCart } from '../App';
-import { useCreateOrderMutation, useDeleteFullCartMutation, useRazorpayMutation, useVerifyPaymentMutation } from '../redux/apis/userApi';
+import { useCreateOrderMutation, useDeleteFullCartMutation, useGetAllPaymentMethodUserQuery, useRazorpayMutation, useVerifyPaymentMutation } from '../redux/apis/userApi';
 import { toast } from 'sonner';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useGetAllPaymentMethodQuery } from '../redux/apis/adminApi';
 import { useGetTaxesQuery } from '../redux/apis/openApi';
 
 const PaymentPage = () => {
     const [raz, { isSuccess: razSuccess, data }] = useRazorpayMutation();
-    const { data: paymentMethods } = useGetAllPaymentMethodQuery();
+    const { data: paymentMethods } = useGetAllPaymentMethodUserQuery();
     const [initiate, { isSuccess: initiateSuccess }] = useVerifyPaymentMutation();
-    const { data: taxes } = useGetTaxesQuery()
-    // console.log(taxes);
-    const discount = taxes && taxes.find(tax => tax.taxName === 'Discount');
-    const salesTax = taxes && taxes.find(tax => tax.taxName === 'Sales Tax');
-    const makingCharges = taxes && taxes.find(tax => tax.taxName === 'Making Charges');
 
-    // console.log("discount", discount && discount.percent);
-    // console.log("sales Tax", salesTax && salesTax.percent);
-    // console.log("making charges", makingCharges && makingCharges.percent);
+
 
     const { user } = useSelector(state => state.userData);
     const [createOrder, { isSuccess }] = useCreateOrderMutation();
@@ -48,14 +40,12 @@ const PaymentPage = () => {
             })),
 
         };
-        const discountAmount = discount ? (cartData.subtotal * discount.percent) / 100 : 0;
-        const salesTaxAmount = salesTax ? (cartData.subtotal * salesTax.percent) / 100 : 0;
-        const makingChargesAmount = makingCharges ? (cartData.subtotal * makingCharges.percent) / 100 : 0;
+        // console.log(cartData);
 
-        const totalAmount = cartData.subtotal - discountAmount + salesTaxAmount + makingChargesAmount;
-
-
+        const totalAmount = cartData.subtotal
         const roundedTotalAmount = Math.round(totalAmount * 100) / 100;
+        // console.log(totalAmount);
+
         if (paymentMethod === 'razorpay') {
             raz({
                 ...orderData, userId: user._id, currency: "INR",

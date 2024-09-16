@@ -12,6 +12,7 @@ router
     .get("/details/:pId", userController.getDetails)
 
     .get("/get-tax", adminController.getTax)
+    .get("/get-company", userController.getCompanyDetails)
 
 
 module.exports = router

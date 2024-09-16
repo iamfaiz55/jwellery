@@ -7,6 +7,7 @@ router
     .put("/update-product/:pUId", adminController.updateProduct)
     .put("/delete-products/:pDId", adminController.deleteProduct)
     
+    .get("/get-all-products", adminController.getAllProductsAdmin)
     .post("/add-carousel", adminController.addCarousel)
     .post("/update-carousel", adminController.updateCarousel)
     .delete("/delete-carousel/:id", adminController.deleteCarousel)

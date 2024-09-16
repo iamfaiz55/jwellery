@@ -1,12 +1,14 @@
 import React from 'react';
+import { useGetCompanyDetailsQuery } from '../redux/apis/openApi';
 
 const Footer = () => {
+    const { data } = useGetCompanyDetailsQuery()
     return (
         <footer className="bg-gradient-to-r from-light-golden via-amber-100 to-light-golden">
             <div className="max-w-screen-xl px-4 py-16 mx-auto sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     <div>
-                        <img className="w-40" src="https://static.vecteezy.com/system/resources/previews/027/990/875/non_2x/royal-frame-logo-generative-ai-free-png.png" alt="Jewelry Logo" />
+                        <img className="w-40" src={data && data.logo} alt="Jewelry Logo" />
                         <p className="max-w-xs mt-4 text-sm text-gray-600">
                             Discover our exquisite collection of fine jewelry crafted with passion and precision. Elevate your style with our unique designs and timeless pieces.
                         </p>

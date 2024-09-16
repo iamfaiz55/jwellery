@@ -3,14 +3,15 @@ import * as yup from 'yup'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
-import { useAddProductMutation, useDeleteProductMutation, useUpdateProdMutation } from '../redux/apis/adminApi'
+import { useAddProductMutation, useDeleteProductMutation, useGetAllProductsAdminQuery, useUpdateProdMutation } from '../redux/apis/adminApi'
 import { useGetAllProductsQuery } from '../redux/apis/openApi'
 // import { useGetAllProductsQuery } from '../redux/apis/userApi'
 
 const Dashboard = () => {
   const [editData, setEditData] = useState({})
-  const { data, refetch, isError: isProdError, error: prodError } = useGetAllProductsQuery()
+  const { data, refetch, isError: isProdError, error: prodError } = useGetAllProductsAdminQuery()
   const [deleteProduct, { isSuccess: deleteSuccess, isError, error }] = useDeleteProductMutation()
+  console.log(data);
 
 
   const navigate = useNavigate()
@@ -197,6 +198,7 @@ const Form = ({ edit, refetch }) => {
       productType: "",
       desc: "",
       purity: "",
+      rating: "",
     },
     validationSchema: yup.object({
       name: yup.string().required(),
@@ -211,6 +213,7 @@ const Form = ({ edit, refetch }) => {
       productType: yup.string().required("Enter productType"),
       desc: yup.string().required("Enter desc"),
       purity: yup.string().required("Enter purity"),
+      rating: yup.number().required("Enter Rating"),
     }),
     onSubmit: async (values, { resetForm }) => {
       const fd = new FormData();
@@ -286,6 +289,8 @@ const Form = ({ edit, refetch }) => {
      input-bordered w-full  my-2 " />
             <input {...formik.getFieldProps("discount")} type="text" placeholder="Type discount" className="input
      input-bordered w-full  my-2 " />
+            <input {...formik.getFieldProps("rating")} type="text" placeholder="Type Rating" className="input
+     input-bordered w-full  my-2 " />
             <input {...formik.getFieldProps("height")} type="text" placeholder="Type height" className="input
      input-bordered w-full  my-2 " />
             <input {...formik.getFieldProps("width")} type="text" placeholder="Type width" className="input
@@ -305,20 +310,6 @@ const Form = ({ edit, refetch }) => {
             </select>
 
 
-            {/* <input type="text" placeholder="Type productType" className="input
-     input-bordered w-full  my-2" /> */}
-            {/* " rings",
-         "earings",
-         "neckless",
-         "mangalsutra",
-         "chain",
-         "pendent",
-         "nose-pin",
-         "bangles",
-         "forehead-ornament",
-         "anklet",
-         "coins"
-          */}
             <select  {...formik.getFieldProps("productType")} className="select select-bordered w-full my-2">
               <option selected>Choose The Typo Of Product</option>
               <option value={"rings"}>

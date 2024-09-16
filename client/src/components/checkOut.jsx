@@ -23,25 +23,23 @@ const CheckOut = () => {
     const salesTax = taxes && taxes.find(tax => tax.taxName === 'Sales Tax');
     const makingCharges = taxes && taxes.find(tax => tax.taxName === 'Making Charges');
 
-    // console.log("discount", discount.percent);
-    // console.log("sales Tax", salesTax.percent);
-    // console.log("making charges", makingCharges.percent);
-
     const originalPrice = product ? parseFloat(product.price) : 0;
     const discountPercent = discount ? discount.percent : 0;
     const salesTaxPercent = salesTax ? salesTax.percent : 0;
-    const makingChargesAmount = makingCharges ? originalPrice * (makingCharges.percent / 100) : 0;
+    const makingChargesPercent = makingCharges ? makingCharges.percent : 0;
 
-    const discountedPrice = product ? originalPrice * (1 - discountPercent / 100) : 0;
+    const discountedPrice = originalPrice * (1 - discountPercent / 100);
     const subtotal = quantity * discountedPrice;
-    const total = subtotal + makingChargesAmount + (subtotal * salesTaxPercent / 100);
+    const makingChargesAmount = subtotal * (makingChargesPercent / 100);
+    const salesTaxAmount = subtotal * (salesTaxPercent / 100);
+    const total = subtotal + makingChargesAmount + salesTaxAmount;
 
     const handlePayNow = () => {
         if (selectedAddress) {
             setCartData({
                 ...cartData,
                 deliveryAddressId: selectedAddress,
-                subtotal: originalPrice,
+                subtotal: total,
                 cartItems: [{ productId: product, quantity }],
             });
             navigate("/user/payment");
@@ -63,7 +61,7 @@ const CheckOut = () => {
 
     return (
         <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-light-golden">
                 {/* Order Summary on Small Screens */}
                 <div className="md:hidden col-span-1 bg-white p-4">
                     <h1 className="py-6 border-b-2 text-xl text-yellow-800">Order Summary</h1>
@@ -85,22 +83,26 @@ const CheckOut = () => {
                                     </div>
                                 </li>
                             </ul>
-                            <div className=" pt-4">
+                            <div className="pt-4">
                                 <div className="flex justify-between py-2 text-gray-600">
-                                    <span>Price</span>
+                                    <span>Original Price</span>
                                     <span className="font-semibold text-gray-500">{originalPrice.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between py-2 text-gray-600">
-                                    <span>Discount</span>
-                                    <span className="font-semibold text-gray-500">{discountPercent}%</span>
+                                    <span>Discount ({discountPercent}%)</span>
+                                    <span className="font-semibold text-gray-500">-{(originalPrice * discountPercent / 100).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between py-2 text-gray-600">
-                                    <span>Making Charges</span>
+                                    <span>Discounted Price</span>
+                                    <span className="font-semibold text-gray-500">{discountedPrice.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between py-2 text-gray-600">
+                                    <span>Making Charges ({makingChargesPercent}%)</span>
                                     <span className="font-semibold text-gray-500">{makingChargesAmount.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between py-2 text-gray-600">
-                                    <span>Sales Tax</span>
-                                    <span className="font-semibold text-gray-500">{salesTaxPercent}%</span>
+                                    <span>Sales Tax ({salesTaxPercent}%)</span>
+                                    <span className="font-semibold text-gray-500">{salesTaxAmount.toFixed(2)}</span>
                                 </div>
                                 <div className="font-semibold text-xl flex justify-between py-4 text-gray-600">
                                     <span>Total</span>
@@ -186,20 +188,24 @@ const CheckOut = () => {
                             </ul>
                             <div className="border-t pt-4">
                                 <div className="flex justify-between py-2 text-gray-600">
-                                    <span>Price</span>
+                                    <span>Original Price</span>
                                     <span className="font-semibold text-gray-500">{originalPrice.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between py-2 text-gray-600">
-                                    <span>Discount</span>
-                                    <span className="font-semibold text-gray-500">{discountPercent}%</span>
+                                    <span>Discount ({discountPercent}%)</span>
+                                    <span className="font-semibold text-gray-500">-{(originalPrice * discountPercent / 100).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between py-2 text-gray-600">
-                                    <span>Making Charges</span>
+                                    <span>Discounted Price</span>
+                                    <span className="font-semibold text-gray-500">{discountedPrice.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between py-2 text-gray-600">
+                                    <span>Making Charges ({makingChargesPercent}%)</span>
                                     <span className="font-semibold text-gray-500">{makingChargesAmount.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between py-2 text-gray-600">
-                                    <span>Sales Tax</span>
-                                    <span className="font-semibold text-gray-500">{salesTaxPercent}%</span>
+                                    <span>Sales Tax ({salesTaxPercent}%)</span>
+                                    <span className="font-semibold text-gray-500">{salesTaxAmount.toFixed(2)}</span>
                                 </div>
                                 <div className="font-semibold text-xl flex justify-between py-4 text-gray-600">
                                     <span>Total</span>
@@ -213,6 +219,7 @@ const CheckOut = () => {
         </>
     );
 };
+``
 
 const Form = ({ edit }) => {
     const { user } = useSelector((state) => state.userData);
