@@ -6,7 +6,8 @@ import { useSelector } from "react-redux";
 const userSlice= createSlice({
     name: "userSlice",
     initialState: {
-        user: JSON.parse(localStorage.getItem("user"))
+        user: JSON.parse(localStorage.getItem("user")),
+        mobile: JSON.parse(localStorage.getItem("mobile"))
     },
     reducers: {
         invalidate: (state, { payload }) => {
@@ -16,8 +17,11 @@ const userSlice= createSlice({
         }
     },
     extraReducers: builder => builder
-        .addMatcher(userAuthApi.endpoints.loginUser.matchFulfilled, (state, { payload }) => {
+        .addMatcher(userAuthApi.endpoints.verifyOTPUser.matchFulfilled, (state, { payload }) => {
             state.user = payload
+        })
+        .addMatcher(userAuthApi.endpoints.loginUser.matchFulfilled, (state, { payload }) => {
+            state.mobile = payload
         })
         .addMatcher(userAuthApi.endpoints.logoutUser.matchFulfilled, (state, { payload }) => {
             state.user = null

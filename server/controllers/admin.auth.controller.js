@@ -10,8 +10,8 @@ const sendEmail = require("../utils/email")
 
 
 exports.registerAdmin = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body
-    const { isError, error } = checkEmpty({ name, email, password })
+    const { name, email, password , mobile} = req.body
+    const { isError, error } = checkEmpty({ name, email, password, mobile })
     if (isError) {
         return res.status(400).json({ message: "All Feilds Required", error })
     }
@@ -23,7 +23,7 @@ exports.registerAdmin = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "email already registered with us" })
     }
     const hash = await bcrypt.hash(password, 10)
-    await Admin.create({ name, email, password: hash })
+    await Admin.create({ name, email, password: hash , mobile})
 
     res.json({ message: "Register Success" })
 })
@@ -49,7 +49,6 @@ exports.loginAdmin = asyncHandler(async (req, res) => {
         return res.status(401).json({ message:"Invalid Password"  })
     }
 
-    // send OTP
     const otp = Math.floor(10000 + Math.random() * 900000)
 
     await Admin.findByIdAndUpdate(result._id, { otp })
@@ -61,6 +60,8 @@ exports.loginAdmin = asyncHandler(async (req, res) => {
             <h1>Do Not Share Your Account OTP</h1>
             <p>your login otp ${otp}</p>
         ` })
+     // send also to mobile👇
+    //  /////////////////////////////////////
 
     res.json({ message: "Credentials Verify Success. OTP send to your registered email.", result:{
         email

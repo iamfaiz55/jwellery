@@ -44,7 +44,7 @@ const UserNavbar = () => {
                     <div className="flex-1 flex items-center space-x-4">
                         <Link to="/">
                             <div className="justify-center">
-                                <img className="w-20 h-14" src={companyDetails.logo} alt="Logo" />
+                                <img className="w-20 h-14" src={companyDetails && companyDetails.logo} alt="Logo" />
                             </div>
                         </Link>
                         <div className="md:hidden flex-none">

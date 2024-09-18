@@ -6,7 +6,7 @@ const AdminAllOrders = () => {
     const [statusData, setStatusData] = useState({})
     const [updateStatus, { isSuccess }] = useUpdateStatusMutation()
     const { data } = useGetAllOrdersQuery();
-    // console.log(data);
+    console.log(data);
     useEffect(() => {
         if (isSuccess) {
             toast.success("Status Update Success")
@@ -42,8 +42,8 @@ const AdminAllOrders = () => {
                             </td>
                             <td className="px-6 py-4 hidden md:table-cell">
                                 <div className="text-sm">
-                                    <div className="font-medium text-gray-700">{order.userId.name}</div>
-                                    <div className="text-gray-400">{order.userId.email}</div>
+                                    <div className="font-medium text-gray-700">{order.userId && order.userId.mobile}</div>
+                                    {/* <div className="text-gray-400">{order.userId.email}</div> */}
                                 </div>
                             </td>
                             <td className="px-6 py-4 hidden md:table-cell">

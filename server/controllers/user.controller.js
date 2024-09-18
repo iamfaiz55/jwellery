@@ -447,8 +447,7 @@ exports.updateProfile = asyncHandler(async (req, res) => {
     //    console.log(updated);
        
         res.json({ message: "Profile image upload successfully", result:{
-            name:updated.name,
-            email:updated.email,
+            mobile:updated.mobile,
             _id:updated._id,
             image:secure_url,
             isBlock:updated.isBlock

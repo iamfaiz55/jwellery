@@ -15,6 +15,9 @@ const adminSchema = new mongoose.Schema({
     },
     otp:{
         type:Number
+    },
+    mobile:{
+        type:Number
     }
 },{timestamps:true})
 

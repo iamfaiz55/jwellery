@@ -203,7 +203,7 @@ const Review = () => {
     const { id } = useParams();
     const [postReview, { isSuccess, isLoading, isError, error }] = usePostReviewMutation()
     const { data: reviews } = useGetReviewsQuery(id)
-    // console.log(reviews);
+    console.log(reviews);
 
     const { user } = useSelector((state) => state.userData);
 
@@ -296,7 +296,7 @@ const Review = () => {
                                 className="p-4 mb-4 bg-yellow-100 rounded-lg shadow-lg border border-yellow-200"
                             >
                                 <h3 className="text-lg font-medium text-yellow-800">
-                                    {review.uId.name}
+                                    {review.uId && review.uId.mobile}
                                 </h3>
                                 <p className="mt-2 text-yellow-900">{review.review}</p>
                                 <div className="flex items-center mt-2">

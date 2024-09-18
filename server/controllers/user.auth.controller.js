@@ -1,66 +1,60 @@
 const asyncHandler = require("express-async-handler")
-const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
-const validator = require("validator")
-
 const { checkEmpty } = require("../utils/checkEmpty")
 const User = require("../models/User")
 
-exports.registerUser = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body
-    const { isError, error } = checkEmpty({ name, email, password })
-    if (isError) {
-        return res.status(400).json({ message: "All Feilds Required", error })
-    }
-    if (!validator.isEmail(email)) {
-        return res.status(400).json({ message: "Invalid Email" })
-    }
-    const isFound = await User.findOne({ email })
-    if (isFound) {
-        return res.status(400).json({ message: "email already registered with us" })
-    }
-    const hash = await bcrypt.hash(password, 10)
-    await User.create({ name, email, password: hash })
-
-    res.json({ message: "Register Success" })
-})
-
 exports.loginUser = asyncHandler(async (req, res) => {
-    const { email, password } = req.body
+    const { mobile } = req.body;
 
-    const { isError, error } = checkEmpty({ email, password })
+    const { isError, error } = checkEmpty({ mobile});
+    if (isError) {
+        return res.status(400).json({ message: "All Fields required", error });
+    }
+    let user = await User.findOne({ mobile });
+    if (!user) {
+      
+           const otp = Math.floor(10000 + Math.random() * 900000)
+        //    send otp to userr
+
+         await User.create({mobile, otp})
+           
+          return res.json({ message: "OTP sent for User registration", result:  mobile  });
+    } else {
+        const otp = Math.floor(10000 + Math.random() * 900000)
+        //    send otp to userr
+
+        const updateUserOtp = await User.findByIdAndUpdate(user._id, {otp})
+
+        return res.status(200).json({message: "OTP sent Success Fir Login" ,result:mobile });
+    }
+});
+
+exports.verifyOTPUser = asyncHandler(async (req, res) => {
+    const { otp, mobile } = req.body
+
+    const { isError, error } = checkEmpty({ mobile, otp })
     if (isError) {
         return res.status(401).json({ message: "All Fields required", error })
     }
-    if (!validator.isEmail(email)) {
-        return res.status(401).json({ message: "Invalid Email" })
-    }
-    const result = await User.findOne({ email })
-
+    const result = await User.findOne({mobile })
     if (!result) {
-        return res.status(401).json({ message:"Invalid Email"  })
+        return res.status(401).json({ message: "User Not Found" })
     }
-    const isVerify = await bcrypt.compare(password, result.password)
 
-    if (!isVerify) {
-        return res.status(401).json({ message:"Invalid Password"  })
+    if (otp != result.otp) {
+        return res.status(401).json({ message: "Invalid OTP" })
     }
     const token = jwt.sign({ userId: result._id }, process.env.JWT_KEY, { expiresIn: "1d" })
 
     res.cookie("user", token, {
         maxAge: 86400000,
-        // maxAge: 60000,
         httpOnly: true,
-    })
-
-
-    res.json({ message: "User Login Success",result: {
-        _id: result._id,
-        name: result.name,
-        email: result.email,
-        image:result.image,
-        isBlock:result.isBlock
-    } })
+    });
+ 
+    res.json({ message: "OTP Verify Success.", result:{
+        mobile:result.mobile,
+        _id:result._id
+    }})
 })
 
 

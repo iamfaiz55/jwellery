@@ -22,7 +22,7 @@ const AllUsers = () => {
     }, [unblocked, refetch]);
 
     return (
-        <div className='bg-light-golden h-screen p-5'>
+        <div className='bg-light-golden  p-5'>
             {/* Table for md and lg screens */}
             <div className="overflow-x-auto shadow-md sm:rounded-lg hidden md:block">
                 <div className='m-5'>
@@ -30,18 +30,18 @@ const AllUsers = () => {
                         <thead className="text-xs text-gray-700 uppercase bg-light-golden">
                             <tr className="text-md font-semibold tracking-wide text-left text-gray-900 bg-light-golden uppercase border-b border-gray-600">
                                 <th className="p-3 font-bold uppercase text-gray-600">#</th>
-                                <th className="p-3 font-bold uppercase text-gray-600">Name</th>
-                                <th className="p-3 font-bold uppercase text-gray-600">Email</th>
+                                <th className="p-3 font-bold uppercase text-gray-600">Mobile</th>
+                                {/* <th className="p-3 font-bold uppercase text-gray-600">Email</th> */}
                                 <th className="p-3 font-bold uppercase text-gray-600">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {data && data.map((user, i) => (
-                                <tr key={user.email} className="hover:bg-light-golden transition">
-                                    <td className="p-3 text-gray-800 text-center border-b">{i + 1}</td>
-                                    <td className="p-3 text-gray-800 text-center border-b">{user.name}</td>
-                                    <td className="p-3 text-gray-800 text-center border-b">{user.email}</td>
-                                    <td className="p-3 text-gray-800 text-center border-b">
+                                <tr key={user.email} className="hover:bg-light-golden ">
+                                    <td className="p-3 text-gray-800  border-b">{i + 1}</td>
+                                    <td className="p-3 text-gray-800  border-b">{user.mobile}</td>
+                                    {/* <td className="p-3 text-gray-800 text-center border-b">{user.email}</td> */}
+                                    <td className="p-3 text-gray-800  border-b">
                                         {user.isBlock
                                             ? <button
                                                 type="button"

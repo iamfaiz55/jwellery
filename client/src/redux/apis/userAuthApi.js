@@ -39,6 +39,21 @@ export const userAuthApi = createApi({
                     }
                 },
                 transformResponse:data => {
+                         localStorage.setItem("mobile", JSON.stringify(data.result))
+                         return data.result
+                },
+                invalidatesTags: ["auth"]
+            }),
+        
+            verifyOTPUser: builder.mutation({
+                query: otpData => {
+                    return {
+                        url: "/verify-otp-user",
+                        method: "POST",
+                        body: otpData
+                    }
+                },
+                transformResponse:data => {
                          localStorage.setItem("user", JSON.stringify(data.result))
                          return data.result
                 },
@@ -67,5 +82,6 @@ export const userAuthApi = createApi({
 export const {
     useRegisterUserMutation,
     useLoginUserMutation,
-    useLogoutUserMutation
+    useLogoutUserMutation,
+    useVerifyOTPUserMutation
 } = userAuthApi

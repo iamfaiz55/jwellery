@@ -1,29 +1,45 @@
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useLoginUserMutation } from '../redux/apis/userAuthApi';
-import { useEffect } from 'react';
+import { useLoginUserMutation, useVerifyOTPUserMutation } from '../redux/apis/userAuthApi';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useSelector } from 'react-redux';
 
 const UserLogin = () => {
-    const [loginUser, { isSuccess, isLoading, isError, error }] = useLoginUserMutation();
+    const { mobile } = useSelector(state => state.userData)
+    console.log(mobile);
+
+    const [verify, { isSuccess }] = useVerifyOTPUserMutation()
+    const [loginUser, { isSuccess: sendSuccess, isLoading, isError, error }] = useLoginUserMutation();
     const navigate = useNavigate();
+    const [otpData, setOtpData] = useState()
 
     const formik = useFormik({
         initialValues: {
-            email: "",
-            password: "",
+            mobile: "",
+
         },
         validationSchema: yup.object({
-            email: yup.string().email().required("Enter Email"),
-            password: yup.string().required("Enter Password"),
+            mobile: yup.string().email().required("Enter Email"),
+
         }),
         onSubmit: (values, { resetForm }) => {
             loginUser(values);
+            console.log(values);
+
             resetForm();
         }
     });
+    const btnRef = useRef()
+
+    useEffect(() => {
+        if (sendSuccess) {
+            toast.success("OTP Sent Successfully")
+            btnRef.current.click()
+        }
+    }, [sendSuccess])
 
     useEffect(() => {
         if (isSuccess) {
@@ -31,6 +47,12 @@ const UserLogin = () => {
             navigate("/");
         }
     }, [isSuccess]);
+    useEffect(() => {
+        if (isError) {
+            toast.error(error.data.message);
+            // navigate("/");
+        }
+    }, [isError]);
 
     const containerVariants = {
         hidden: { opacity: 0, y: -50 },
@@ -54,6 +76,8 @@ const UserLogin = () => {
                     animate="visible"
                     variants={containerVariants}
                 >
+                    <button className="hidden" ref={btnRef} onClick={() => document.getElementById('my_modal_1').showModal()}>open modal</button>
+
                     <div className="grid place-items-center mx-2 my-20 sm:my-auto mb-96 lg:mb-24">
                         <motion.div
                             className="w-11/12 p-12 sm:w-8/12 md:w-6/12 lg:w-5/12 2xl:w-4/12 px-6 py-10 sm:px-10 sm:py-6 bg-white rounded-lg shadow-md lg:shadow-lg"
@@ -62,22 +86,22 @@ const UserLogin = () => {
                             <h2 className="text-center font-semibold text-3xl lg:text-4xl text-gray-800">
                                 User Login
                             </h2>
-
+                            <pre>{JSON.stringify(formik.values, null, 2)}</pre>
                             <form className="mt-10" onSubmit={formik.handleSubmit}>
-                                <label htmlFor="email" className="block text-xs font-semibold text-gray-600 uppercase">E-mail</label>
+                                <label htmlFor="mobile" className="block text-xs font-semibold text-gray-600 uppercase">Mobile</label>
                                 <input
-                                    {...formik.getFieldProps("email")}
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    placeholder="e-mail address"
-                                    autoComplete="email"
+                                    {...formik.getFieldProps("mobile")}
+                                    id="mobile"
+                                    type="number"
+                                    name="mobile"
+                                    placeholder="Mobile Number"
+                                    // autoComplete="email"
                                     className="block w-full py-3 px-1 mt-2 text-gray-800 appearance-none border-b-2 border-gray-100 focus:text-gray-500 focus:outline-none focus:border-light-golden"
                                     required
                                 />
 
-                                <label htmlFor="password" className="block mt-2 text-xs font-semibold text-gray-600 uppercase">Password</label>
-                                <input
+                                {/* <label htmlFor="password" className="block mt-2 text-xs font-semibold text-gray-600 uppercase">Password</label> */}
+                                {/* <input
                                     {...formik.getFieldProps("password")}
                                     id="password"
                                     type="password"
@@ -86,9 +110,10 @@ const UserLogin = () => {
                                     autoComplete="current-password"
                                     className="block w-full py-3 px-1 mt-2 mb-4 text-gray-800 appearance-none border-b-2 border-gray-100 focus:text-gray-500 focus:outline-none focus:border-light-golden"
                                     required
-                                />
+                                /> */}
 
                                 <motion.button
+                                    onClick={e => loginUser(formik.values)}
                                     type="submit"
                                     className="w-full py-3 mt-10 bg-gray-800 rounded-sm font-medium text-white uppercase focus:outline-none hover:bg-gray-700 hover:shadow-none"
                                     whileHover={{ scale: 1.05 }}
@@ -115,6 +140,21 @@ const UserLogin = () => {
                     </div>
                 </motion.div>
             )}
+
+
+
+            <dialog id="my_modal_1" className="modal">
+                <div className="modal-box">
+                    <h3 className="font-bold text-lg">Hello!</h3>
+                    <input onChange={e => setOtpData(e.target.value)} id="otp" type="number" name="otp" placeholder="Enter Your OTP"
+                        className="block w-full py-3 px-1 mt-2 text-gray-800 appearance-none border-b-2 border-golden-100 focus:text-gray-500 focus:outline-none focus:border-golden-200"
+                        required />
+                    <div className="modal-action">
+                        <button className="btn bg-black text-white" onClick={e => document.getElementById("my_modal_1").close()}>Close</button>
+                        <button onClick={() => verify({ otp: otpData, mobile: mobile })} className="btn bg-green-500">Verify</button>
+                    </div>
+                </div>
+            </dialog>
         </>
     );
 };
