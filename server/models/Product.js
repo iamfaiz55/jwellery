@@ -3,7 +3,7 @@ const mongoose = require("mongoose")
 const productSchema = new mongoose.Schema({
       name:{ type:String,required:true},
       mrp:{type:String,required:true},
-      image:{type:String,required:true},
+      images: { type: [String], required: true },
       price:{type:String,required:true},
       discount:{type:String,required:true},
       height:{type:String,required:true},
@@ -23,6 +23,18 @@ const productSchema = new mongoose.Schema({
             default: false
       },
       cloudinary_id: {
+            type: [String]
+      }, 
+      productDetails: {
+            type:String
+      }, 
+      specification: {
+            type:String
+      }, 
+      freeShippingpolicy: {
+            type:String
+      }, 
+      ratingReviews: {
             type:String
       }, 
 }, {timestamps:true})

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useGetAllOrdersQuery, useUpdateStatusMutation } from '../redux/apis/adminApi';
 import { toast } from 'sonner';
+import { Outlet } from 'react-router-dom';
 
 const AdminAllOrders = () => {
     const [statusData, setStatusData] = useState({})
@@ -16,6 +17,7 @@ const AdminAllOrders = () => {
 
     return (
         <div className="overflow-hidden rounded-lg border border-gray-200 shadow-md m-5">
+            {/* <Outlet /> */}
             <table className="w-full border-collapse bg-light-golden text-left text-sm text-gray-500">
                 <thead className="bg-light-golden">
                     <tr>
@@ -35,7 +37,7 @@ const AdminAllOrders = () => {
                             <td className="px-6 py-4 font-medium text-gray-900">
                                 {order.orderItems.map(item => (
                                     <div key={item._id}>
-                                        <div className="font-medium text-gray-700">{item.productId.name}</div>
+                                        <div className="font-medium text-gray-700">{item.productId && item.productId.name}</div>
                                         <div className="text-gray-400">Qty: {item.quantity}</div>
                                     </div>
                                 ))}

@@ -13,6 +13,8 @@ router
 
     .get("/get-tax", adminController.getTax)
     .get("/get-company", userController.getCompanyDetails)
+    .get("/get-scroll-cards", adminController.getAllScrollCards)
+    .get("/get-menu-items", adminController.getAllMenuItems)
 
 
 module.exports = router

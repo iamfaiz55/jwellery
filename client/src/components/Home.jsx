@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { usefilter } from '../App';
 import { toast } from 'sonner';
 import { useGetCArouselQuery, useGetTaxesQuery, useLazyGetFilteredDataQuery, useLazyGetAllProductsQuery } from '../redux/apis/openApi';
+import ScrollCard from './ScrollCard';
 
 const Home = () => {
     const { selectedType } = usefilter();
@@ -116,6 +117,7 @@ const Home = () => {
                         ))}
                     </div>
                 </div>
+                <ScrollCard />
 
                 <section>
                     <div className="container mx-auto flex flex-col items-center px-6 py-4">
@@ -136,7 +138,7 @@ const Home = () => {
                                     to={`/details/${item._id}`}
                                     className="transform overflow-hidden rounded-lg bg-white shadow-md duration-300 hover:scale-105 hover:shadow-lg"
                                 >
-                                    <img className="h-48 w-full object-cover object-center duration-300 hover:scale-110" src={item.image} alt="Product Image" />
+                                    <img className="h-48 w-full object-cover object-center duration-300 hover:scale-110" src={item.images[0]} alt="Product Image" />
                                     <div className="p-4">
                                         <h2 className="mb-2 text-lg font-medium text-gray-900">{item.name}</h2>
                                         <p className="mb-2 text-base text-gray-700">{item.desc}</p>

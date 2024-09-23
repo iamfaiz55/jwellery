@@ -87,7 +87,7 @@ const Cart = () => {
                                         {cartItems.map(item => (
                                             <div key={item.productId._id} className="mb-6 rounded-lg bg-white p-6 shadow-xl transform transition-all hover:scale-105">
                                                 <div className="sm:flex sm:justify-between">
-                                                    <img src={item.productId.image} alt="product-image" className="w-full rounded-lg sm:w-40" />
+                                                    <img src={item.productId.images[0]} alt="product-image" className="w-full rounded-lg sm:w-40" />
                                                     <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
                                                         <div className="mt-5 sm:mt-0">
                                                             <h2 className="text-xl font-semibold text-gray-800">{item.productId.name}</h2>

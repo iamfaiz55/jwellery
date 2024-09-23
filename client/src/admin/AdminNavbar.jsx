@@ -20,9 +20,9 @@ const AdminNavbar = () => {
         }
     }, [isSuccess]);
     useEffect(() => {
-        if (error) {
+        if (isError) {
             logoutAdmin()
-            toast.error(error && error.data.message)
+            toast.error(JSON.stringify(error, null, 2))
         }
     }, [isError])
 
@@ -42,7 +42,7 @@ const AdminNavbar = () => {
                                     />
                                 </div>
                             </Link>
-                            <div className="flex  ">
+                            {/* <div className="flex  ">
                                 <div className="hidden lg:flex ">
                                     <Link to="/admin/dashboard" className="btn btn-ghost   hover:bg-gray-200 transition duration-300 ease-in-out">
                                         Dashboard
@@ -68,6 +68,12 @@ const AdminNavbar = () => {
                                     <Link to="/admin/addresses" className="btn btn-ghost  hover:bg-gray-200 transition duration-300 ease-in-out">
                                         Addresses And Taxes
                                     </Link>
+                                    <Link to="/admin/admin-scroll-card" className="btn btn-ghost  hover:bg-gray-200 transition duration-300 ease-in-out">
+                                        Scroll Cards
+                                    </Link>
+                                    <Link to="/admin/navmenu" className="btn btn-ghost  hover:bg-gray-200 transition duration-300 ease-in-out">
+                                        Navmenu
+                                    </Link>
 
                                 </div>
                                 {
@@ -76,11 +82,11 @@ const AdminNavbar = () => {
                                     </div>
 
                                 }
-                            </div>
+                            </div> */}
 
                         </div>
 
-                        <div className="lg:hidden flex-none">
+                        <div className="md:hidden flex-none">
                             <button
                                 onClick={() => setSidebarOpen(!isSidebarOpen)}
                                 className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out"

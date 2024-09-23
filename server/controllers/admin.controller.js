@@ -11,6 +11,9 @@ const Categories = require("../models/Categories")
 const PaymentMethod = require("../models/PaymentMethod")
 const CompanyAddress = require("../models/CompanyAddress")
 const Tax = require("../models/Tax")
+const Navmenu = require("../models/Navmenu")
+const ScrollCards = require("../models/ScrollCards")
+const upload2 = require("../utils/upload2")
 
 
 exports.addProduct = asyncHandler(async (req, res) => {
@@ -21,16 +24,21 @@ exports.addProduct = asyncHandler(async (req, res) => {
             return res.status(400).json({ message: "File upload failed", error: err.message });
         }
 
-        // Ensure you're accessing the correct field
-        const file = req.files[0]; // Use req.files if you are using array or req.file if single file upload
+        const file = req.files[0];
 
         if (!file) {
             return res.status(400).json({ message: "No file uploaded" });
         }
+        const files = req.files; 
+        console.log("Uploaded files:", files);
 
-        const { secure_url } = await cloudinary.uploader.upload(file.path);
+        // const { secure_url } = await cloudinary.uploader.upload(file.path);
+        const imageUploads = await Promise.all(files.map(file => 
+            cloudinary.uploader.upload(file.path)
+        ));
         
-        // Process other form data
+        const imageUrls = imageUploads.map(upload => upload.secure_url);
+        
         const { name, mrp, price, discount, height, width, prductWeight, material, productType, desc, purity } = req.body;
 
        
@@ -39,7 +47,7 @@ exports.addProduct = asyncHandler(async (req, res) => {
         await Product.create({
             name,
             mrp,
-            image: secure_url,
+            images: imageUrls,
             price,
             discount,
             height,
@@ -61,9 +69,7 @@ exports.addProduct = asyncHandler(async (req, res) => {
 exports.updateProduct = asyncHandler(async (req, res) => {
     const { pUId } = req.params;
 
-
     const product = await Product.findById(pUId);
-
     if (!product) {
         return res.status(404).json({ message: "Product not found" });
     }
@@ -73,19 +79,23 @@ exports.updateProduct = asyncHandler(async (req, res) => {
             return res.status(400).json({ message: "File upload failed", error: err.message });
         }
 
-        let secure_url = product.image; 
-        let public_id = product.cloudinary_id;
+        let secure_urls = product.images;
+        let public_ids = product.cloudinary_ids;
 
-        if (req.files && req.files[0]) {
-            const file = req.files[0];
-
-            if (product.cloudinary_id) {
-                await cloudinary.uploader.destroy(product.cloudinary_id);
+        if (req.files && req.files.length > 0) {
+            if (public_ids && public_ids.length > 0) {
+                for (const public_id of public_ids) {
+                    await cloudinary.uploader.destroy(public_id);
+                }
             }
 
-            const uploadResult = await cloudinary.uploader.upload(file.path);
-            secure_url = uploadResult.secure_url;
-            public_id = uploadResult.public_id; 
+
+            const imageUploads = await Promise.all(
+                req.files.map(file => cloudinary.uploader.upload(file.path))
+            );
+
+            secure_urls = imageUploads.map(upload => upload.secure_url);
+            public_ids = imageUploads.map(upload => upload.public_id);
         }
 
         const {
@@ -98,8 +108,8 @@ exports.updateProduct = asyncHandler(async (req, res) => {
             {
                 name,
                 mrp,
-                image: secure_url,
-                cloudinary_id: public_id,
+                images: secure_urls,
+                cloudinary_ids: public_ids,
                 price,
                 discount,
                 height,
@@ -110,7 +120,7 @@ exports.updateProduct = asyncHandler(async (req, res) => {
                 desc,
                 purity,
             },
-            { new: true } // Return the updated document
+            { new: true } 
         );
 
         res.json({ message: "Product updated successfully", updatedProduct });
@@ -142,10 +152,10 @@ exports.updateOrderStatus =asyncHandler(async(req, res)=> {
     res.json({message:"Order Update Success"})
 })
 
-exports.addEvenOffers = asyncHandler(async(req, res)=> {
-    const {image, offPercents} = req.body
+// exports.addEvenOffers = asyncHandler(async(req, res)=> {
+//     const {image, offPercents} = req.body
 
-})
+// })
 
 exports.getAllUsers = asyncHandler(async(req, res)=> {
     const result = await User.find()
@@ -320,7 +330,7 @@ exports.createPaymentMethod = asyncHandler(async(req, res)=> {
 })
 
 
-
+// use nhi karna hai👇
 exports.addAddress = asyncHandler(async (req, res) => {
     upload(req, res, async (err) => {
     if (err) {
@@ -350,9 +360,7 @@ exports.updateCompanyAddress = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
     upload(req, res, async (err) => {
-        console.log(req.files[0]);
-        console.log(req.body);
-        
+   
         if (err) {
             return res.status(400).json({ message: "File upload failed", error: err.message });
         }
@@ -372,8 +380,8 @@ exports.updateCompanyAddress = asyncHandler(async (req, res) => {
 
         let secure_url 
         if (req.files[0]) {
-                const uploadResult = await cloudinary.uploader.upload(req.files[0].path);
-                secure_url = uploadResult.secure_url;  
+                const {secure_url} = await cloudinary.uploader.upload(req.files[0].path);
+                secure_url = secure_url;  
         }
           await CompanyAddress.findByIdAndUpdate(id, {...req.body,logo: secure_url});
           res.json({ message: "Company Details updated successfully" });
@@ -386,4 +394,186 @@ exports.getCompanyAddress = asyncHandler(async(req, res)=> {
     const result = await CompanyAddress.find()
 
     res.json({message:"Company address get Success", result})
+})
+
+exports.addMenuItem = asyncHandler(async (req, res) => {
+    upload2(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({ message: "File upload failed", error: err.message });
+        }
+
+        const { menuitem } = req.body; 
+        const newChildren = []; 
+
+        for (let i = 0; ; i++) {
+         const childMenuItem = req.body[`children[${i}].menuitem`];
+        const childSubtitle = req.body[`children[${i}].subtitle`];
+                const childLink = req.body[`children[${i}].link`];
+            const childImageFile = req.files[`children[${i}].image`] && req.files[`children[${i}].image`][0];
+
+            if (!childMenuItem) break;
+
+        const childImagePath = childImageFile ? childImageFile.path : null;
+        let secure_url = null;
+            if (childImagePath) {
+                const uploadResult = await cloudinary.uploader.upload(childImagePath);
+                secure_url = uploadResult.secure_url;
+            }
+
+            newChildren.push({
+                menuitem: childMenuItem,
+                subtitle: childSubtitle,
+                link: childLink,
+                image: secure_url 
+            });
+        }
+
+        const { isError, error } = checkEmpty({ menuitem });
+        if (isError) {
+            return res.status(400).json({ message: "All Fields Required", error });
+        }
+
+        let existingMenuItem = await Navmenu.findOne({ menuitem });
+
+        if (existingMenuItem) {
+            const updatedChildren = [...existingMenuItem.children, ...newChildren];
+            existingMenuItem.children = updatedChildren; 
+            await existingMenuItem.save();
+
+            return res.json({ message: "Menu Item updated successfully" });
+        } else {
+            await Navmenu.create({
+                menuitem,
+                children: newChildren
+            });
+
+            res.json({ message: "Menu Item created successfully" });
+        }
+    });
+});
+
+
+
+
+
+exports.getAllMenuItems = asyncHandler(async(req, res)=> {
+    const result = await Navmenu.find()
+    res.json({message:"all Menu Items Fetch Success", result})
+})
+
+exports.updateMenuItem = asyncHandler(async(req,res)=> {
+    const {id}= req.params
+    upload(req, res, async err => {
+        if (err) {
+            return res.status(400).json({ message: "File upload failed", error: err.message });
+        }
+        const result = await Navmenu.findById(id)
+        
+        if (result.children.image) {
+            const x = result.children.image.split('/').pop().split('.')[0]; 
+            await cloudinary.uploader.destroy(x);
+        }
+        let imageNew
+        if (req.files[0]) {
+                const {secure_url} = await cloudinary.uploader.upload(req.files[0].path);
+                imageNew = secure_url;  
+        }
+
+        await Navmenu.findByIdAndUpdate(id, {...req.body, image:imageNew})
+        res.json({message:"NavMenu Update Success"})
+    })
+})
+
+exports.addScrollCard = asyncHandler(async(req, res)=> {
+    upload(req, res, async err => {
+        if (err) {
+            return res.status(400).json({ message: "File upload failed", error: err.message });
+        }
+
+        const {title,  link}=req.body
+console.log(req.body);
+
+const {isError, error}= checkEmpty({title,  link})
+if(isError){
+    return res.status(400).json({message:"All Filds Required", error})
+} 
+const {secure_url}=await cloudinary.uploader.upload(req.files[0].path)
+// console.log(await img);
+         await ScrollCards.create({title, link, image:secure_url})
+
+         res.json({message:"ScrollCard Create Sucecss"})
+    })
+
+})
+exports.getAllScrollCards = asyncHandler(async(req, res)=>{
+    const result = await ScrollCards.find()
+    res.json({message:"All SScroll Cards Fetch Success", result})
+})
+exports.updateScrollCard = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    upload(req, res, async err => {
+        if (err) {
+            return res.status(400).json({ message: "File upload failed" });
+        }
+
+        const result = await ScrollCards.findOne({_id:id});
+        if (!result) {
+            return res.status(404).json({ message: "Scroll Card not found" });
+        }
+
+        if (result.image) {
+            const x = result.image.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(x);
+        }
+
+        let imageNew = result.image; 
+        if (req.files[0]) {
+            const { secure_url } = await cloudinary.uploader.upload(req.files[0].path);
+            imageNew = secure_url;
+        }
+
+        await ScrollCards.findByIdAndUpdate(id, { ...req.body, image: imageNew });
+
+        res.json({ message: "Scroll Card Update Success" });
+    });
+});
+
+
+exports.deleteScrollCard = asyncHandler(async(req, res)=> {
+    const {id}= req.params
+    const result = await ScrollCards.findById(id)
+
+    if(result.image){
+        const x = result.image.split('/').pop().split('.')[0]; 
+        await cloudinary.uploader.destroy(x);
+   }
+   await ScrollCards.findByIdAndDelete(id)
+   res.json({message:"Scroll Card Delete Success"})
+   
+})
+exports.deleteMenuItem = asyncHandler(async (req, res) => {
+    const { id, menuId } = req.params;
+    const result = await Navmenu.findById(id);
+    if (!result) {
+        return res.status(408).json({ message: "No Have Menu Item " });
+    }
+    const childIndex = result.children.findIndex(child => child._id.toString() === menuId);
+    if (childIndex === -1) {
+        return res.status(404).json({ message: "Child Menu Item not found" });
+    }
+    result.children.splice(childIndex, 1);
+    await result.save();
+
+    res.json({ message: "Child Menu Item deleted successfully" });
+});
+
+exports.addImage = asyncHandler(async(req, res)=> {
+    upload(req, res, async err => {
+        if (err) {
+            return res.status(400).json({ message: "File upload failed", error: err.message });
+        }
+
+        console.log(req.files[0]);
+        res.json({message:"Add Image Create Success"})
+    })
 })

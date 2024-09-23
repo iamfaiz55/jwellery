@@ -250,6 +250,78 @@ export const adminApi = createApi({
                 transformResponse:data => data.result,
                 invalidatesTags: ["admin"]
             }),
+
+          
+          
+            addMenuItem: builder.mutation({
+                query: menuData=> {
+                    return {
+                        url: `add-menu-item`,
+                        method: "POST",
+                        body: menuData
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
+           
+            updateMenuItem: builder.mutation({
+                query: menuData=> {
+                    return {
+                        url: `/update-menu-item/${menuData._id}`,
+                        method: "PUT",
+                        body: menuData.fd
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
+       
+            addScrollCard: builder.mutation({
+                query: scrollCardData=> {
+                    return {
+                        url: `/add-scroll-card`,
+                        method: "POST",
+                        body: scrollCardData
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
+                 // .put("/update-scroll-card/:id", adminController.updateScrollCard)
+            updateScrollCard: builder.mutation({
+                query: scrollCardData=> {
+                    return {
+                        url: `/update-scroll-card/${scrollCardData._id}`,
+                        method: "PUT",
+                        body: scrollCardData.fd
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
+            deleteScrollCard: builder.mutation({
+                query: id=> {
+                    return {
+                        url: `/delete-scroll-card/${id}`,
+                        method: "DELETE",
+                        // body: scrollCardData.fd
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
+            deleteMenuItem: builder.mutation({
+                query: ({childId, menuId})=> {
+                    return {
+                        url: `/delete-menu-item/${menuId}/${childId}`,
+                        method: "DELETE",
+                        // body: scrollCardData.fd
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
         
         }
     }
@@ -281,5 +353,11 @@ export const {
 useLazyGetCompanyAddressQuery,
   useUpdtaeCompanyAddressMutation,
   useUpdateTaxMutation,
-  useGetAllProductsAdminQuery
+  useGetAllProductsAdminQuery,
+  useAddMenuItemMutation,
+  useUpdateMenuItemMutation,
+  useAddScrollCardMutation,
+  useUpdateScrollCardMutation,
+  useDeleteScrollCardMutation,
+  useDeleteMenuItemMutation
 } = adminApi

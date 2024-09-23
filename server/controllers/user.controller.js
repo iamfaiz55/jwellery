@@ -225,42 +225,98 @@ exports.createOrder = asyncHandler(async (req, res) => {
 
 
 
-exports.addAddress = asyncHandler(async(req, res)=> {
+// exports.addAddress = asyncHandler(async(req, res)=> {
+//     const {
+//         pincode,
+//         city,
+//         state,
+//         // pincode,
+//         country,
+//         addressType,
+//         mobile,
+//         userId
+//     }=req.body
+
+//     const {isError, error}= checkEmpty({pincode,
+//         city,
+//         state,
+//         country,
+//         pincode,
+//         addressType,
+//         mobile,  userId})
+
+//         if(isError){
+//             return res.status(400).json({message :"All Fields Required"})
+//         }
+
+//         await UserAddress.create({ city,
+//             state,
+//             pincode,
+//             country,
+//             addressType,
+//             mobile,
+//             userId})
+//         // console.log(req.loggedInUser);
+        
+
+//             res.json({message:"Address Create Success"})
+// })
+
+
+
+exports.addAddress = asyncHandler(async (req, res) => {
     const {
+        email,
         pincode,
         city,
         state,
-        // pincode,
         country,
         addressType,
         mobile,
         userId
-    }=req.body
+    } = req.body;
 
-    const {isError, error}= checkEmpty({pincode,
+    // Check for required fields
+    const { isError, error } = checkEmpty({
+        pincode,
         city,
         state,
         country,
-        pincode,
         addressType,
-        mobile,  userId})
+        mobile,
+        userId
+    });
 
-        if(isError){
-            return res.status(400).json({message :"All Fields Required"})
-        }
+    if (isError) {
+        return res.status(400).json({ message: "All Fields Required" , error});
+    }
 
-        await UserAddress.create({ city,
-            state,
-            pincode,
-            country,
-            addressType,
-            mobile,
-            userId})
-        // console.log(req.loggedInUser);
-        
+    let user = await User.findById(userId);
+console.log(user);
 
-            res.json({message:"Address Create Success"})
-})
+    if (!user) {
+        return res.status(505).json({message:"user not found"})
+    }
+
+if(!user.email){
+   const updated= await User.findByIdAndUpdate(userId, {email})
+   console.log("updated", updated);
+   
+}
+    // Now add the address
+    await UserAddress.create({
+        city,
+        state,
+        pincode,
+        country,
+        addressType,
+        mobile,
+        userId: user._id
+    });
+
+    res.json({ message: "Address Created Successfully" });
+});
+
 
 exports.getAddresses = asyncHandler(async(req, res)=> {
     const {id} = req.params

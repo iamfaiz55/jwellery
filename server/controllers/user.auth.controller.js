@@ -53,7 +53,11 @@ exports.verifyOTPUser = asyncHandler(async (req, res) => {
  
     res.json({ message: "OTP Verify Success.", result:{
         mobile:result.mobile,
-        _id:result._id
+        _id:result._id,
+        name:result && result.name &&result.name ,
+        email:result && result.email &&result.email ,
+        image:result && result.image&&result.image,
+
     }})
 })
 

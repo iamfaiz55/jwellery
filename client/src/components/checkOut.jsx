@@ -70,7 +70,7 @@ const CheckOut = () => {
                             <ul className="py-6 border-b space-y-6">
                                 <li className="flex items-center space-x-4 border-b pb-4">
                                     <div className="w-24">
-                                        <img src={product.image} alt={product.name} className="rounded w-full" />
+                                        <img src={product.images[0]} alt={product.name} className="rounded w-full" />
                                     </div>
                                     <div className="flex flex-col flex-grow">
                                         <span className="text-gray-600 text-md font-semibold">{product.name}</span>
@@ -173,7 +173,7 @@ const CheckOut = () => {
                             <ul className="py-6 border-b space-y-6">
                                 <li className="flex items-center space-x-4 border-b pb-4">
                                     <div className="w-24">
-                                        <img src={product.image} alt={product.name} className="rounded w-full" />
+                                        <img src={product.images[0]} alt={product.name} className="rounded w-full" />
                                     </div>
                                     <div className="flex flex-col flex-grow">
                                         <span className="text-gray-600 text-md font-semibold">{product.name}</span>

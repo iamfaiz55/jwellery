@@ -69,6 +69,24 @@ export const openApi = createApi({
                 transformResponse: (data) => data.result,
                 providesTags: ["user"]
             }),
+//             get-scroll-cards
+// get-menu-items
+            getAllMenuItems: builder.query({
+                query: () => ({
+                    url: `/get-menu-items`,
+                    method: "GET"
+                }),
+                transformResponse: (data) => data.result,
+                providesTags: ["user"]
+            }),
+            getAllScrollCards: builder.query({
+                query: () => ({
+                    url: `/get-scroll-cards`,
+                    method: "GET"
+                }),
+                transformResponse: (data) => data.result,
+                providesTags: ["user"]
+            }),
 
             postContact: builder.mutation({
                 query: (contactData) => ({
@@ -93,7 +111,9 @@ export const {
     usePostContactMutation,
     useGetTaxesQuery,
     useLazyGetTaxesQuery,
-    useGetCompanyDetailsQuery
+    useGetCompanyDetailsQuery,
+    useGetAllScrollCardsQuery,
+    useGetAllMenuItemsQuery
 } = openApi;
 
 

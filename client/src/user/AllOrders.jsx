@@ -52,7 +52,7 @@ const AllOrders = () => {
                                                         <div className="pb-4 md:pb-8 w-full md:w-40">
                                                             <img
                                                                 className="w-full"
-                                                                src={item.productId.image}
+                                                                src={item.productId.images[0]}
                                                                 alt={item.productId.name}
                                                             />
                                                         </div>

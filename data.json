@@ -1,0 +1,71 @@
+{
+    "id": "1234567",
+    "menuitem": "Gold",
+    "children": [
+        {
+            "id": " uuid()",
+            "menuitem": "Rings",
+            "subtitle": "'24 Carrot Gold'",
+            "image": "https://d1put4x3vjlh9s.cloudfront.net/public/uploads/menus/menu-items/Gold-Studspng__1468486032268477368.webp",
+            "link": "#"
+        },
+        {
+            "id": " uuid()",
+            "menuitem": "'Pendant'",
+            "subtitle": "'24 Carrot Gold'",
+            "image": "https://d1put4x3vjlh9s.cloudfront.net/public/uploads/menus/menu-items/Gold-Studspng__1468486032268477368.webp",
+            "link": "'#'"
+        },
+        {
+            "id": " uuid()",
+            "menuitem": "'Necklaces'",
+            "subtitle": "'24 Carrot Gold'",
+            "image": "https://d1put4x3vjlh9s.cloudfront.net/public/uploads/menus/menu-items/Gold-Studspng__1468486032268477368.webp",
+            "link": "'#'"
+        },
+        {
+            "id": " uuid()",
+            "menuitem": "'Bracelets and Bangles'",
+            "subtitle": "'24 Carrot Gold'",
+            "image": "https://d1put4x3vjlh9s.cloudfront.net/public/uploads/menus/menu-items/Gold-Studspng__1468486032268477368.webp",
+            "link": "'#'"
+        },
+        {
+            "id": " uuid()",
+            "menuitem": "'Mangalsutra'",
+            "subtitle": "'24 Carrot Gold'",
+            "image": "https://d1put4x3vjlh9s.cloudfront.net/public/uploads/menus/menu-items/Gold-Studspng__1468486032268477368.webp",
+            "button": false,
+            "link": "'#'"
+        },
+        {
+            "id": " uuid()",
+            "menuitem": "'Gold Cufflinks'",
+            "subtitle": "'24 Carrot Gold'",
+            "image": "https://d1put4x3vjlh9s.cloudfront.net/public/uploads/menus/menu-items/Gold-Studspng__1468486032268477368.webp",
+            "link": "'#'"
+        },
+        {
+            "id": " uuid()",
+            "menuitem": "'Gold Chain'",
+            "subtitle": "'24 Carrot Gold'",
+            "image": "https://d1put4x3vjlh9s.cloudfront.net/public/uploads/menus/menu-items/Gold-Studspng__1468486032268477368.webp",
+            "link": "'#'"
+        },
+        {
+            "id": " uuid()",
+            "menuitem": " 'Gold Nath'",
+            "subtitle": "'24 Carrot Gold'",
+            "image": "https://d1put4x3vjlh9s.cloudfront.net/public/uploads/menus/menu-items/Gold-Studspng__1468486032268477368.webp",
+            "button": false,
+            "link": "'#'"
+        },
+        {
+            "id": " uuid()",
+            "menuitem": " 'View All Gold'",
+            "subtitle": "'24 Carrot Gold'",
+            "button": true,
+            "link": "'#'"
+        }
+    ]
+}

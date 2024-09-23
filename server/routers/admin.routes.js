@@ -38,4 +38,14 @@ router
     .put("/update-tax/:taxId", adminController.updateTax)
 
 
+    .post("/add-menu-item", adminController.addMenuItem)
+    .put("/update-menu-item/:id", adminController.updateMenuItem)
+
+
+    .post("/add-scroll-card", adminController.addScrollCard)
+    .put("/update-scroll-card/:id", adminController.updateScrollCard)
+    .delete("/delete-scroll-card/:id", adminController.deleteScrollCard)
+    .delete("/delete-menu-item/:id/:menuId", adminController.deleteMenuItem)
+
+
 module.exports = router

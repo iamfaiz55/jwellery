@@ -106,7 +106,7 @@ const CartCheckOut = () => {
                             return (
                                 <li key={item.productId._id} className="flex items-center justify-between border-b py-2">
                                     <div className="flex items-center">
-                                        <img src={item.productId.image} alt={item.name} className="w-16 h-16 rounded object-cover mr-4" />
+                                        <img src={item.productId.images[0]} alt={item.name} className="w-16 h-16 rounded object-cover mr-4" />
                                         <div className="text-sm">
                                             <h3 className="font-medium text-gray-900">{item.name}</h3>
                                             <p className="text-gray-500">₹{discountedPrice.toFixed(2)} x {item.quantity}</p>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGetAllContactsQuery } from '../redux/apis/adminApi';
 import { motion } from 'framer-motion';
+import Sidebar from './Sidebar';
 
 const GetContacts = () => {
     const { data, isLoading, error } = useGetAllContactsQuery();
@@ -9,8 +10,9 @@ const GetContacts = () => {
     if (error) return <p>Error fetching contacts.</p>;
 
     return (
-        <div className="min-h-screen bg-light-golden py-6 sm:py-12">
-            <div className="container mx-auto px-4">
+        <div className=" min-h-screen bg-light-golden py-6 sm:py-12">
+            {/* <Sidebar /> */}
+            <div className="container mx-auto ">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}

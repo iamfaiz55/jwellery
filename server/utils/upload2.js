@@ -8,6 +8,10 @@ const postStorage = multer.diskStorage({
     },
 });
 
-const upload = multer({ storage: postStorage,  limits: { fileSize: 5 * 1024 * 1024 } }).array("images", 10);
+const upload2 = multer({ storage: postStorage }).fields([
+    { name: 'children[0].image', maxCount: 1 },
+    { name: 'children[1].image', maxCount: 1 },
+    { name: 'children[2].image', maxCount: 1 },
+]);
 
-module.exports = upload;
+module.exports = upload2;

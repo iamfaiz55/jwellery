@@ -212,8 +212,8 @@ const Profile = () => {
                                     className="hidden"
                                 />
 
-                                <h4 className="text-2xl font-bold mt-4">Hi, {user.mobile}</h4>
-                                <p className="text-gray-500">{user.email}</p>
+                                <h4 className="text-2xl font-bold mt-4">Hi, {user && user.mobile && user.mobile}</h4>
+                                {/* <p className="text-gray-500">{user && user.email && user.email}</p> */}
                             </div>
                             {/* <!-- component --> */}
                             <>
@@ -224,17 +224,16 @@ const Profile = () => {
 
                                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-2 w-full">
                                                 <div class="flex flex-col items-start justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                    <p class="text-sm text-gray-600">Education</p>
+                                                    <p class="text-sm text-gray-600">Name</p>
                                                     <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                        Stanford University
+                                                        {user && user.name && user.name}
                                                     </p>
                                                 </div>
 
                                                 <div class="flex flex-col justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                    <p class="text-sm text-gray-600">Languages</p>
+                                                    <p class="text-sm text-gray-600">Email</p>
                                                     <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                        English, Spanish, Italian
-                                                    </p>
+                                                        {user && user.email && user.email}                                                    </p>
                                                 </div>
 
                                                 <div class="flex flex-col items-start justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
@@ -353,6 +352,7 @@ const Form = ({ edit }) => {
             country: "",
             addressType: "",
             mobile: "",
+            email: "",
         },
         validationSchema: yup.object({
             pincode: yup.string().required("Enter pincode"),
@@ -362,6 +362,7 @@ const Form = ({ edit }) => {
             country: yup.string().required("Enter country"),
             addressType: yup.string().required("Select address type"),
             mobile: yup.string().required("Enter mobile number"),
+            email: yup.string().required("Enter mobile number"),
         }),
         onSubmit: (values, { resetForm }) => {
             addAddress({ ...values, userId: user._id });
@@ -394,6 +395,7 @@ const Form = ({ edit }) => {
                     <input {...formik.getFieldProps("pincode")} type="number" placeholder="Pincode" className="input w-full my-2" />
                     <input {...formik.getFieldProps("country")} type="text" placeholder="Country" className="input w-full my-2" />
                     <input {...formik.getFieldProps("mobile")} type="number" placeholder="Mobile" className="input w-full my-2" />
+                    <input {...formik.getFieldProps("email")} type="email" placeholder="Optional" className="input w-full my-2" />
                     <select {...formik.getFieldProps("addressType")} className="select select-bordered w-full my-2">
                         <option value="" disabled>Select Address Type</option>
                         <option value="home">Home</option>
