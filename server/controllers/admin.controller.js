@@ -14,6 +14,7 @@ const Tax = require("../models/Tax")
 const Navmenu = require("../models/Navmenu")
 const ScrollCards = require("../models/ScrollCards")
 const upload2 = require("../utils/upload2")
+const AddImages = require("../models/AddImages")
 
 
 exports.addProduct = asyncHandler(async (req, res) => {
@@ -572,8 +573,32 @@ exports.addImage = asyncHandler(async(req, res)=> {
         if (err) {
             return res.status(400).json({ message: "File upload failed", error: err.message });
         }
+console.log(req.files[0]);
 
-        console.log(req.files[0]);
+        if(!req.files[0]){
+            return res.status(501).json({message:"please add image"})
+        }
+
+        const {secure_url}=await cloudinary.uploader.upload(req.files[0].path)
+
+        const result = await AddImages.create({image:secure_url})
         res.json({message:"Add Image Create Success"})
     })
+})
+
+exports.deleteImage = asyncHandler(async(req, res)=> {
+    const {id}=req.params
+    const result = await AddImages.findById(id)
+
+    if(result.image){
+        const x = result.image.split('/').pop().split('.')[0]; 
+        await cloudinary.uploader.destroy(x);
+   }
+   await AddImages.findByIdAndDelete(id)
+   res.json({message:"Image Delete Success"})
+})
+
+exports.getAddsImages = asyncHandler(async(req, res)=> {
+    const result = await AddImages.find()
+    res.json({message:"Adds Images feTCH success", result})
 })

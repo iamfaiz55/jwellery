@@ -10,11 +10,12 @@ const Sidebar = () => {
         { section: 'dashboard', label: 'Dashboard', path: '/admin/dashboard' },
         { section: 'orders', label: 'All Orders', path: '/admin/allOrders' },
         { section: 'users', label: 'All Users', path: '/admin/allUsers' },
-        { section: 'addCarousel', label: 'Carousel And Add Image', path: '/admin/addCarousel' },
+        { section: 'addCarousel', label: 'Carousel ', path: '/admin/addCarousel' },
         { section: 'categories', label: 'Categories', path: '/admin/categories' },
         { section: 'contacts', label: 'Contacts', path: '/admin/get-contacts' },
         { section: 'paymentMethod', label: 'Payment Methods', path: '/admin/paymentMethod' },
         { section: 'addresses', label: 'Address And Taxes', path: '/admin/addresses' },
+        { section: 'addsImages', label: 'Adds Images', path: '/admin/addsImage' },
     ];
 
     useEffect(() => {

@@ -9,4 +9,4 @@ const adImagesSchema = new mongoose.Schema({
 },{timestamps:true})
 
 
-module.exports = mongoose.model("Admin", adImagesSchema)
+module.exports = mongoose.model("addsImage", adImagesSchema)

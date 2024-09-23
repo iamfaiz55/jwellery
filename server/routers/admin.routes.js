@@ -45,6 +45,8 @@ router
     .post("/add-scroll-card", adminController.addScrollCard)
     .put("/update-scroll-card/:id", adminController.updateScrollCard)
     .delete("/delete-scroll-card/:id", adminController.deleteScrollCard)
+    .post("/add-image", adminController.addImage)
+    .delete("/delete-add-image/:id", adminController.deleteImage)
     .delete("/delete-menu-item/:id/:menuId", adminController.deleteMenuItem)
 
 

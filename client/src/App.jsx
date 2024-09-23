@@ -34,6 +34,7 @@ import AdminScrollCards from './admin/AdminScrollCards';
 import Navmenu from './admin/Navmenu';
 import AdminLayout from './admin/AdminLayout';
 import UserNavbar from './user/UserNAvbar';
+import AdminAddImages from './admin/AdminAddImages';
 // import AdminLayout from './components/AdminLayout'; // Import the new layout component
 
 export const CartContext = createContext();
@@ -70,6 +71,7 @@ const App = () => {
                 <Route path="categories" element={<AdminProtected compo={<Categories />} />} />
                 <Route path="dashboard" element={<AdminProtected compo={<Dashboard />} />} />
                 <Route path="get-contacts" element={<AdminProtected compo={<GetContacts />} />} />
+                <Route path="addsImage" element={<AdminProtected compo={<AdminAddImages />} />} />
                 <Route path="allUsers" element={<AdminProtected compo={<AllUsers />} />} />
                 <Route path="admin-scroll-card" element={<AdminProtected compo={<AdminScrollCards />} />} />
                 <Route path="navmenu" element={<AdminProtected compo={<Navmenu />} />} />

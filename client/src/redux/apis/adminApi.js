@@ -288,6 +288,17 @@ export const adminApi = createApi({
                 transformResponse:data => data.result,
                 invalidatesTags: ["admin"]
             }),
+            AddImages: builder.mutation({
+                query: imageData=> {
+                    return {
+                        url: `/add-image`,
+                        method: "POST",
+                        body: imageData
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
                  // .put("/update-scroll-card/:id", adminController.updateScrollCard)
             updateScrollCard: builder.mutation({
                 query: scrollCardData=> {
@@ -304,6 +315,17 @@ export const adminApi = createApi({
                 query: id=> {
                     return {
                         url: `/delete-scroll-card/${id}`,
+                        method: "DELETE",
+                        // body: scrollCardData.fd
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
+            deleteAddImage: builder.mutation({
+                query: id=> {
+                    return {
+                        url: `/delete-add-image/${id}`,
                         method: "DELETE",
                         // body: scrollCardData.fd
                     }
@@ -359,5 +381,7 @@ useLazyGetCompanyAddressQuery,
   useAddScrollCardMutation,
   useUpdateScrollCardMutation,
   useDeleteScrollCardMutation,
-  useDeleteMenuItemMutation
+  useDeleteMenuItemMutation,
+  useAddImagesMutation,
+  useDeleteAddImageMutation
 } = adminApi

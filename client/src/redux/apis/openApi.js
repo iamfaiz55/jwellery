@@ -87,6 +87,14 @@ export const openApi = createApi({
                 transformResponse: (data) => data.result,
                 providesTags: ["user"]
             }),
+            getAllAddImages: builder.query({
+                query: () => ({
+                    url: `/get-adds-images`,
+                    method: "GET"
+                }),
+                transformResponse: (data) => data.result,
+                providesTags: ["user"]
+            }),
 
             postContact: builder.mutation({
                 query: (contactData) => ({
@@ -113,7 +121,8 @@ export const {
     useLazyGetTaxesQuery,
     useGetCompanyDetailsQuery,
     useGetAllScrollCardsQuery,
-    useGetAllMenuItemsQuery
+    useGetAllMenuItemsQuery,
+    useGetAllAddImagesQuery
 } = openApi;
 
 

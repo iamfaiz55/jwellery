@@ -9,7 +9,7 @@ import { useLazyGetCompanyAddressQuery } from '../redux/apis/adminApi';
 
 const UserNavbar = () => {
     const { data: companyDetails } = useGetCompanyDetailsQuery()
-    console.log(companyDetails);
+    // console.log(companyDetails);
 
     const { data: taxes } = useGetTaxesQuery();
     const navigate = useNavigate();

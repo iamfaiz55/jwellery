@@ -15,6 +15,7 @@ router
     .get("/get-company", userController.getCompanyDetails)
     .get("/get-scroll-cards", adminController.getAllScrollCards)
     .get("/get-menu-items", adminController.getAllMenuItems)
+    .get("/get-adds-images", adminController.getAddsImages)
 
 
 module.exports = router

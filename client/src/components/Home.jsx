@@ -5,6 +5,7 @@ import { usefilter } from '../App';
 import { toast } from 'sonner';
 import { useGetCArouselQuery, useGetTaxesQuery, useLazyGetFilteredDataQuery, useLazyGetAllProductsQuery } from '../redux/apis/openApi';
 import ScrollCard from './ScrollCard';
+import AddsImages from './AddsImages';
 
 const Home = () => {
     const { selectedType } = usefilter();
@@ -118,6 +119,7 @@ const Home = () => {
                     </div>
                 </div>
                 <ScrollCard />
+                <AddsImages />
 
                 <section>
                     <div className="container mx-auto flex flex-col items-center px-6 py-4">
