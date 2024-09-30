@@ -5,10 +5,11 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useCart } from '../App';
+import { useCart, useProduct } from '../App';
 import { useGetDetailsQuery, useGetTaxesQuery } from '../redux/apis/openApi';
 
 const CheckOut = () => {
+    const { selectedProd, setselectedProd } = useProduct()
     const { cartData, setCartData } = useCart();
     const [selectedAddress, setSelectedAddress] = useState(null);
     const { data: taxes } = useGetTaxesQuery();
@@ -23,7 +24,8 @@ const CheckOut = () => {
     const salesTax = taxes && taxes.find(tax => tax.taxName === 'Sales Tax');
     const makingCharges = taxes && taxes.find(tax => tax.taxName === 'Making Charges');
 
-    const originalPrice = product ? parseFloat(product.price) : 0;
+    // const originalPrice = product ? parseFloat(product.price) : 0;
+    const originalPrice = selectedProd && selectedProd.varient.price ? parseFloat(selectedProd.varient.price) : 0;
     const discountPercent = discount ? discount.percent : 0;
     const salesTaxPercent = salesTax ? salesTax.percent : 0;
     const makingChargesPercent = makingCharges ? makingCharges.percent : 0;
@@ -33,6 +35,9 @@ const CheckOut = () => {
     const makingChargesAmount = subtotal * (makingChargesPercent / 100);
     const salesTaxAmount = subtotal * (salesTaxPercent / 100);
     const total = subtotal + makingChargesAmount + salesTaxAmount;
+    // console.log(product);
+    // console.log(selectedProd);
+    // console.log("qty", quantity);
 
     const handlePayNow = () => {
         if (selectedAddress) {
@@ -40,7 +45,7 @@ const CheckOut = () => {
                 ...cartData,
                 deliveryAddressId: selectedAddress,
                 subtotal: total,
-                cartItems: [{ productId: product, quantity }],
+                cartItems: [{ productId: selectedProd, quantity }],
             });
             navigate("/user/payment");
         } else {

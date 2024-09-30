@@ -16,6 +16,7 @@ router
     .get("/get-scroll-cards", adminController.getAllScrollCards)
     .get("/get-menu-items", adminController.getAllMenuItems)
     .get("/get-adds-images", adminController.getAddsImages)
+    // .get("/get-varient/:id", adminController.getVarient)
 
 
 module.exports = router

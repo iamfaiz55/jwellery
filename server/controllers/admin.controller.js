@@ -18,7 +18,7 @@ const AddImages = require("../models/AddImages")
 
 
 exports.addProduct = asyncHandler(async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     
     upload(req, res, async err => {
         if (err) {
@@ -31,7 +31,8 @@ exports.addProduct = asyncHandler(async (req, res) => {
             return res.status(400).json({ message: "No file uploaded" });
         }
         const files = req.files; 
-        console.log("Uploaded files:", files);
+        // console.log("Uploaded files:", files);
+        // console.log("req.body:", req.body);
 
         // const { secure_url } = await cloudinary.uploader.upload(file.path);
         const imageUploads = await Promise.all(files.map(file => 
@@ -40,23 +41,25 @@ exports.addProduct = asyncHandler(async (req, res) => {
         
         const imageUrls = imageUploads.map(upload => upload.secure_url);
         
-        const { name, mrp, price, discount, height, width, prductWeight, material, productType, desc, purity } = req.body;
+        // const { name, mrp, price, discount, height, width, prductWeight, material, productType, desc, purity } = req.body;
+        const { name, varient, material, productType, mainDesc, purity } = req.body;
 
        
             
         
         await Product.create({
             name,
-            mrp,
+            varient,
+            // mrp,
             images: imageUrls,
-            price,
-            discount,
-            height,
-            width,
-            prductWeight,
+            // price,
+            // discount,
+            // height,
+            // width,
+            // prductWeight,
             material,
             productType,
-            desc,
+            mainDesc,
             purity,
         });
 
@@ -64,7 +67,14 @@ exports.addProduct = asyncHandler(async (req, res) => {
     });
 });
 
-
+// exports.getVarient=  asyncHandler(async(req, res)=> {
+//     const {id} = req.params
+//     const result = await Product.findById({_id:id})
+//     console.log("result",result);
+//     console.log("id", id);
+    
+//     res.json({message:"VArient get Success", result})
+// })
 
 
 exports.updateProduct = asyncHandler(async (req, res) => {

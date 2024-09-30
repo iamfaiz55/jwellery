@@ -15,6 +15,10 @@ const cartSchema = new mongoose.Schema({
         type: Number,
         required:true
     },
+    varientId: {
+        type: String,
+        required:true
+    },
     isDeleted:{
         type:Boolean,
         default:false

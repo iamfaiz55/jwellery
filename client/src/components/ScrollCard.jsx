@@ -44,26 +44,26 @@ const ScrollCard = () => {
         };
     }, []);
 
-    useEffect(() => {
-        const startAutoScroll = () => {
-            const interval = setInterval(() => {
-                if (scrollContainerRef.current) {
-                    const { scrollLeft, scrollWidth } = scrollContainerRef.current;
-                    scrollContainerRef.current.scrollLeft += 1;
+    // useEffect(() => {
+    //     const startAutoScroll = () => {
+    //         const interval = setInterval(() => {
+    //             if (scrollContainerRef.current) {
+    //                 const { scrollLeft, scrollWidth } = scrollContainerRef.current;
+    //                 scrollContainerRef.current.scrollLeft += 1;
 
-                    if (scrollLeft >= scrollWidth / 2) {
-                        scrollContainerRef.current.scrollLeft = 0;
-                    }
-                }
-            }, 10);
-            setScrollInterval(interval);
-        };
+    //                 if (scrollLeft >= scrollWidth / 2) {
+    //                     scrollContainerRef.current.scrollLeft = 0;
+    //                 }
+    //             }
+    //         }, 10);
+    //         setScrollInterval(interval);
+    //     };
 
-        // Start the auto-scrolling
-        startAutoScroll();
+    //     // Start the auto-scrolling
+    //     startAutoScroll();
 
-        return () => clearInterval(scrollInterval);
-    }, [scrollInterval]);
+    //     return () => clearInterval(scrollInterval);
+    // }, [scrollInterval]);
 
     // Pause scrolling on hover
     const handleMouseEnter = () => {

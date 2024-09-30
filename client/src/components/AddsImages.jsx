@@ -3,20 +3,8 @@ import { motion } from 'framer-motion';
 import { useGetAllAddImagesQuery } from '../redux/apis/openApi';
 
 const AddsImages = () => {
-    // const images = [
-    //     { image: "https://images.pexels.com/photos/3065096/pexels-photo-3065096.jpeg?auto=compress&cs=tinysrgb&w=600" },
-    //     { image: "https://cdn.pixabay.com/photo/2016/10/16/12/28/mehndi-designs-1745048_1280.jpg" },
-    //     { image: "https://cdn.pixabay.com/photo/2024/01/06/10/24/indian-8491082_1280.jpg" },
-    //     { image: "https://cdn.pixabay.com/photo/2017/09/23/17/29/deepika-padukone-2779557_1280.jpg" },
-    //     { image: "https://cdn.pixabay.com/photo/2024/01/25/00/32/ai-generated-8530801_1280.jpg" },
-    //     { image: "https://cdn.pixabay.com/photo/2018/07/01/08/50/flower-3508963_1280.jpg" },
-    //     { image: "https://cdn.pixabay.com/photo/2016/05/19/17/11/woman-1403458_1280.jpg" },
-    //     { image: "https://cdn.pixabay.com/photo/2017/06/09/17/11/model-2387582_1280.jpg" }
-    // ];
-    const [fadeOut, setFadeOut] = useState(false);
     const { data: images = [] } = useGetAllAddImagesQuery();
-    console.log(images); // Check if this outputs an array of image objects
-
+    const [fadeOut, setFadeOut] = useState(false);
     const [currentImages, setCurrentImages] = useState(images.slice(0, 6));
     const [imageIndex, setImageIndex] = useState(0);
 
@@ -24,14 +12,12 @@ const AddsImages = () => {
         setFadeOut(true);
         setTimeout(() => {
             setCurrentImages((prevImages) => {
-                const availableImages = images.filter(img => !prevImages.includes(img.image));
-                if (availableImages.length === 0) return prevImages; // No new images available
-
-                const nextImage = availableImages[imageIndex % availableImages.length].image;
                 const newImages = [...prevImages];
-                newImages[imageIndex % newImages.length] = { image: nextImage };
-                setImageIndex(prevIndex => (prevIndex + 1) % newImages.length);
-
+                if (images.length > 0) {
+                    const nextImage = images[(imageIndex + prevImages.length) % images.length].image;
+                    newImages[imageIndex % prevImages.length] = { image: nextImage };
+                }
+                setImageIndex((prevIndex) => (prevIndex + 1) % images.length); // Loop through the image array
                 return newImages;
             });
             setFadeOut(false);
@@ -40,12 +26,11 @@ const AddsImages = () => {
 
     useEffect(() => {
         if (images.length > 0) {
-            setCurrentImages(images.slice(0, 6)); // Ensure to set initial images when data is available
+            setCurrentImages(images.slice(0, 6));
         }
-        const interval = setInterval(replaceImageOneByOne, 3000);
+        const interval = setInterval(replaceImageOneByOne, 2000);
         return () => clearInterval(interval);
-    }, [images]); // Trigger on images change
-
+    }, [images]);
 
     return (
         <div className="container mx-auto p-20">
@@ -60,7 +45,6 @@ const AddsImages = () => {
             >
                 {currentImages && currentImages.map((src, index) => {
                     const isLarge = index % 3 === 0;
-
                     return (
                         <motion.div
                             key={index}
@@ -88,29 +72,7 @@ const AddsImages = () => {
 
             {/* Small screen layout */}
             <div className="grid gap-4 md:hidden grid-cols-1 sm:grid-cols-2">
-                {currentImages && currentImages.slice(0, 6).map((src, index) => (  // Limit to 6 images
-                    <motion.div
-                        key={index}
-                        className={`rounded-lg overflow-hidden ${fadeOut ? 'fade-out' : 'fade-in'}`}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <img
-                            className="h-full w-full object-cover rounded-lg"
-                            src={src.image}
-                            alt={`image-${index}`}
-                        />
-                    </motion.div>
-                ))}
-            </div>
-
-            {/* Extra small screen layout */}
-            <div className="grid gap-4 sm:hidden">
-                {currentImages && currentImages.slice(0, 0).map((src, index) => (  // Limit to 6 images
+                {currentImages && currentImages.map((src, index) => (
                     <motion.div
                         key={index}
                         className={`rounded-lg overflow-hidden ${fadeOut ? 'fade-out' : 'fade-in'}`}

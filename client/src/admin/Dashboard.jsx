@@ -8,8 +8,10 @@ const Dashboard = () => {
   const [editData, setEditData] = useState({})
   const { data, refetch, isError: isProdError, error: prodError } = useGetAllProductsAdminQuery()
   const [deleteProduct, { isSuccess: deleteSuccess, isError, error }] = useDeleteProductMutation()
-  console.log(data);
+  // console.log(data);\
+  const [varients, setVarients] = useState()
 
+  console.log(varients);
 
   useEffect(() => {
     if (deleteSuccess) {
@@ -55,14 +57,15 @@ const Dashboard = () => {
                 <th className="p-3 font-bold uppercase text-gray-600">Name</th>
                 <th className="p-3 font-bold uppercase text-gray-600">Image</th>
                 <th className="p-3 font-bold uppercase text-gray-600">Description</th>
-                <th className="p-3 font-bold uppercase text-gray-600">Price</th>
-                <th className="p-3 font-bold uppercase text-gray-600">MRP</th>
-                <th className="p-3 font-bold uppercase text-gray-600">Discount</th>
-                <th className="p-3 font-bold uppercase text-gray-600">Width</th>
-                <th className="p-3 font-bold uppercase text-gray-600">Weight</th>
+                <th className="p-3 font-bold uppercase text-gray-600">Varient</th>
+                {/* <th className="p-3 font-bold uppercase text-gray-600">Price</th> */}
+                {/* <th className="p-3 font-bold uppercase text-gray-600">MRP</th> */}
+                {/* <th className="p-3 font-bold uppercase text-gray-600">Discount</th> */}
+                {/* <th className="p-3 font-bold uppercase text-gray-600">Width</th> */}
+                {/* <th className="p-3 font-bold uppercase text-gray-600">Weight</th> */}
                 <th className="p-3 font-bold uppercase text-gray-600">Material</th>
                 <th className="p-3 font-bold uppercase text-gray-600">Type</th>
-                <th className="p-3 font-bold uppercase text-gray-600">Height</th>
+                {/* <th className="p-3 font-bold uppercase text-gray-600">Height</th> */}
                 <th className="p-3 font-bold uppercase text-gray-600">Purity</th>
                 <th className="p-3 font-bold uppercase text-gray-600">Action</th>
               </tr>
@@ -91,15 +94,20 @@ const Dashboard = () => {
                         </div>
                       </td>
 
-                      <td className="p-3 text-gray-800 text-center border-b">{item.desc}</td>
-                      <td className="p-3 text-gray-800 text-center border-b">{item.price}</td>
-                      <td className="p-3 text-gray-800 text-center border-b">{item.mrp}</td>
-                      <td className="p-3 text-gray-800 text-center border-b">{item.discount}</td>
-                      <td className="p-3 text-gray-800 text-center border-b">{item.width}</td>
-                      <td className="p-3 text-gray-800 text-center border-b">{item.prductWeight}</td>
+                      <td className="p-3 text-gray-800 text-center border-b">{item.mainDesc || "no description"}</td>
+                      <td className="p-3 text-gray-800 text-center border-b">
+                        <button className='btn btn-circle bg-golden hover:bg-yellow-700' onClick={e => {
+                          document.getElementById("variant").showModal()
+                          setVarients(item.varient)
+                        }}>open</button>
+                      </td>
+                      {/* <td className="p-3 text-gray-800 text-center border-b">{item.mrp}</td> */}
+                      {/* <td className="p-3 text-gray-800 text-center border-b">{item.discount}</td> */}
+                      {/* <td className="p-3 text-gray-800 text-center border-b">{item.width}</td> */}
+                      {/* <td className="p-3 text-gray-800 text-center border-b">{item.prductWeight}</td> */}
                       <td className="p-3 text-gray-800 text-center border-b">{item.material}</td>
                       <td className="p-3 text-gray-800 text-center border-b">{item.productType}</td>
-                      <td className="p-3 text-gray-800 text-center border-b">{item.height}</td>
+                      {/* <td className="p-3 text-gray-800 text-center border-b">{item.height}</td> */}
                       <td className="p-3 text-gray-800 text-center border-b">{item.purity}</td>
 
                       <td className="p-3 text-gray-800 text-center border-b">
@@ -152,32 +160,39 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <h4 className="text-lg font-bold mb-2">{item.name}</h4>
-                  <p className="mb-2">Description: {item.desc}</p>
-                  <p className="mb-2">Price: {item.price}</p>
-                  <p className="mb-2">MRP: {item.mrp}</p>
-                  <p className="mb-2">Discount: {item.discount}</p>
-                  <p className="mb-2">Width: {item.width}</p>
-                  <p className="mb-2">Weight: {item.prductWeight}</p>
-                  <p className="mb-2">Material: {item.material}</p>
-                  <p className="mb-2">Type: {item.productType}</p>
-                  <p className="mb-2">Height: {item.height}</p>
-                  <p className="mb-2">Purity: {item.purity}</p>
-                  <div className="flex justify-between mt-2">
-                    <button
-                      onClick={() => {
-                        document.getElementById('update').showModal();
-                        setEditData(item);
-                      }}
-                      className="btn bg-green-300 hover:bg-green-400 transition"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => deleteProduct(item._id)}
-                      className="btn bg-red-500 hover:bg-red-600 transition"
-                    >
-                      Delete
-                    </button>
+                  <p className="mb-2">Description: {item.mainDesc || "No description"}</p>
+
+                  {/* Add a button to open the variants modal */}
+                  <button
+                    className="btn  bg-golden hover:bg-yellow-700 mt-2"
+                    onClick={() => {
+                      document.getElementById("variant").showModal();
+                      setVarients(item.varient);
+                    }}>
+                    View Variants
+                  </button>
+
+                  <div className="mt-4">
+                    <p><strong>Material:</strong> {item.material}</p>
+                    <p><strong>Type:</strong> {item.productType}</p>
+                    <p><strong>Purity:</strong> {item.purity}</p>
+                    <div className="flex justify-between mt-2">
+                      <button
+                        onClick={() => {
+                          document.getElementById('update').showModal();
+                          setEditData(item);
+                        }}
+                        className="btn bg-green-300 hover:bg-green-400 transition"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deleteProduct(item._id)}
+                        className="btn bg-red-500 hover:bg-red-600 transition"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -194,6 +209,43 @@ const Dashboard = () => {
           </div>
         </dialog>
         {/* Update Modal End */}
+
+
+
+
+        <dialog id="variant" className="modal modal-bottom sm:modal-middle mt-5">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Product Variants</h3>
+
+            {/* Check if variants exist */}
+            {varients && varients.length > 0 ? (
+              <div className="space-y-4 mt-2">
+                {varients.map((item, index) => (
+                  <div key={item._id} className="border p-4 rounded-md shadow-md bg-light-golden">
+                    <h4 className="font-semibold text-md">Variant {index + 1}</h4>
+                    <p><strong>Description:</strong> {item.desc}</p>
+                    <p><strong>Price:</strong> ${item.price}</p>
+                    <p><strong>MRP:</strong> ${item.mrp}</p>
+                    <p><strong>Discount:</strong> ${item.discount}</p>
+                    <p><strong>Height:</strong> {item.height}</p>
+                    <p><strong>Width:</strong> {item.width}</p>
+                    <p><strong>Weight:</strong> {item.prductWeight}</p>
+                    <p><strong>Quantity Available:</strong> {item.quantity}</p>
+                  </div>
+                ))}
+                <div className='text-right'>
+
+                  <button className='btn bg-golden ' onClick={e => document.getElementById("variant").close()}> Close</button>
+                </div>
+              </div>
+            ) : (
+              <p className="mt-4 text-gray-600">No variants available for this product.</p>
+            )}
+          </div>
+
+
+        </dialog>
+
       </div>
     </div>
   </>
@@ -202,58 +254,65 @@ const Dashboard = () => {
 const Form = ({ edit, refetch }) => {
   const [addProd, { isSuccess, isLoading, isError, error }] = useAddProductMutation();
   const [updateProd, { isSuccess: updateSuccess, isLoading: updateLoad }] = useUpdateProdMutation();
+  // console.log(edit);
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: edit || {
       name: "",
-      mrp: "",
       images: [],
-      price: "",
-      discount: "",
-      height: "",
-      width: "",
-      prductWeight: "",
+      varient: [{ price: "", mrp: "", discount: "", desc: "", height: "", width: "", prductWeight: "", quantity: "" }],
       material: "",
       productType: "",
-      desc: "",
+      mainDesc: "",
       purity: "",
-      rating: "",
+      // rating: "",
     },
     validationSchema: yup.object({
-      name: yup.string().required(),
-      mrp: yup.string().required("Enter mrp"),
+      name: yup.string().required("Name is required"),
       images: yup.array().min(1, "At least one image is required"),
-      price: yup.string().required("Enter price"),
-      discount: yup.string().required("Enter discount"),
-      height: yup.string().required("Enter height"),
-      width: yup.string().required("Enter width"),
-      prductWeight: yup.string().required("Enter prductWeight"),
-      material: yup.string().required("Enter material"),
-      productType: yup.string().required("Enter productType"),
-      desc: yup.string().required("Enter desc"),
-      purity: yup.string().required("Enter purity"),
-      rating: yup.number().required("Enter Rating"),
+      varient: yup.array().of(
+        yup.object({
+          price: yup.number().required("Enter price"),
+          mrp: yup.number().required("Enter MRP"),
+          discount: yup.number(),
+          desc: yup.string().required("Enter description"),
+          height: yup.string().required("Enter height"),
+          width: yup.string().required("Enter width"),
+          prductWeight: yup.string().required("Enter product weight"),
+          quantity: yup.number().required("Enter quantity"),
+        })
+      ),
+      material: yup.string().required("Material is required"),
+      productType: yup.string().required("Product type is required"),
+      mainDesc: yup.string(),
+      purity: yup.string().required("Purity is required"),
+      // rating: yup.number().min(1).max(5).required("Rating is required"),
     }),
     onSubmit: (values, { resetForm }) => {
       const fd = new FormData();
-      // Append all form data to FormData
+      console.log(values);
+
       fd.append("name", values.name);
-      fd.append("mrp", values.mrp);
-      fd.append("price", values.price);
-      fd.append("discount", values.discount);
-      fd.append("height", values.height);
-      fd.append("width", values.width);
-      fd.append("prductWeight", values.prductWeight);
       fd.append("material", values.material);
       fd.append("productType", values.productType);
-      fd.append("desc", values.desc);
+      fd.append("mainDesc", values.mainDesc);
       fd.append("purity", values.purity);
-      fd.append("rating", values.rating);
+      // fd.append("rating", values.rating);
 
-      // Append images array
       values.images.forEach(file => {
         fd.append("images", file);
+      });
+
+      values.varient.forEach((variant, index) => {
+        fd.append(`varient[${index}][price]`, variant.price);
+        fd.append(`varient[${index}][mrp]`, variant.mrp);
+        fd.append(`varient[${index}][discount]`, variant.discount);
+        fd.append(`varient[${index}][desc]`, variant.desc);
+        fd.append(`varient[${index}][height]`, variant.height);
+        fd.append(`varient[${index}][width]`, variant.width);
+        fd.append(`varient[${index}][prductWeight]`, variant.prductWeight);
+        fd.append(`varient[${index}][quantity]`, variant.quantity);
       });
 
       if (edit) {
@@ -265,6 +324,39 @@ const Form = ({ edit, refetch }) => {
       resetForm();
     },
   });
+
+  const addVariant = () => {
+    formik.setFieldValue("varient", [
+      ...formik.values.varient,
+      { price: "", mrp: "", discount: "", desc: "", height: "", width: "", prductWeight: "", quantity: "" },
+    ]);
+  };
+
+  const removeVariant = (index) => {
+    const newVariants = [...formik.values.varient];
+    newVariants.splice(index, 1);
+    formik.setFieldValue("varient", newVariants);
+  };
+
+  const handlePriceChange = (e, index) => {
+    const { value } = e.target;
+    const price = parseFloat(value);
+    const mrp = formik.values.varient[index].mrp;
+    const discount = mrp ? mrp - price : 0;
+
+    formik.setFieldValue(`varient[${index}].price`, price);
+    formik.setFieldValue(`varient[${index}].discount`, discount);
+  };
+
+  const handleMrpChange = (e, index) => {
+    const { value } = e.target;
+    const mrp = parseFloat(value);
+    const price = formik.values.varient[index].price;
+    const discount = price ? mrp - price : 0;
+
+    formik.setFieldValue(`varient[${index}].mrp`, mrp);
+    formik.setFieldValue(`varient[${index}].discount`, discount);
+  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -300,7 +392,8 @@ const Form = ({ edit, refetch }) => {
         </div>
       ) : (
         <form onSubmit={formik.handleSubmit}>
-          <pre>{JSON.stringify(formik.values, null, 2)}</pre>
+
+          <pre>{JSON.stringify(formik.errors, null, 2)}</pre>
           <input
             {...formik.getFieldProps("name")}
             type="text"
@@ -315,49 +408,13 @@ const Form = ({ edit, refetch }) => {
               const files = Array.from(e.currentTarget.files);
               formik.setFieldValue("images", files);
             }}
-            className="file-input file-input-bordered w-full"
+            className="file-input file-input-bordered file-input-warning w-full"
           />
 
           <input
-            {...formik.getFieldProps("price")}
-            type="number"
-            placeholder="Type price"
-            className="input input-bordered w-full my-2"
-          />
-          <input
-            {...formik.getFieldProps("mrp")}
-            type="number"
-            placeholder="Type mrp"
-            className="input input-bordered w-full my-2"
-          />
-          <input
-            {...formik.getFieldProps("discount")}
+            {...formik.getFieldProps("mainDesc")}
             type="text"
-            placeholder="Type discount"
-            className="input input-bordered w-full my-2"
-          />
-          <input
-            {...formik.getFieldProps("rating")}
-            type="text"
-            placeholder="Type Rating"
-            className="input input-bordered w-full my-2"
-          />
-          <input
-            {...formik.getFieldProps("height")}
-            type="text"
-            placeholder="Type height"
-            className="input input-bordered w-full my-2"
-          />
-          <input
-            {...formik.getFieldProps("width")}
-            type="text"
-            placeholder="Type width"
-            className="input input-bordered w-full my-2"
-          />
-          <input
-            {...formik.getFieldProps("prductWeight")}
-            type="text"
-            placeholder="Type Weight"
+            placeholder="Type Main Description"
             className="input input-bordered w-full my-2"
           />
 
@@ -386,12 +443,7 @@ const Form = ({ edit, refetch }) => {
             <option value={"coins"}>Coins</option>
           </select>
 
-          <input
-            {...formik.getFieldProps("desc")}
-            type="text"
-            placeholder="Type Description"
-            className="input input-bordered w-full my-2"
-          />
+
 
           <select {...formik.getFieldProps("purity")} className="select select-bordered w-full my-2">
             <option value="">Select Purity</option>
@@ -399,23 +451,106 @@ const Form = ({ edit, refetch }) => {
             <option value="18">18k</option>
           </select>
 
+          {formik.values.varient && formik.values.varient.map((varient, index) => (
+            <div key={index} className="border p-4 my-2">
+              <h3 className="text-lg font-semibold">Variant {index + 1}</h3>
+
+              <input
+                {...formik.getFieldProps(`varient[${index}].price`)}
+                type="number"
+                placeholder="Price"
+                className="input input-bordered w-full my-2"
+                onChange={(e) => handlePriceChange(e, index)}
+              />
+              <input
+                {...formik.getFieldProps(`varient[${index}].mrp`)}
+                type="number"
+                placeholder="MRP"
+                className="input input-bordered w-full my-2"
+                onChange={(e) => handleMrpChange(e, index)}
+              />
+
+              {/* Automatically calculated discount */}
+              <input
+                {...formik.getFieldProps(`varient[${index}].discount`)}
+                type="number"
+                placeholder="Discount"
+                value={formik.values.varient[index].discount || ""}
+                className="input input-bordered w-full my-2"
+                readOnly
+              />
+
+              <input
+                {...formik.getFieldProps(`varient[${index}].desc`)}
+                type="text"
+                placeholder="Description"
+                className="input input-bordered w-full my-2"
+              />
+              <input
+                {...formik.getFieldProps(`varient[${index}].height`)}
+                type="text"
+                placeholder="Height"
+                className="input input-bordered w-full my-2"
+              />
+              <input
+                {...formik.getFieldProps(`varient[${index}].width`)}
+                type="text"
+                placeholder="Width"
+                className="input input-bordered w-full my-2"
+              />
+              <input
+                {...formik.getFieldProps(`varient[${index}].prductWeight`)}
+                type="text"
+                placeholder="Product Weight"
+                className="input input-bordered w-full my-2"
+              />
+              <input
+                {...formik.getFieldProps(`varient[${index}].quantity`)}
+                type="number"
+                placeholder="Quantity"
+                className="input input-bordered w-full my-2"
+              />
+
+              <button
+                type="button"
+                onClick={() => removeVariant(index)}
+                className="btn bg-golden mt-2"
+              >
+                Remove Variant
+              </button>
+            </div>
+          ))}
+
+          {/* Button to add a new variant */}
+          <button type="button" onClick={addVariant} className="btn bg-golden w-full my-2">
+            Add Variant
+          </button>
+
+
+
           <div className="modal-action">
             <button type="submit" className="btn bg-gray-400 text-black">
               {edit ? "Update" : "Add"} Product
             </button>
             <button
               type="button"
-              onClick={() => document.getElementById(edit ? "update" : "add").close()}
+              onClick={() => {
+                document.getElementById(edit ? "update" : "add").close()
+              }
+              }
               className="btn"
             >
               Close
             </button>
           </div>
         </form>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
+
+
 
 
 

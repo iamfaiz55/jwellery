@@ -38,7 +38,7 @@ const AddCarousel = () => {
         formData.append('mainHeading', carouselDetails.mainHeading);
         formData.append('paragraph', carouselDetails.paragraph);
         selectedImages.forEach(image => {
-            formData.append('image', image);
+            formData.append('images', image);
         });
 
         try {
@@ -123,7 +123,6 @@ const AddCarousel = () => {
                             <div>
                                 <input
                                     type="file"
-                                    accept="image/*"
                                     onChange={handleFileChange}
                                     className="file-input w-full mt-4"
                                 />

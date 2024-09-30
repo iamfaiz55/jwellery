@@ -19,7 +19,7 @@ const PaymentPage = () => {
     const [deleteFull, { isSuccess: deleteSuccess }] = useDeleteFullCartMutation();
     const [paymentMethod, setPaymentMethod] = useState('');
 
-    // console.log("cart Data", cartData);
+    console.log("cart Data", cartData);
 
     const handlePaymentMethodChange = (e) => {
         setPaymentMethod(e.target.value);
@@ -36,7 +36,8 @@ const PaymentPage = () => {
             subtotal: cartData.subtotal,
             orderItems: cartData.cartItems.map(item => ({
                 _id: item.productId._id,
-                quantity: item.quantity
+                quantity: item.quantity,
+                varientId: item.productId.varient._id
             })),
 
         };
@@ -82,7 +83,8 @@ const PaymentPage = () => {
                     userId: user._id,
                     orderItems: cartData.cartItems.map(item => ({
                         _id: item.productId._id,
-                        quantity: item.quantity
+                        quantity: item.quantity,
+                        varientId: item.productId.varient._id
                     })),
                 }),
             });

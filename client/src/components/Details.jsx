@@ -5,8 +5,10 @@ import { toast } from 'sonner';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { useGetDetailsQuery, useGetTaxesQuery } from '../redux/apis/openApi';
+import { useProduct } from '../App';
 
 const Details = () => {
+    const { selectedProd, setselectedProd } = useProduct()
     const { id } = useParams();
     const { data: reviews } = useGetReviewsQuery(id);
     const { data, isError: isDetailError, error: detailsError } = useGetDetailsQuery(id);
@@ -18,12 +20,19 @@ const Details = () => {
     const [like, { isSuccess: likeSuccesss, isError, error }] = useLikeMutation();
 
     const [currentImage, setCurrentImage] = useState(data?.images[0] || 'default-image-url');
+    const [selectedVariant, setSelectedVariant] = useState(data?.varient[0] || {});
+
     useEffect(() => {
         if (data && data.images.length > 0) {
-            setCurrentImage(data.images[0]); // Set the first image as the current image
+            setCurrentImage(data.images[0]);
         }
     }, [data]);
 
+    useEffect(() => {
+        if (data) {
+            setSelectedVariant(data.varient[0]);
+        }
+    }, [data]);
 
     useEffect(() => {
         if (isSuccess) {
@@ -94,12 +103,6 @@ const Details = () => {
     const [zoomedImage, setZoomedImage] = useState(false);
     const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
 
-    useEffect(() => {
-        if (data && data.images.length > 0) {
-            setCurrentImage(data.images[0]);
-        }
-    }, [data]);
-
     const handleMouseMove = (e) => {
         const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - left;
@@ -114,7 +117,12 @@ const Details = () => {
     const handleMouseLeave = () => {
         setZoomedImage(false);
     };
-    const discountTax = taxes?.find((tax) => tax.taxName === 'Discount' && tax.active);
+
+    const handleVariantChange = (variantId) => {
+        const selected = data.varient.find((variant) => variant._id === variantId);
+        setSelectedVariant(selected);
+
+    };
 
     return (
         <section className="text-gray-700 body-font overflow-hidden bg-light-golden">
@@ -161,26 +169,54 @@ const Details = () => {
                         <h2 className="text-sm title-font text-gray-500 tracking-widest">{data?.brand || 'IAMFAIZ55'}</h2>
                         <h1 className="text-gray-900 text-3xl title-font font-medium mb-4">{data?.name || 'Product Name'}</h1>
                         <p className="leading-relaxed mb-6">{data?.desc || 'Product description here'}</p>
-                        {/* Other product details */}
+
+
+                        {/* Variant Selection Dropdown */}
+                        <select onChange={(e) => handleVariantChange(e.target.value)} className="select select-warning m-5">
+                            {data && data.varient.map(item => (
+                                <option key={item._id} value={item._id}>
+                                    {item.height}
+                                </option>
+                            ))}
+                        </select>
+                        <div className=" p-4 rounded-md">
+                            <h3 className="font-semibold text-lg">Product Details:</h3>
+                            <ul className="list-disc list-inside">
+                                <li>Material: {data?.material || 'N/A'}</li>
+                                <li>Purity: {data?.purity || 'N/A'}</li>
+                                <li>Weight: {selectedVariant?.prductWeight || 'N/A'}</li>
+                                <li>Discount: ${selectedVariant?.discount || 'N/A'}</li>
+                                <li>Available Quantity: {selectedVariant?.quantity || 'N/A'}</li>
+                            </ul>
+                            <h1 className='font-bold mt-5 text-md'>Varient Description: </h1>
+                            <p className="leading-relaxed mb-6 ">{selectedVariant && selectedVariant.desc || 'Product description here'}</p>
+                        </div>
                         <div className="flex items-center mb-6">
-                            <div className="flex">{renderStars(calculateRating())}</div>
+                            <div className="flex">{renderStars(data && data.rating)}</div>
                             <span className="ml-3 text-gray-600 text-sm">({calculateRating()}/5)</span>
                         </div>
 
                         <div className="flex items-center mb-6">
-                            <h4 className="text-lg font-medium mr-4">Price: ${discountedPrice(data?.price) || 'Price'}</h4>
+                            <h4 className="text-lg font-medium mr-4">Price: ${discountedPrice(selectedVariant?.price) || 'Price'}</h4>
                             <button
-                                onClick={() => navigate(`/user/checkout/${data?._id}`)}
+                                onClick={() => {
+                                    navigate(`/user/checkout/${data?._id}`)
+                                    // console.log(setselectedProd({}))
+                                    setselectedProd({ ...data, varient: selectedVariant })
+
+                                }}
                                 className="flex ml-4 text-white bg-red-500 border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded"
                             >
                                 Buy
                             </button>
                             <button
-                                onClick={() => addToCart({ pId: data._id, uId: user?._id })}
+                                onClick={() => addToCart({ pId: data._id, uId: user?._id, varientId: selectedVariant._id })}
                                 className="flex ml-4 text-white bg-blue-500 border-0 py-2 px-6 focus:outline-none hover:bg-blue-600 rounded"
                             >
                                 Add to Cart
                             </button>
+
+
                         </div>
                     </motion.div>
                 </div>
@@ -197,9 +233,8 @@ const Details = () => {
                         />
                     ))}
                 </div>
+                <Review />
             </div>
-
-            <Review />
         </section>
     );
 };
@@ -215,7 +250,7 @@ const Review = () => {
     const { id } = useParams();
     const [postReview, { isSuccess, isLoading, isError, error }] = usePostReviewMutation()
     const { data: reviews } = useGetReviewsQuery(id)
-    console.log(reviews);
+    // console.log(reviews);
 
     const { user } = useSelector((state) => state.userData);
 

@@ -40,11 +40,14 @@ import AdminAddImages from './admin/AdminAddImages';
 export const CartContext = createContext();
 export const filterContext = createContext();
 export const sectionContext = createContext();
+export const selectedProductContext = createContext();
 export const useCart = () => useContext(CartContext);
 export const useSection = () => useContext(sectionContext);
 export const usefilter = () => useContext(filterContext);
+export const useProduct = () => useContext(selectedProductContext);
 
 const App = () => {
+  const [selectedProd, setselectedProd] = useState()
   const [selectedType, setSelectedType] = useState();
   const [currentSection, setCurrentSection] = useState()
   const [cartData, setCartData] = useState(() => {
@@ -59,56 +62,58 @@ const App = () => {
   return (
     <filterContext.Provider value={{ selectedType, setSelectedType }}>
       <sectionContext.Provider value={{ setCurrentSection, currentSection }}>
-        <CartContext.Provider value={{ cartData, setCartData }}>
-          <Toaster richColors position="top-right" />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<><UserNavbar /><Home /></>} />
+        <selectedProductContext.Provider value={{ selectedProd, setselectedProd }}>
+          <CartContext.Provider value={{ cartData, setCartData }}>
+            <Toaster richColors position="top-right" />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<><UserNavbar /><Home /></>} />
 
-              <Route path="admin/*" element={<AdminLayout />}>
-                <Route path="register" element={<AdminRegister />} />
-                <Route path="login" element={<AdminLogin />} />
-                <Route path="categories" element={<AdminProtected compo={<Categories />} />} />
-                <Route path="dashboard" element={<AdminProtected compo={<Dashboard />} />} />
-                <Route path="get-contacts" element={<AdminProtected compo={<GetContacts />} />} />
-                <Route path="addsImage" element={<AdminProtected compo={<AdminAddImages />} />} />
-                <Route path="allUsers" element={<AdminProtected compo={<AllUsers />} />} />
-                <Route path="admin-scroll-card" element={<AdminProtected compo={<AdminScrollCards />} />} />
-                <Route path="navmenu" element={<AdminProtected compo={<Navmenu />} />} />
-                <Route path="addresses" element={<AdminProtected compo={<CompanyAddress />} />} />
-                <Route path="paymentMethod" element={<AdminProtected compo={<PaymentMethod />} />} />
-                <Route path="addCarousel" element={<AdminProtected compo={<AddCarousel />} />} />
-                <Route path="allOrders" element={<AdminProtected compo={<AdminAllOrders />} />} />
-              </Route>
+                <Route path="admin/*" element={<AdminLayout />}>
+                  <Route path="register" element={<AdminRegister />} />
+                  <Route path="login" element={<AdminLogin />} />
+                  <Route path="categories" element={<AdminProtected compo={<Categories />} />} />
+                  <Route path="dashboard" element={<AdminProtected compo={<Dashboard />} />} />
+                  <Route path="get-contacts" element={<AdminProtected compo={<GetContacts />} />} />
+                  <Route path="addsImage" element={<AdminProtected compo={<AdminAddImages />} />} />
+                  <Route path="allUsers" element={<AdminProtected compo={<AllUsers />} />} />
+                  <Route path="admin-scroll-card" element={<AdminProtected compo={<AdminScrollCards />} />} />
+                  <Route path="navmenu" element={<AdminProtected compo={<Navmenu />} />} />
+                  <Route path="addresses" element={<AdminProtected compo={<CompanyAddress />} />} />
+                  <Route path="paymentMethod" element={<AdminProtected compo={<PaymentMethod />} />} />
+                  <Route path="addCarousel" element={<AdminProtected compo={<AddCarousel />} />} />
+                  <Route path="allOrders" element={<AdminProtected compo={<AdminAllOrders />} />} />
+                </Route>
 
-              <Route path="user/*" element={
-                <>
-                  <UserNavbar />
-                  <Routes>
-                    <Route path="register" element={<UserRegister />} />
-                    <Route path="login" element={<UserLogin />} />
-                    <Route path="about" element={<About />} />
-                    <Route path="mission" element={<OurMission />} />
-                    <Route path="vision" element={<Vision />} />
-                    <Route path="contact" element={<Contact />} />
-                    <Route path="team" element={<Team />} />
-                    <Route path="cart" element={<><UserProtected compo={<Cart />} /></>} />
-                    <Route path="cartCheckout" element={<><UserProtected compo={<CartCheckOut />} /></>} />
-                    <Route path="liked" element={<><UserProtected compo={<Liked />} /></>} />
-                    <Route path="allOrders" element={<><UserProtected compo={<AllOrders />} /></>} />
-                    <Route path="checkout/:id" element={<CheckOut />} />
-                    <Route path="profile" element={<UserProtected compo={<Profile />} />} />
-                    <Route path="payment" element={<UserProtected compo={<PaymentPage />} />} />
-                  </Routes>
-                </>
-              } />
+                <Route path="user/*" element={
+                  <>
+                    <UserNavbar />
+                    <Routes>
+                      <Route path="register" element={<UserRegister />} />
+                      <Route path="login" element={<UserLogin />} />
+                      <Route path="about" element={<About />} />
+                      <Route path="mission" element={<OurMission />} />
+                      <Route path="vision" element={<Vision />} />
+                      <Route path="contact" element={<Contact />} />
+                      <Route path="team" element={<Team />} />
+                      <Route path="cart" element={<><UserProtected compo={<Cart />} /></>} />
+                      <Route path="cartCheckout" element={<><UserProtected compo={<CartCheckOut />} /></>} />
+                      <Route path="liked" element={<><UserProtected compo={<Liked />} /></>} />
+                      <Route path="allOrders" element={<><UserProtected compo={<AllOrders />} /></>} />
+                      <Route path="checkout/:id" element={<CheckOut />} />
+                      <Route path="profile" element={<UserProtected compo={<Profile />} />} />
+                      <Route path="payment" element={<UserProtected compo={<PaymentPage />} />} />
+                    </Routes>
+                  </>
+                } />
 
-              <Route path="/details/:id" element={<><UserNavbar /><Details /></>} />
-              <Route path="*" element={<h1>Page Not Found</h1>} />
-            </Routes>
-          </BrowserRouter>
-          <Footer />
-        </CartContext.Provider>
+                <Route path="/details/:id" element={<><UserNavbar /><Details /></>} />
+                <Route path="*" element={<h1>Page Not Found</h1>} />
+              </Routes>
+            </BrowserRouter>
+            <Footer />
+          </CartContext.Provider>
+        </selectedProductContext.Provider>
       </sectionContext.Provider>
     </filterContext.Provider>
   );

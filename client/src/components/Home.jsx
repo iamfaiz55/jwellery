@@ -145,9 +145,9 @@ const Home = () => {
                                         <h2 className="mb-2 text-lg font-medium text-gray-900">{item.name}</h2>
                                         <p className="mb-2 text-base text-gray-700">{item.desc}</p>
                                         <div className="flex items-center">
-                                            <p className="mr-2 text-lg font-semibold text-gray-900">${applyDiscount(item.price)}</p>
-                                            <p className="text-base font-medium text-gray-500 line-through">${item.mrp}</p>
-                                            <p className="ml-auto text-base font-medium text-green-500">{item.discount} off</p>
+                                            <p className="mr-2 text-lg font-semibold text-gray-900">${applyDiscount(item.varient && item.varient[0].price)}</p>
+                                            <p className="text-base font-medium text-gray-500 line-through">${item.varient && item.varient[0].mrp}</p>
+                                            <p className="ml-auto text-base font-medium text-green-500">{item.varient && item.varient[0].discount} off</p>
                                         </div>
                                     </div>
                                 </Link>

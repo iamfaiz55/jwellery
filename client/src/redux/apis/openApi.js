@@ -95,6 +95,14 @@ export const openApi = createApi({
                 transformResponse: (data) => data.result,
                 providesTags: ["user"]
             }),
+            // getVarient: builder.query({
+            //     query: (id) => ({
+            //         url: `/get-varient/${id}`,
+            //         method: "GET"
+            //     }),
+            //     transformResponse: (data) => data.result,
+            //     providesTags: ["user"]
+            // }),
 
             postContact: builder.mutation({
                 query: (contactData) => ({
@@ -122,7 +130,8 @@ export const {
     useGetCompanyDetailsQuery,
     useGetAllScrollCardsQuery,
     useGetAllMenuItemsQuery,
-    useGetAllAddImagesQuery
+    useGetAllAddImagesQuery,
+    // useGetVarientQuery
 } = openApi;
 
 

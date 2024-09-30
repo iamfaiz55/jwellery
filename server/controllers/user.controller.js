@@ -72,7 +72,8 @@ exports.createOrder = asyncHandler(async (req, res) => {
         let totalMakingChargesAmount = 0;
 
         const discountedProducts = productDetails.map(item => {
-            const originalPrice = item.product.price;
+            const selectedVarient = item.product.varient.find(vari => vari._id == item.varientId )
+            const originalPrice = selectedVarient.price;
             const discountAmount = (discount / 100) * originalPrice;
             const discountedPrice = originalPrice - discountAmount;
 
@@ -88,6 +89,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
 
             return {
                 ...item,
+                varient:selectedVarient,
                 discountedPrice,
                 makingChargesAmount,
                 salesTaxAmount,
@@ -99,7 +101,8 @@ exports.createOrder = asyncHandler(async (req, res) => {
 
         const orderItemsFormatted = orderItems.map(item => ({
             productId: item._id,
-            quantity: item.quantity || 1
+            quantity: item.quantity || 1,
+            varientId: item.varientId
         }));
 
         const newOrder = await Order.create({
@@ -161,13 +164,13 @@ exports.createOrder = asyncHandler(async (req, res) => {
             headers: ['Name', 'Title', 'Material', 'Size', 'Weight', 'Purity', 'Qty', 'Price', 'Discounted Price', 'Total'],
             rows: discountedProducts.map(item => [
                 item.product.name,
-                item.product.desc,
+                item.varient.desc,
                 item.product.material,
-                `${item.product.height} x ${item.product.width}`,
+                `${item.varient.height} x ${item.varient.width}`,
                 item.product.productWeight,
                 item.product.purity,
                 item.quantity,
-                item.product.price,
+                item.varient.price,
                 item.discountedPrice,
                 item.totalPrice
             ])
@@ -276,7 +279,6 @@ exports.addAddress = asyncHandler(async (req, res) => {
         userId
     } = req.body;
 
-    // Check for required fields
     const { isError, error } = checkEmpty({
         pincode,
         city,
@@ -303,7 +305,6 @@ if(!user.email){
    console.log("updated", updated);
    
 }
-    // Now add the address
     await UserAddress.create({
         city,
         state,
@@ -344,10 +345,10 @@ exports.getDetails = asyncHandler(async(req, res)=>{
 
 
 exports.addCart = asyncHandler(async (req, res) => {
-    const { pId, uId } = req.body;
+    const { pId, uId, varientId } = req.body;
 // console.log(req.body);
 
-    let result = await Cart.findOne({ userId: uId, productId: pId });
+    let result = await Cart.findOne({ userId: uId, productId: pId, varientId });
 
     if (result) {
        await Cart.findByIdAndUpdate(
@@ -355,7 +356,7 @@ exports.addCart = asyncHandler(async (req, res) => {
             { $inc: { quantity: 1 } }
         );
     } else {
-       await Cart.create({userId:uId, productId:pId, quantity:1})
+       await Cart.create({userId:uId, productId:pId, quantity:1, varientId})
     }
 
     res.json({ message: 'Cart Add successfully' });
@@ -549,7 +550,7 @@ exports.razorpay = asyncHandler(async (req, res) => {
            return res.status(400).json({message:"body me nhi aaya"})
         }
     const options = {amount:req.body.subtotal *100, receipt:req.body.receipt, currency:req.body.currency}
-    console.log(req.body.subtotal);
+    // console.log(req.body.subtotal);
     
     const order = await razorpay.orders.create(options)
     res.json({message:"initiate ", result:order})
@@ -576,7 +577,7 @@ const getProductDetails = async (orderItems) => {
       }
     }));
   
-    return productDetails.filter(detail => detail !== null); // Filter out any null results
+    return productDetails.filter(detail => detail !== null); 
   };
 
 
@@ -599,8 +600,11 @@ exports.verifyPayment = asyncHandler(async (req, res) => {
     let totalSalesTaxAmount = 0;
     let totalMakingChargesAmount = 0;
 
+    // console.log(productDetails);
+    
     const discountedProducts = productDetails.map(item => {
-        const originalPrice = item.product.price;
+        const selectedVarient = item.product.varient.find(vari => vari._id == item.varientId )
+        const originalPrice = selectedVarient.price;
         const discountAmount = (discount / 100) * originalPrice;
         const discountedPrice = originalPrice - discountAmount;
 
@@ -612,19 +616,25 @@ exports.verifyPayment = asyncHandler(async (req, res) => {
         totalSalesTaxAmount += salesTaxAmount * item.quantity;
         totalMakingChargesAmount += makingChargesAmount * item.quantity;
 
+
         return {
             ...item,
+            varient: selectedVarient,
             discountedPrice,
             makingChargesAmount,
             salesTaxAmount,
         };
     });
+    // console.log("discounted product",discountedProducts);
+    
 
     const total = Math.round((subtotal + totalMakingChargesAmount + totalSalesTaxAmount) * 100); 
+// console.log(total);
 
     const OrderItems2 = orderItems.map(item => ({
         productId: item._id,
         quantity: item.quantity || 1,
+        varientId: item.varientId
     }));
 
     const newOrder = await Order.create({
@@ -693,13 +703,13 @@ exports.verifyPayment = asyncHandler(async (req, res) => {
         rows: discountedProducts.map(item => {
             return [
                 item.product.name,
-                item.product.desc,
+                item.varient.desc,
                 item.product.material,
-                `${item.product.height} x ${item.product.width}`,
-                item.product.prductWeight,
+                `${item.varient.height} x ${item.varient.width}`,
+                item.varient.prductWeight,
                 item.product.purity,
                 item.quantity,
-                item.product.price,
+                item.varient.price,
                 item.discountedPrice,
                 item.discountedPrice * item.quantity,
             ];

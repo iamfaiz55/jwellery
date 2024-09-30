@@ -16,6 +16,7 @@ const Sidebar = () => {
         { section: 'paymentMethod', label: 'Payment Methods', path: '/admin/paymentMethod' },
         { section: 'addresses', label: 'Address And Taxes', path: '/admin/addresses' },
         { section: 'addsImages', label: 'Adds Images', path: '/admin/addsImage' },
+        { section: 'navmenu', label: 'Nav MEnu', path: '/admin/navmenu' },
     ];
 
     useEffect(() => {
