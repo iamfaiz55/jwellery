@@ -18,6 +18,8 @@ const CheckOut = () => {
     const { id } = useParams();
     const { data: product, error, isError } = useGetDetailsQuery(id);
     const navigate = useNavigate();
+    // console.log("product ", product);
+    console.log("selected prod ", selectedProd);
 
     const [quantity, setQuantity] = useState(1);
     const discount = taxes && taxes.find(tax => tax.taxName === 'Discount');

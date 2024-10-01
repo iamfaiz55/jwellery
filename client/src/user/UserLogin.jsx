@@ -71,7 +71,7 @@ const UserLogin = () => {
                 </div>
             ) : (
                 <motion.div
-                    className="flex flex-col h-screen bg-light-golden"
+                    className="flex flex-col   bg-light-golden"
                     initial="hidden"
                     animate="visible"
                     variants={containerVariants}
@@ -80,13 +80,13 @@ const UserLogin = () => {
 
                     <div className="grid place-items-center mx-2 my-20 sm:my-auto mb-96 lg:mb-24">
                         <motion.div
-                            className="w-11/12 p-12 sm:w-8/12 md:w-6/12 lg:w-5/12 2xl:w-4/12 px-6 py-10 sm:px-10 sm:py-6 bg-white rounded-lg shadow-md lg:shadow-lg"
+                            className="w-11/12 p-12 sm:w-8/12 md:w-6/12 lg:w-5/12 2xl:w-4/12 px-6 py-10 mt-10 sm:px-10 sm:py-6 bg-white rounded-lg shadow-md lg:shadow-lg"
                             variants={containerVariants}
                         >
                             <h2 className="text-center font-semibold text-3xl lg:text-4xl text-gray-800">
                                 User Login
                             </h2>
-                            <pre>{JSON.stringify(formik.values, null, 2)}</pre>
+                            {/* <pre>{JSON.stringify(formik.values, null, 2)}</pre> */}
                             <form className="mt-10" onSubmit={formik.handleSubmit}>
                                 <label htmlFor="mobile" className="block text-xs font-semibold text-gray-600 uppercase">Mobile</label>
                                 <input

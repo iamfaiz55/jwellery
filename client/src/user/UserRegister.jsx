@@ -41,7 +41,7 @@ const UserRegister = () => {
     return (
         <>
             <motion.div
-                className="flex flex-col h-screen bg-light-golden"
+                className="flex flex-col  bg-light-golden"
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}

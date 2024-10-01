@@ -18,12 +18,26 @@ const CartCheckOut = () => {
     const [selectedAddress, setSelectedAddress] = useState(null);
     const navigate = useNavigate();
     const { data: taxes } = useGetTaxesQuery();
+    // console.log(cartData.cartItems);
+    const finalData = cartData && cartData.cartItems.map(item => {
+        const x = item.productId.varient.find(v => v._id == item.varientId)
+        // console.log("item", item);
+        // console.log("item", );
+
+        return { ...item, varient: x }
+    })
+    // console.log(finalData);
 
     const salesTax = taxes?.find(tax => tax.taxName === 'Sales Tax')?.percent || 0;
     const discount = taxes?.find(tax => tax.taxName === 'Discount')?.percent || 0;
     const makingCharges = taxes?.find(tax => tax.taxName === 'Making Charges')?.percent || 0;
 
-    const totalProductPrice = cartData.cartItems.reduce((acc, item) => acc + (Number(item.productId.price) * item.quantity), 0);
+    const totalProductPrice = cartData.cartItems.reduce((acc, item) => {
+        const variant = item.productId.varient.find(v => v._id === item.varientId);
+        const variantPrice = variant ? Number(variant.price) : 0;
+        return acc + (variantPrice * item.quantity);
+    }, 0);
+
     const totalAfterDiscount = totalProductPrice - (totalProductPrice * (discount / 100));
     const makingChargesAmount = totalAfterDiscount * (makingCharges / 100);
     const salesTaxAmount = totalAfterDiscount * (salesTax / 100);
@@ -39,7 +53,8 @@ const CartCheckOut = () => {
             setCartData(prevData => ({
                 ...prevData,
                 subtotal: totalInCents,
-                deliveryAddressId: selectedAddress
+                deliveryAddressId: selectedAddress,
+                cartItems: finalData
             }));
             navigate("/user/payment");
         } else {
@@ -81,10 +96,11 @@ const CartCheckOut = () => {
                                     <div className="ml-4">
                                         <h3 className="text-xl font-bold text-gray-900">{item.addressType}</h3>
                                         <p className="mt-2 text-sm text-gray-500">House {item.houseNo}</p>
-                                        <p className="mt-2 text-sm text-gray-500">Country {item.country}</p>
-                                        <p className="mt-2 text-sm text-gray-500">State {item.state}</p>
-                                        <p className="mt-2 text-sm text-gray-500">Pincode {item.pincode}</p>
-                                        <p className="mt-2 text-sm text-gray-500">Mobile {item.mobile}</p>
+                                        <p className="mt-2 text-sm text-gray-500">City: {item.city}</p>
+                                        <p className="mt-2 text-sm text-gray-500">Country: {item.country}</p>
+                                        <p className="mt-2 text-sm text-gray-500">State: {item.state}</p>
+                                        <p className="mt-2 text-sm text-gray-500">Pincode: {item.pincode}</p>
+                                        <p className="mt-2 text-sm text-gray-500">Mobile: {item.mobile}</p>
                                     </div>
                                 </label>
                             </div>
@@ -101,8 +117,9 @@ const CartCheckOut = () => {
                     <h2 className="text-xl font-semibold text-yellow-800 mb-4">Order Summary</h2>
                     <ul>
                         {cartData.cartItems.map(item => {
-                            const itemPrice = Number(item.productId.price);
-                            const discountedPrice = itemPrice * (1 - (discount / 100));
+                            const variant = item.productId.varient.find(v => v._id === item.varientId);
+                            const variantPrice = variant ? Number(variant.price) : 0;
+                            const discountedPrice = variantPrice * (1 - (discount / 100));
                             return (
                                 <li key={item.productId._id} className="flex items-center justify-between border-b py-2">
                                     <div className="flex items-center">
@@ -171,6 +188,12 @@ const Form = ({ edit }) => {
             mobile: yup.string().required("Mobile is required"),
         }),
         onSubmit: (values, { resetForm }) => {
+            if (!user.email) {
+                const x = localStorage.getItem("user")
+                const y = JSON.parse(x)
+                const z = { ...y, email: values.email }
+                localStorage.setItem("user", JSON.stringify(z))
+            }
             addAddress({ ...values, userId: user._id });
             resetForm();
         },
@@ -201,6 +224,8 @@ const Form = ({ edit }) => {
                     <input {...formik.getFieldProps("pincode")} type="number" placeholder="Pincode" className="input w-full my-2" />
                     <input {...formik.getFieldProps("country")} type="text" placeholder="Country" className="input w-full my-2" />
                     <input {...formik.getFieldProps("mobile")} type="number" placeholder="Mobile" className="input w-full my-2" />
+                    <input disabled={user && user.email} {...formik.getFieldProps("email")} type="email" placeholder="Enter your email" className="input w-full my-2" />
+
                     <select {...formik.getFieldProps("addressType")} className="select select-bordered w-full my-2">
                         <option value="" disabled>Select Address Type</option>
                         <option value="home">Home</option>

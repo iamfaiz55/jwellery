@@ -12,6 +12,8 @@ import {
 import { useFormik } from 'formik';
 
 const Profile = () => {
+    const [isSmallSidebarOpen, setIsSmallSidebarOpen] = useState(false);
+
     const [currentSection, setCurrentSection] = useState('profile');
     const [updateProfile, { isSuccess, isLoading }] = useUpdateProfileMutation();
     const { user } = useSelector((state) => state.userData);
@@ -26,7 +28,7 @@ const Profile = () => {
     const handleInput = (e) => {
         const file = e.target.files[0];
         const fd = new FormData();
-        fd.append('image', file);
+        fd.append('images', file);
         fd.append('userId', user._id);
         updateProfile(fd);
     };
@@ -47,155 +49,70 @@ const Profile = () => {
     return (
         <div className="flex h-screen bg-light-golden">
             {/* Sidebar */}
-            <div className=" inset-y-0 left-0 z-30 w-64 overflow-y-auto bg-golden rounded-lg m-2 ">
-                <div className="flex flex-col items-center mt-8">
-                    <h2 className="text-2xl font-bold text-white">Hi, {user.mobile}</h2>
+            <div className="hidden md:block inset-y-0 left-0 z-30 w-64 overflow-y-auto bg-golden rounded-lg m-2 ">
+                <div className="flex flex-col items-center mt-20">
+                    {
+                        user && user.name && <h2 className="text-2xl font-bold text-white">Hi, {user.name}</h2>
+                    }
                 </div>
 
                 <nav className="mt-10">
-                    <button
-                        onClick={() => setCurrentSection('profile')}
-                        className={`flex items-center px-6 py-2 mt-4 text-gray-100 transition-colors duration-200 ${currentSection === 'profile' ? 'bg-gray-700' : 'bg-transparent'
-                            }`}
-                    >
-                        <svg
-                            className="w-6 h-6"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"
-                            />
-                        </svg>
-                        <span className="mx-3">Profile</span>
-                    </button>
-
-                    <button
-                        onClick={() => setCurrentSection('addresses')}
-                        className={`flex items-center px-6 py-2 mt-4 text-gray-100 transition-colors duration-200 ${currentSection === 'addresses' ? 'bg-gray-700' : 'bg-transparent'
-                            }`}
-                    >
-                        <svg
-                            className="w-6 h-6"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M5 12h14M12 5l7 7-7 7"
-                            />
-                        </svg>
-                        <span className="mx-3">Addresses</span>
-                    </button>
+                    <SidebarButton
+                        section="profile"
+                        currentSection={currentSection}
+                        setCurrentSection={setCurrentSection}
+                        setIsSmallSidebarOpen={setIsSmallSidebarOpen}
+                    />
+                    <SidebarButton
+                        section="addresses"
+                        currentSection={currentSection}
+                        setCurrentSection={setCurrentSection}
+                        setIsSmallSidebarOpen={setIsSmallSidebarOpen}
+                    />
                 </nav>
             </div>
 
-            <div className="flex flex-col flex-1 p-6  overflow-hidden">
+            <div className={`mt-24 fixed inset-y-0 left-0 z-40 w-48 overflow-y-auto bg-golden rounded-lg m-2 transition-transform transform ${isSmallSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden`}>
+                <div className="flex flex-col items-center mt-8">
+                    {/* <h2 className="text-2xl font-bold text-white">Hi, {user.mobile}</h2> */}
+                </div>
+                <nav className="mt-10">
+                    <SidebarButton
+                        section="profile"
+                        currentSection={currentSection}
+                        setCurrentSection={setCurrentSection}
+                        setIsSmallSidebarOpen={setIsSmallSidebarOpen}
+                    />
+                    <SidebarButton
+                        section="addresses"
+                        currentSection={currentSection}
+                        setCurrentSection={setCurrentSection}
+                        setIsSmallSidebarOpen={setIsSmallSidebarOpen}
+                    />
+                </nav>
+            </div>
+
+            <div className="flex flex-col flex-1 p-6 overflow-hidden">
+                {/* Toggle Button for Small Sidebar */}
+                {
+                    !isSmallSidebarOpen && <button
+                        aria-label={isSmallSidebarOpen ? 'Close menu' : 'Open menu'}
+                        className="md:hidden p-2 text-sm fixed top-24 left-4 z-50 bg-golden text-white rounded-full transition duration-300 transform hover:scale-105"
+                        onClick={() => setIsSmallSidebarOpen(!isSmallSidebarOpen)}
+                    >
+                        {isSmallSidebarOpen ? "" : 'Menu'}
+                    </button>
+                }
 
 
-                <main className="flex-1 overflow-auto mt-6">
+                <main className="flex-1 overflow-auto mt-10">
                     {currentSection === 'profile' && (
                         <div className="p-4 bg-white rounded-lg shadow-md">
                             <div className="flex flex-col items-center">
-                                {isLoading ? (
-                                    <div className="w-24 h-24 flex items-center justify-center">
-                                        <svg
-                                            className="animate-spin h-10 w-10 text-golden"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <circle
-                                                className="opacity-25"
-                                                cx="12"
-                                                cy="12"
-                                                r="10"
-                                                stroke="currentColor"
-                                                strokeWidth="4"
-                                            />
-                                            <path
-                                                className="opacity-75"
-                                                fill="currentColor"
-                                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                            />
-                                        </svg>
-                                        {/* <!-- component --> */}
-                                        <>
+                                {isLoading ? <>
+                                    <span className="loading loading-spinner text-warning loading-lg"></span>
 
-                                            <body >
-                                                <div class="flex flex-col justify-center items-center h-[100vh]">
-                                                    <div class="relative flex flex-col items-center rounded-[20px] w-[700px] max-w-[95%] mx-auto bg-white bg-clip-border shadow-3xl shadow-shadow-500 dark:!bg-navy-800 dark:text-white dark:!shadow-none p-3">
-                                                        <div class="mt-2 mb-8 w-full">
-                                                            <h4 class="px-2 text-xl font-bold text-navy-700 dark:text-white">
-                                                                General Information
-                                                            </h4>
-                                                            <p class="mt-2 px-2 text-base text-gray-600">
-                                                                As we live, our hearts turn colder. Cause pain is what we go through
-                                                                as we become older. We get insulted by others, lose trust for those
-                                                                others. We get back stabbed by friends. It becomes harder for us to
-                                                                give others a hand. We get our heart broken by people we love, even
-                                                                that we give them all...
-                                                            </p>
-                                                        </div>
-                                                        <div class="grid grid-cols-2 gap-4 px-2 w-full">
-                                                            <div class="flex flex-col items-start justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                                <p class="text-sm text-gray-600">Education</p>
-                                                                <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                                    Stanford University
-                                                                </p>
-                                                            </div>
-
-                                                            <div class="flex flex-col justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                                <p class="text-sm text-gray-600">Languages</p>
-                                                                <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                                    English, Spanish, Italian
-                                                                </p>
-                                                            </div>
-
-                                                            <div class="flex flex-col items-start justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                                <p class="text-sm text-gray-600">Department</p>
-                                                                <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                                    Product Design
-                                                                </p>
-                                                            </div>
-
-                                                            <div class="flex flex-col justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                                <p class="text-sm text-gray-600">Work History</p>
-                                                                <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                                    English, Spanish, Italian
-                                                                </p>
-                                                            </div>
-
-                                                            <div class="flex flex-col items-start justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                                <p class="text-sm text-gray-600">Organization</p>
-                                                                <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                                    Simmmple Web LLC
-                                                                </p>
-                                                            </div>
-
-                                                            <div class="flex flex-col justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                                <p class="text-sm text-gray-600">Birthday</p>
-                                                                <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                                    20 July 1986
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <p class="font-normal text-navy-700 mt-20 mx-auto w-max">Profile Card component from <a href="https://horizon-ui.com?ref=tailwindcomponents.com" target="_blank" class="text-brand-500 font-bold">Horizon UI Tailwind React</a></p>
-                                                </div>
-                                            </body>
-                                        </>
-                                    </div>
-                                ) : (
+                                </> : (
                                     <motion.img
                                         src={user.image}
                                         className="w-24 h-24 rounded-full border-4 border-golden cursor-pointer"
@@ -335,12 +252,33 @@ const Profile = () => {
     );
 };
 
-
+const SidebarButton = ({ section, currentSection, setCurrentSection, setIsSmallSidebarOpen }) => (
+    <button
+        onClick={() => {
+            setCurrentSection(section);
+            setIsSmallSidebarOpen(false);
+        }}
+        className={`flex items-center px-6 py-2 mt-4 text-gray-100 transition-colors duration-200 ${currentSection === section ? 'bg-gray-700' : 'bg-transparent'}`}
+    >
+        {section === 'profile' ? (
+            <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+            </svg>
+        ) : (
+            // <></>
+            <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+        )}
+        <span className="mx-3 capitalize">{section}</span>
+    </button>
+);
 
 
 const Form = ({ edit }) => {
     const { user } = useSelector((state) => state.userData);
     const [addAddress, { isSuccess, isLoading }] = useAddAddressMutation();
+    // console.log(user);
 
     const formik = useFormik({
         enableReinitialize: true,
@@ -362,9 +300,15 @@ const Form = ({ edit }) => {
             country: yup.string().required("Enter country"),
             addressType: yup.string().required("Select address type"),
             mobile: yup.string().required("Enter mobile number"),
-            email: yup.string().required("Enter mobile number"),
+            email: yup.string()
         }),
         onSubmit: (values, { resetForm }) => {
+            if (!user.email) {
+                const x = localStorage.getItem("user")
+                const y = JSON.parse(x)
+                const z = { ...y, email: values.email }
+                localStorage.setItem("user", JSON.stringify(z))
+            }
             addAddress({ ...values, userId: user._id });
             resetForm();
         },
@@ -395,7 +339,12 @@ const Form = ({ edit }) => {
                     <input {...formik.getFieldProps("pincode")} type="number" placeholder="Pincode" className="input w-full my-2" />
                     <input {...formik.getFieldProps("country")} type="text" placeholder="Country" className="input w-full my-2" />
                     <input {...formik.getFieldProps("mobile")} type="number" placeholder="Mobile" className="input w-full my-2" />
-                    <input {...formik.getFieldProps("email")} type="email" placeholder="Optional" className="input w-full my-2" />
+                    {/* { */}
+                    {/* // user && user.email */}
+                    {/* // ? <></> */}
+                    {/* // : <></> */}
+                    {/* // } */}
+                    <input disabled={user && user.email} {...formik.getFieldProps("email")} type="email" placeholder="Enter your email" className="input w-full my-2" />
                     <select {...formik.getFieldProps("addressType")} className="select select-bordered w-full my-2">
                         <option value="" disabled>Select Address Type</option>
                         <option value="home">Home</option>

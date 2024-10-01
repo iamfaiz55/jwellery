@@ -19,7 +19,12 @@ const PaymentPage = () => {
     const [deleteFull, { isSuccess: deleteSuccess }] = useDeleteFullCartMutation();
     const [paymentMethod, setPaymentMethod] = useState('');
 
-    console.log("cart Data", cartData);
+    // const finalData = cartData && cartData.cartItems.map(item => {
+    //     const x = item.productId.varient.find(v => v._id == item.varientId)
+
+    //     return { ...item, varient: x }
+    // })
+    // console.log("cartItems", cartData.cartItems);
 
     const handlePaymentMethodChange = (e) => {
         setPaymentMethod(e.target.value);
@@ -40,12 +45,13 @@ const PaymentPage = () => {
                 varientId: item.productId.varient._id
             })),
 
+
         };
-        // console.log(cartData);
+
 
         const totalAmount = cartData.subtotal
         const roundedTotalAmount = Math.round(totalAmount * 100) / 100;
-        // console.log(totalAmount);
+        // console.log(roundedTotalAmount);
 
         if (paymentMethod === 'razorpay') {
             raz({
@@ -55,7 +61,15 @@ const PaymentPage = () => {
             });
 
         } else {
-            createOrder({ ...orderData, userId: user._id });
+            createOrder({
+                ...orderData,
+                userId: user._id,
+                orderItems: cartData.cartItems.map(item => ({
+                    _id: item.productId._id,
+                    quantity: item.quantity,
+                    varientId: item.varientId
+                })),
+            });
         }
     };
 
@@ -82,9 +96,10 @@ const PaymentPage = () => {
                     paymentMethod: paymentMethod,
                     userId: user._id,
                     orderItems: cartData.cartItems.map(item => ({
+
                         _id: item.productId._id,
                         quantity: item.quantity,
-                        varientId: item.productId.varient._id
+                        varientId: item.varientId
                     })),
                 }),
             });
@@ -100,7 +115,8 @@ const PaymentPage = () => {
     useEffect(() => {
         if (isSuccess) {
             toast.success("Order placed successfully! Thank you.");
-            deleteFull({ userId: user._id });
+            // deleteFull({ userId: user._id });
+            navigate("/");
             setCartData({});
             localStorage.removeItem("cartData");
         }

@@ -49,6 +49,10 @@ exports.createOrder = asyncHandler(async (req, res) => {
         }
 
         const productDetails = await getProductDetails(orderItems);
+        console.log("product details ",productDetails);
+        console.log("req.body",req.body);
+        console.log("orderItems",orderItems);
+        
         if (!productDetails || productDetails.length === 0) {
             return res.status(404).json({ message: 'Products not found.' });
         }
@@ -276,7 +280,8 @@ exports.addAddress = asyncHandler(async (req, res) => {
         country,
         addressType,
         mobile,
-        userId
+        userId,
+        houseNo
     } = req.body;
 
     const { isError, error } = checkEmpty({
@@ -286,7 +291,8 @@ exports.addAddress = asyncHandler(async (req, res) => {
         country,
         addressType,
         mobile,
-        userId
+        userId,
+        houseNo
     });
 
     if (isError) {
@@ -294,7 +300,7 @@ exports.addAddress = asyncHandler(async (req, res) => {
     }
 
     let user = await User.findById(userId);
-console.log(user);
+// console.log(user);
 
     if (!user) {
         return res.status(505).json({message:"user not found"})
@@ -312,6 +318,7 @@ if(!user.email){
         country,
         addressType,
         mobile,
+        houseNo,
         userId: user._id
     });
 
@@ -400,6 +407,7 @@ exports.getAllLiked = asyncHandler(async (req, res) => {
 exports.getAllCartItems = asyncHandler(async (req, res) => {
     const { uid } = req.params;
     const result = await Cart.find({ userId: uid }).populate("productId")
+    
     res.json({ message: 'Cart Items Get Success', result });
 });
 
@@ -584,6 +592,7 @@ const getProductDetails = async (orderItems) => {
 
 exports.verifyPayment = asyncHandler(async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, deliveryAddressId, paymentMethod, orderItems, userId } = req.body;
+// console.log("orderItems", orderItems);
 
     const productDetails = await getProductDetails(orderItems);
     const userData = await User.findById(userId);
@@ -600,10 +609,13 @@ exports.verifyPayment = asyncHandler(async (req, res) => {
     let totalSalesTaxAmount = 0;
     let totalMakingChargesAmount = 0;
 
-    // console.log(productDetails);
+        // console.log("product details",productDetails);
     
     const discountedProducts = productDetails.map(item => {
         const selectedVarient = item.product.varient.find(vari => vari._id == item.varientId )
+        // console.log("selected varient ",selectedVarient);
+        // console.log("varientId ",item.varientId);
+        
         const originalPrice = selectedVarient.price;
         const discountAmount = (discount / 100) * originalPrice;
         const discountedPrice = originalPrice - discountAmount;
