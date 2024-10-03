@@ -28,6 +28,8 @@ router
     .post("/verify-payment", userController.verifyPayment)
 
     .post("/post-review", userController.postReview)
+    .put("/update-profile-data/:id", userController.updateProfileData)
+    .get("/get-profile/:id", userController.getProfile)
     .get("/get-all-reviews/:id", userController.getReviews)
     .get("/get-all-payment-method", userController.getPaymentMethodsUser)
 

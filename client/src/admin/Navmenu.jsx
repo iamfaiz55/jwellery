@@ -110,6 +110,7 @@ const Form = ({ edit }) => {
         enableReinitialize: true,
         initialValues: {
             menuitem: edit?.menuitem || '',
+            menuImage: edit?.menuImage || null,
             children: edit?.children || [
                 {
                     menuitem: '',
@@ -134,6 +135,9 @@ const Form = ({ edit }) => {
             // console.log(values);
             const fd = new FormData();
             fd.append('menuitem', values.menuitem);
+            if (values.menuImage) {
+                fd.append('menuImage', values.menuImage);
+            }
 
             values.children.forEach((child, index) => {
                 fd.append(`children[${index}].menuitem`, child.menuitem);
@@ -197,6 +201,17 @@ const Form = ({ edit }) => {
                         className="input w-full bg-yellow-50 border border-yellow-300 rounded-lg px-4 py-2 text-gray-700"
                     />
                 </div>
+                <div className="mb-4">
+                    <label htmlFor="menuImage" className="block text-gray-700">Menu Image</label>
+                    <input
+                        type="file"
+                        onChange={e => formik.setFieldValue('menuImage', e.currentTarget.files[0])}
+                        id="menuImage"
+                        name="menuImage"
+                        className="file-input file-input-bordered file-input-warning w-full"
+                    />
+                </div>
+
 
                 {formik.values.children.map((child, index) => (
                     <div key={child._id} className="mb-4 border p-4 rounded-lg">

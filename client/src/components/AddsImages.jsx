@@ -33,7 +33,7 @@ const AddsImages = () => {
     }, [images]);
 
     return (
-        <div className="container mx-auto p-20">
+        <div className="container mx-auto sm:p-5 md:p-20">
             {/* Large screen grid */}
             <div
                 className="grid gap-4 hidden md:grid"
@@ -71,25 +71,27 @@ const AddsImages = () => {
             </div>
 
             {/* Small screen layout */}
-            <div className="grid gap-4 md:hidden grid-cols-1 sm:grid-cols-2">
-                {currentImages && currentImages.map((src, index) => (
-                    <motion.div
-                        key={index}
-                        className={`rounded-lg overflow-hidden ${fadeOut ? 'fade-out' : 'fade-in'}`}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <img
-                            className="h-full w-full object-cover rounded-lg"
-                            src={src.image}
-                            alt={`image-${index}`}
-                        />
-                    </motion.div>
-                ))}
+            <div className="grid gap-4 md:hidden grid-cols-2 sm:grid-cols-2">
+                {currentImages && currentImages.map((src, index) => {
+                    return (
+                        <motion.div
+                            key={index}
+                            className={`rounded-lg overflow-hidden ${fadeOut ? 'fade-out' : 'fade-in'}`}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            <img
+                                className="h-full w-full object-cover rounded-lg"
+                                src={src.image}
+                                alt={`image-${index}`}
+                            />
+                        </motion.div>
+                    );
+                })}
             </div>
 
             <style jsx>{`

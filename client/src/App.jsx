@@ -35,6 +35,7 @@ import Navmenu from './admin/Navmenu';
 import AdminLayout from './admin/AdminLayout';
 import UserNavbar from './user/UserNAvbar';
 import AdminAddImages from './admin/AdminAddImages';
+import BottomNav from './user/BottomNav';
 // import AdminLayout from './components/AdminLayout'; // Import the new layout component
 
 export const CartContext = createContext();
@@ -106,12 +107,11 @@ const App = () => {
                     </Routes>
                   </>
                 } />
-
                 <Route path="/details/:id" element={<><UserNavbar /><Details /></>} />
                 <Route path="*" element={<h1>Page Not Found</h1>} />
               </Routes>
             </BrowserRouter>
-            <Footer />
+            <BottomNav />
           </CartContext.Provider>
         </selectedProductContext.Provider>
       </sectionContext.Provider>

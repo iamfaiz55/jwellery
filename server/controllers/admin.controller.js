@@ -414,12 +414,23 @@ exports.addMenuItem = asyncHandler(async (req, res) => {
         }
 
         const { menuitem } = req.body; 
-        const newChildren = []; 
+        const newChildren = [];
+
+
+        let menuImageFile = req.files.menuImage && req.files.menuImage[0]; 
+        let menuImageUrl = null;
+
+        if (menuImageFile) {
+            const menuImagePath = menuImageFile.path;
+            const uploadResult = await cloudinary.uploader.upload(menuImagePath);
+            menuImageUrl = uploadResult.secure_url; 
+        }
+ 
 
         for (let i = 0; ; i++) {
-         const childMenuItem = req.body[`children[${i}].menuitem`];
-        const childSubtitle = req.body[`children[${i}].subtitle`];
-                const childLink = req.body[`children[${i}].link`];
+            const childMenuItem = req.body[`children[${i}].menuitem`];
+            const childSubtitle = req.body[`children[${i}].subtitle`];
+            const childLink = req.body[`children[${i}].link`];
             const childImageFile = req.files[`children[${i}].image`] && req.files[`children[${i}].image`][0];
 
             if (!childMenuItem) break;
@@ -447,14 +458,20 @@ exports.addMenuItem = asyncHandler(async (req, res) => {
         let existingMenuItem = await Navmenu.findOne({ menuitem });
 
         if (existingMenuItem) {
-            const updatedChildren = [...existingMenuItem.children, ...newChildren];
-            existingMenuItem.children = updatedChildren; 
-            await existingMenuItem.save();
+      const updatedChildren = [...existingMenuItem.children, ...newChildren];
+      existingMenuItem.children = updatedChildren;
 
-            return res.json({ message: "Menu Item updated successfully" });
+      if (menuImageUrl) {
+          existingMenuItem.menuImage = menuImageUrl;
+      }
+
+      await existingMenuItem.save();
+
+      return res.json({ message: "Menu Item updated successfully" });
         } else {
             await Navmenu.create({
                 menuitem,
+                menuImage: menuImageUrl,
                 children: newChildren
             });
 

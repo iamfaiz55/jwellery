@@ -77,6 +77,10 @@ exports.createOrder = asyncHandler(async (req, res) => {
 
         const discountedProducts = productDetails.map(item => {
             const selectedVarient = item.product.varient.find(vari => vari._id == item.varientId )
+
+            // console.log("selectedVarient", selectedVarient);
+            // console.log("varientId",item.varientId);
+            
             const originalPrice = selectedVarient.price;
             const discountAmount = (discount / 100) * originalPrice;
             const discountedPrice = originalPrice - discountAmount;
@@ -119,6 +123,20 @@ exports.createOrder = asyncHandler(async (req, res) => {
             razorpay_order_id: req.body.razorpay_order_id
         });
 
+        for (const item of discountedProducts) {
+            const product = await Product.findById(item.product._id);
+            const variant = product.varient.id(item.varient._id); 
+        
+            if (variant) {
+                variant.quantity -= item.quantity; 
+                if (variant.quantity < 0) {
+                    variant.quantity = 0; 
+                }
+        
+                await product.save(); 
+            }
+        }
+        
         const notoSansFontPath = path.join(__dirname, '..', 'font', 'font.ttf');
         const pdfPath = path.join(__dirname, '../pdfs', `OrderDetails-${uuid()}.pdf`);
         const doc = new PDFDocument({ margin: 50 });
@@ -228,47 +246,6 @@ exports.createOrder = asyncHandler(async (req, res) => {
         res.json({ message: "Order created successfully, payment verified, and receipt sent to email." });
    
 });
-
-
-
-
-// exports.addAddress = asyncHandler(async(req, res)=> {
-//     const {
-//         pincode,
-//         city,
-//         state,
-//         // pincode,
-//         country,
-//         addressType,
-//         mobile,
-//         userId
-//     }=req.body
-
-//     const {isError, error}= checkEmpty({pincode,
-//         city,
-//         state,
-//         country,
-//         pincode,
-//         addressType,
-//         mobile,  userId})
-
-//         if(isError){
-//             return res.status(400).json({message :"All Fields Required"})
-//         }
-
-//         await UserAddress.create({ city,
-//             state,
-//             pincode,
-//             country,
-//             addressType,
-//             mobile,
-//             userId})
-//         // console.log(req.loggedInUser);
-        
-
-//             res.json({message:"Address Create Success"})
-// })
-
 
 
 exports.addAddress = asyncHandler(async (req, res) => {
@@ -511,15 +488,21 @@ exports.updateProfile = asyncHandler(async (req, res) => {
        const updated = await User.findByIdAndUpdate(req.body.userId, {image:secure_url})
     //    console.log(updated);
        
-        res.json({ message: "Profile image upload successfully", result:{
-            mobile:updated.mobile,
-            _id:updated._id,
-            image:secure_url,
-            isBlock:updated.isBlock
-        } });
+        res.json({ message: "Profile image upload successfully", result:updated });
     });
 });
 
+exports.updateProfileData = asyncHandler(async (req, res) => {
+    const {id}=req.params
+    const result = await User.findByIdAndUpdate(id, req.body)
+    const x = await User.findById(id)
+    res.json({messaege:"User Update Success", result:x})
+});
+exports.getProfile = asyncHandler(async(req, res)=> {
+   const {id}=req.params
+   const result = await User.findById(id)
+   res.json({message:"User Get Success", result})
+})
 exports.getAllCategory = asyncHandler(async(req, res)=> {
     //   const {cId}= req.params  
       const result = await Categories.find()
@@ -648,6 +631,7 @@ exports.verifyPayment = asyncHandler(async (req, res) => {
         quantity: item.quantity || 1,
         varientId: item.varientId
     }));
+// console.log(orderItems);
 
     const newOrder = await Order.create({
         userId,
@@ -664,6 +648,26 @@ exports.verifyPayment = asyncHandler(async (req, res) => {
         currency: "INR",
         receipt: uuid(),
     });
+// console.log("OrderItems2",OrderItems2);
+// console.log("product Details ",productDetails);
+// console.log("Discounted POroduct",discountedProducts);
+
+ 
+   for (const item of discountedProducts) {
+    const product = await Product.findById(item.product._id);
+    const variant = product.varient.id(item.varient._id); 
+
+    if (variant) {
+        variant.quantity -= item.quantity; 
+        if (variant.quantity < 0) {
+            variant.quantity = 0; 
+        }
+
+        await product.save(); 
+    }
+}
+
+    // const updateProductQuantity = await Product
 
     const notoSansFontPath = path.join(__dirname, '..', 'font', 'font.ttf');
     const pdfPath = path.join(__dirname, '../pdfs', `OrderDetails-${uuid()}.pdf`);

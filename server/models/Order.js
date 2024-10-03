@@ -9,6 +9,10 @@ const orderItemSchema = new mongoose.Schema({
     quantity: {
         type: Number,
         required: true
+    },
+    varientId: {
+        type: String,
+        // required: true
     }
 });
 

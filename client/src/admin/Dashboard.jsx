@@ -238,9 +238,15 @@ const Dashboard = () => {
                   <button className='btn bg-golden ' onClick={e => document.getElementById("variant").close()}> Close</button>
                 </div>
               </div>
-            ) : (
+            ) : <>
               <p className="mt-4 text-gray-600">No variants available for this product.</p>
-            )}
+              <div className='text-right'>
+
+                <button className='btn bg-golden ' onClick={e => document.getElementById("variant").close()}> Close</button>
+              </div>
+            </>
+
+            }
           </div>
 
 

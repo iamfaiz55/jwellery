@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { usefilter } from '../App';
 import { toast } from 'sonner';
-import { useGetCArouselQuery, useGetTaxesQuery, useLazyGetFilteredDataQuery, useLazyGetAllProductsQuery } from '../redux/apis/openApi';
+import { useGetCArouselQuery, useGetTaxesQuery, useLazyGetFilteredDataQuery, useLazyGetAllProductsQuery, useGetAllMenuItemsQuery } from '../redux/apis/openApi';
 import ScrollCard from './ScrollCard';
 import AddsImages from './AddsImages';
+import Footer from './Footer';
 
 const Home = () => {
     const { selectedType } = usefilter();
+    const { data: navmenus } = useGetAllMenuItemsQuery();
 
     const [allProducts, setAllProducts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -85,6 +87,16 @@ const Home = () => {
 
     return (
         <div className='bg-light-golden'>
+            <div className="avatar flex justify-around sm:hidden ">
+                {navmenus?.map((menu, i) => (
+                    <div key={menu._id} className="w-16 rounded-full m-5">
+                        {/* <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" /> */}
+                        <img src={menu.menuImage} />
+
+
+                    </div>
+                ))}
+            </div>
             <div className='mx-3'>
                 <div className="relative w-full h-80 overflow-hidden rounded-md">
                     <div className="relative w-full h-full">
@@ -133,7 +145,7 @@ const Home = () => {
                             Recommended for You
                         </motion.h2>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-8">
+                        <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-8">
                             {allProducts.map(item => (
                                 <Link
                                     key={item._id}
@@ -154,6 +166,29 @@ const Home = () => {
                             ))}
                         </div>
 
+
+
+                        {/* small screen */}
+                        <div className="grid grid-cols-2 gap-8 mt-8 sm:hidden">
+                            {allProducts.map(item => (
+                                <Link
+                                    key={item._id}
+                                    to={`/details/${item._id}`}
+                                    className="transform overflow-hidden rounded-lg bg-white shadow-md duration-300 hover:scale-105 hover:shadow-lg"
+                                >
+                                    <img className="h-24 w-full object-cover object-center duration-300 hover:scale-110" src={item.images[0]} alt={item.name} />
+                                    <div className="p-2"> {/* Adjusted padding for smaller screens */}
+                                        <p className="  font-bold text-gray-900" style={{ fontSize: 14 }}>{item.name}</p> {/* Smaller name */}
+                                        <p className=" text-sm text-gray-700">{item.desc}</p> {/* Smaller description */}
+                                        <div className="flex items-center text-sm"> {/* Smaller text for price */}
+                                            <p className="mr-1 font-semibold text-gray-900 " style={{ fontSize: 12 }}>${applyDiscount(item.varient[0]?.price)}</p>
+                                            <p style={{ fontSize: 12 }} className="text-gray-500 line-through text-sm">${item.varient[0]?.mrp}</p>
+                                        </div>
+                                        <p className="ml-auto text-green-500 text-sm" style={{ fontSize: 12 }}>{item.varient[0]?.discount} off</p>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
                         {!selectedType && (
                             <div className="flex justify-center mt-8">
                                 {Array.from({ length: totalPages }, (_, index) => (
@@ -170,6 +205,8 @@ const Home = () => {
                     </div>
                 </section>
             </div>
+            <Footer />
+
         </div>
     );
 }

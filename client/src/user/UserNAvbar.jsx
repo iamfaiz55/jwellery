@@ -9,13 +9,15 @@ import { useGetAllCAtegoriesQuery, useGetAllMenuItemsQuery, useGetCompanyDetails
 const UserNavbar = () => {
     const { data: companyDetails } = useGetCompanyDetailsQuery();
     const { data: navmenus } = useGetAllMenuItemsQuery();
+    // console.log(navmenus);
+
     const { data: taxes } = useGetTaxesQuery();
     const navigate = useNavigate();
     const { setSelectedType } = usefilter(filterContext);
     const [logoutUser] = useLogoutUserMutation();
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const { user } = useSelector(state => state.userData);
-    const { data, isError, error } = useGetAllCartItemsQuery(user && user._id);
+    const { data: cartItems, isError, error } = useGetAllCartItemsQuery(user && user._id);
     const { data: allCategories } = useGetAllCAtegoriesQuery();
 
     useEffect(() => {
@@ -24,15 +26,25 @@ const UserNavbar = () => {
         }
     }, [error, logoutUser]);
 
-    const subtotal = data && data.reduce((acc, item) => acc + item.productId.price * item.quantity, 0);
+    // console.log(data);
+
+    const subtotal = cartItems?.reduce((acc, item) => {
+        // Find the variant for the product
+        const productVariant = item.productId.varient.find(variant => variant._id === item.varientId);
+        // If a matching variant is found, add to the subtotal
+        return productVariant ? acc + (productVariant.price * item.quantity) : acc;
+    }, 0);
+
+    // Calculate discounts if applicable
     const discount = taxes?.find(tax => tax.taxName === 'Discount')?.percent || 0;
     const discountAmount = (subtotal * discount) / 100;
     const totalAfterDiscount = subtotal - discountAmount;
 
-    return (
+
+    return <>
         <div className="bg-light-golden py-2">
             <div className="m-2 md:m-5 z-20 relative">
-                <div className="navbar rounded-lg bg-light-golden border-2 border-black">
+                <div className="navbar rounded-lg bg-light-golden ">
                     <div className="flex-1 flex items-center space-x-4">
                         <Link to="/">
                             <div className="justify-center">
@@ -66,6 +78,7 @@ const UserNavbar = () => {
                                     ))}
                                 </div>
                             </div>
+
 
                             {/* "Menus" Dropdown with Main Menuitems and Children */}
                             <div className="dropdown dropdown-hover relative ">
@@ -135,7 +148,7 @@ const UserNavbar = () => {
                                             d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                                         />
                                     </svg>
-                                    <span className="badge badge-sm indicator-item">{data && data.length}</span>
+                                    <span className="badge badge-sm indicator-item">{cartItems && cartItems.length}</span>
                                 </div>
                             </div>
                             <div
@@ -143,7 +156,7 @@ const UserNavbar = () => {
                                 className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-44 shadow transition-all duration-300 ease-in-out"
                             >
                                 <div className="card-body bg-light-golden">
-                                    <span className="text-md font-bold">{data && data.length} Items</span>
+                                    <span className="text-md font-bold">{cartItems && cartItems.length} Items</span>
                                     <span className="font-bold">Total: ${totalAfterDiscount ? totalAfterDiscount.toFixed(2) : ""}</span>
                                     <div className="card-actions">
                                         <Link to="/user/cart" className="btn bg-golden btn-block text-sm">View cart</Link>
@@ -153,7 +166,7 @@ const UserNavbar = () => {
                         </div>
 
                         {/* Profile Icon */}
-                        <div className="dropdown dropdown-end">
+                        <div className=" dropdown dropdown-end hidden sm:block">
                             <div
                                 tabIndex={0}
                                 role="button"
@@ -177,11 +190,7 @@ const UserNavbar = () => {
                                             <Link to="/user/profile" className="justify-between text-sm">Profile</Link>
                                         </li>
                                         <li><Link to="/admin/dashboard" className="text-sm text-center">Admin Page</Link></li>
-                                        <li><Link to="/user/allOrders" className="text-sm text-center">My Orders</Link></li>
-                                        <li><Link to="/user/liked" className="text-sm text-center">Liked</Link></li>
-                                        <li>
-                                            <button onClick={() => logoutUser(user._id)} type="button" className="btn text-sm">Logout</button>
-                                        </li>
+
                                     </>
                                 ) : (
                                     <li>
@@ -194,6 +203,11 @@ const UserNavbar = () => {
                         </div>
                     </div>
                 </div>
+                <div className="">
+
+                </div>
+
+
 
                 {/* Sidebar for small screens */}
                 <div
@@ -228,8 +242,14 @@ const UserNavbar = () => {
                     </div>
                 </div>
             </div>
+
+
         </div>
-    );
+
+
+
+
+    </>
 };
 
 export default UserNavbar;

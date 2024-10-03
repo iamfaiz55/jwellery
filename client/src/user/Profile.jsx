@@ -7,17 +7,23 @@ import {
     useAddAddressMutation,
     useDeleteAddressMutation,
     useGetAddressesQuery,
+    useGetProfileQuery,
+    useUpdateProfileDataMutation,
     useUpdateProfileMutation
 } from '../redux/apis/userApi';
 import { useFormik } from 'formik';
+import Liked from '../components/Liked';
+import AllOrders from './AllOrders';
 
 const Profile = () => {
     const [isSmallSidebarOpen, setIsSmallSidebarOpen] = useState(false);
-
     const [currentSection, setCurrentSection] = useState('profile');
     const [updateProfile, { isSuccess, isLoading }] = useUpdateProfileMutation();
     const { user } = useSelector((state) => state.userData);
-    const { data, error, isError } = useGetAddressesQuery(user._id);
+    const { data: userData } = useGetProfileQuery(user && user._id)
+    // console.log(userData);
+    const [updateProfileData, { isSuccess: updateSuccess, isLoading: updateLoading }] = useUpdateProfileDataMutation()
+    const { data, error, isError } = useGetAddressesQuery(user && user._id);
     const [deleteAdress, { isSuccess: addressDeleteSuccess }] = useDeleteAddressMutation();
     const fileInputRef = useRef();
 
@@ -33,6 +39,23 @@ const Profile = () => {
         updateProfile(fd);
     };
 
+
+    const formik = useFormik({
+        initialValues: {
+            name: user && user.name ? user.name : "",
+            email: user && user.email ? user.email : "",
+            mobile: user && user.mobile ? user.mobile : "",
+        },
+        validationSchema: yup.object({
+            name: yup.string(),
+            mobile: yup.string(),
+            email: yup.string()
+        }),
+        onSubmit: (values, { resetForm }) => {
+            updateProfileData({ ...values, _id: user._id })
+            resetForm()
+        }
+    })
     useEffect(() => {
         if (isSuccess) {
             toast.success('Profile Update Success');
@@ -46,17 +69,26 @@ const Profile = () => {
         }
     }, [addressDeleteSuccess]);
 
+
+    useEffect(() => {
+        if (updateSuccess) {
+            toast.success("Profile Update Success")
+            location.reload()
+            document.getElementById("update").close()
+        }
+    }, [updateSuccess])
+
     return (
-        <div className="flex h-screen bg-light-golden">
+        <div className="flex  bg-light-golden">
             {/* Sidebar */}
-            <div className="hidden md:block inset-y-0 left-0 z-30 w-64 overflow-y-auto bg-golden rounded-lg m-2 ">
+            <div className="hidden md:block inset-y-0 left-0 z-30 w-64 overflow-y-auto bg-golden rounded-lg m-2">
                 <div className="flex flex-col items-center mt-20">
                     {
                         user && user.name && <h2 className="text-2xl font-bold text-white">Hi, {user.name}</h2>
                     }
                 </div>
 
-                <nav className="mt-10">
+                <nav className="">
                     <SidebarButton
                         section="profile"
                         currentSection={currentSection}
@@ -65,6 +97,18 @@ const Profile = () => {
                     />
                     <SidebarButton
                         section="addresses"
+                        currentSection={currentSection}
+                        setCurrentSection={setCurrentSection}
+                        setIsSmallSidebarOpen={setIsSmallSidebarOpen}
+                    />
+                    <SidebarButton
+                        section="liked"
+                        currentSection={currentSection}
+                        setCurrentSection={setCurrentSection}
+                        setIsSmallSidebarOpen={setIsSmallSidebarOpen}
+                    />
+                    <SidebarButton
+                        section="allOrders"
                         currentSection={currentSection}
                         setCurrentSection={setCurrentSection}
                         setIsSmallSidebarOpen={setIsSmallSidebarOpen}
@@ -72,11 +116,11 @@ const Profile = () => {
                 </nav>
             </div>
 
-            <div className={`mt-24 fixed inset-y-0 left-0 z-40 w-48 overflow-y-auto bg-golden rounded-lg m-2 transition-transform transform ${isSmallSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden`}>
-                <div className="flex flex-col items-center mt-8">
+            <div onClick={() => setIsSmallSidebarOpen(!isSmallSidebarOpen)} className={`mt-24 mb-20 fixed inset-y-0 left-0 z-40 w-48 overflow-y-auto bg-golden rounded-lg m-2 transition-transform transform ${isSmallSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden`}>
+                <div className="flex flex-col items-center">
                     {/* <h2 className="text-2xl font-bold text-white">Hi, {user.mobile}</h2> */}
                 </div>
-                <nav className="mt-10">
+                <nav className="">
                     <SidebarButton
                         section="profile"
                         currentSection={currentSection}
@@ -89,12 +133,27 @@ const Profile = () => {
                         setCurrentSection={setCurrentSection}
                         setIsSmallSidebarOpen={setIsSmallSidebarOpen}
                     />
+                    <SidebarButton
+                        section="liked"
+                        currentSection={currentSection}
+                        setCurrentSection={setCurrentSection}
+                        setIsSmallSidebarOpen={setIsSmallSidebarOpen}
+                    />
+                    <SidebarButton
+                        section="allOrders"
+                        currentSection={currentSection}
+                        setCurrentSection={setCurrentSection}
+                        setIsSmallSidebarOpen={setIsSmallSidebarOpen}
+                    />
+                    <div className="text-center">
+                        <button className='btn w-24 mt-16 bg-gray-600 text-white'>Logout</button>
+                    </div>
                 </nav>
             </div>
 
             <div className="flex flex-col flex-1 p-6 overflow-hidden">
                 {/* Toggle Button for Small Sidebar */}
-                {
+                {/* {
                     !isSmallSidebarOpen && <button
                         aria-label={isSmallSidebarOpen ? 'Close menu' : 'Open menu'}
                         className="md:hidden p-2 text-sm fixed top-24 left-4 z-50 bg-golden text-white rounded-full transition duration-300 transform hover:scale-105"
@@ -102,10 +161,10 @@ const Profile = () => {
                     >
                         {isSmallSidebarOpen ? "" : 'Menu'}
                     </button>
-                }
+                } */}
 
 
-                <main className="flex-1 overflow-auto mt-10">
+                <main className="flex-1 overflow-auto  mb-10">
                     {currentSection === 'profile' && (
                         <div className="p-4 bg-white rounded-lg shadow-md">
                             <div className="flex flex-col items-center">
@@ -129,7 +188,54 @@ const Profile = () => {
                                     className="hidden"
                                 />
 
-                                <h4 className="text-2xl font-bold mt-4">Hi, {user && user.mobile && user.mobile}</h4>
+                                {/* <h4 className="text-2xl font-bold mt-4">Hi, {user && user.mobile && user.mobile}</h4> */}
+                                <div className="text-end">
+                                    <button onClick={e => {
+                                        document.getElementById("update").showModal()
+                                    }} className='btn btn-sm bg-golden m-5'>Edit Profile</button>
+
+                                </div>
+                                <dialog id="update" className="modal border-yellow-400 rounded-lg">
+                                    <div className="modal-box  relative">
+                                        {
+                                            updateLoading
+                                                ? <>
+                                                    <div className="absolute inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-10">
+                                                        <div className="text-white text-lg">Loading...</div>
+                                                    </div>
+                                                </>
+                                                : <>
+                                                    <h3 className=" font-bold text-yellow-600">Update Profile</h3>
+
+                                                    <form onSubmit={formik.handleSubmit}>
+                                                        <input
+                                                            {...formik.getFieldProps("name")}
+                                                            type="text"
+                                                            value={formik.values.name}
+                                                            placeholder="Enter Your Name"
+                                                            className="input input-bordered input-warning w-full my-2" />
+                                                        <input
+                                                            {...formik.getFieldProps("mobile")}
+                                                            type="number"
+                                                            value={formik.values.mobile}
+                                                            placeholder="Enter Your Mobile Number"
+                                                            className="input input-bordered input-warning w-full my-2" />
+                                                        <input
+                                                            {...formik.getFieldProps("email")}
+                                                            type="email"
+                                                            value={formik.values.email}
+                                                            placeholder="Enter Your Email"
+                                                            className="input input-bordered input-warning w-full my-2" />
+                                                        <div className="text-right">
+                                                            <button type='submit' className='btn m-3 bg-golden'>Update</button>
+                                                            <button type='button' onClick={e => document.getElementById("update").close()} className='btn m-3 bg-golden'>close</button>
+                                                        </div>
+                                                    </form>
+                                                </>
+                                        }
+                                    </div>
+                                </dialog>
+
                                 {/* <p className="text-gray-500">{user && user.email && user.email}</p> */}
                             </div>
                             {/* <!-- component --> */}
@@ -154,32 +260,17 @@ const Profile = () => {
                                                 </div>
 
                                                 <div class="flex flex-col items-start justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                    <p class="text-sm text-gray-600">Department</p>
+                                                    <p class="text-sm text-gray-600">Mobile</p>
                                                     <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                        Product Design
+                                                        {user && user.mobile}
                                                     </p>
                                                 </div>
 
-                                                <div class="flex flex-col justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                    <p class="text-sm text-gray-600">Work History</p>
-                                                    <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                        English, Spanish, Italian
-                                                    </p>
-                                                </div>
 
-                                                <div class="flex flex-col items-start justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                    <p class="text-sm text-gray-600">Organization</p>
-                                                    <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                        Simmmple Web LLC
-                                                    </p>
-                                                </div>
 
-                                                <div class="flex flex-col justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                    <p class="text-sm text-gray-600">Birthday</p>
-                                                    <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                        20 July 1986
-                                                    </p>
-                                                </div>
+
+
+
                                             </div>
                                         </div>
                                     </div>
@@ -188,7 +279,7 @@ const Profile = () => {
                             </>
                         </div>
                     )}
-
+                    {/* address sectiomn */}
                     {
                         currentSection === "addresses" && <>
                             <div className="p-4 bg-white rounded-lg shadow-md">
@@ -243,6 +334,44 @@ const Profile = () => {
                                             ))}
                                     </div>
                                 )}
+                            </div>
+                        </>
+                    }
+
+                    {/* liked section */}
+                    {
+                        currentSection === "liked" && <>
+                            <div className="p-4 bg-light-golden rounded-lg ">
+                                {/* <div className="mb-5">
+                                    <button className="btn bg-gray-400" onClick={() => document.getElementById('add').showModal()}>Add Address</button>
+                                    <dialog id="add" className="modal">
+                                        <div className="modal-box">
+                                            <h3 className="font-bold text-lg">Add New Address</h3>
+                                            <Form />
+                                        </div>
+                                    </dialog>
+                                </div> */}
+
+                                <Liked />
+                            </div>
+                        </>
+                    }
+
+                    {/* orders section */}
+                    {
+                        currentSection === "allOrders" && <>
+                            <div className="p-4 bg-light-golden rounded-lg ">
+                                {/* <div className="mb-5">
+                                    <button className="btn bg-gray-400" onClick={() => document.getElementById('add').showModal()}>Add Address</button>
+                                    <dialog id="add" className="modal">
+                                        <div className="modal-box">
+                                            <h3 className="font-bold text-lg">Add New Address</h3>
+                                            <Form />
+                                        </div>
+                                    </dialog>
+                                </div> */}
+
+                                <AllOrders />
                             </div>
                         </>
                     }

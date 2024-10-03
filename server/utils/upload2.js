@@ -9,6 +9,7 @@ const postStorage = multer.diskStorage({
 });
 
 const upload2 = multer({ storage: postStorage }).fields([
+    { name: 'menuImage', maxCount: 1 }, 
     { name: 'children[0].image', maxCount: 1 },
     { name: 'children[1].image', maxCount: 1 },
     { name: 'children[2].image', maxCount: 1 },

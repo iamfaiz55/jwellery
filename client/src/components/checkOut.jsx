@@ -19,7 +19,7 @@ const CheckOut = () => {
     const { data: product, error, isError } = useGetDetailsQuery(id);
     const navigate = useNavigate();
     // console.log("product ", product);
-    console.log("selected prod ", selectedProd);
+    // console.log("selected prod ", selectedProd);
 
     const [quantity, setQuantity] = useState(1);
     const discount = taxes && taxes.find(tax => tax.taxName === 'Discount');
@@ -47,7 +47,7 @@ const CheckOut = () => {
                 ...cartData,
                 deliveryAddressId: selectedAddress,
                 subtotal: total,
-                cartItems: [{ productId: selectedProd, quantity }],
+                cartItems: [{ productId: selectedProd, quantity, varientId: selectedProd.varient._id }],
             });
             navigate("/user/payment");
         } else {
@@ -120,7 +120,7 @@ const CheckOut = () => {
                     )}
                 </div>
 
-                <div className="md:col-span-2 bg-yellow-50 p-4 space-y-8">
+                <div className="md:col-span-2 bg-yellow-50 p-4 space-y-8 mb-20 md:mb-0">
                     {/* Checkout Message */}
                     <div className="p-4 bg-white shadow rounded-md">
                         <div className="flex items-center border-b pb-4">
@@ -138,7 +138,7 @@ const CheckOut = () => {
                         <div className='text-center font-bold text-3xl'>{error.data.message}</div>
                     ) : (
                         <>
-                            <button className="btn bg-yellow-400 text-black hover:bg-yellow-500" onClick={() => document.getElementById('add').showModal()}>
+                            <button className="btn bg-yellow-400 text-black hover:bg-yellow-500 z-1" onClick={() => document.getElementById('add').showModal()}>
                                 Add Address
                             </button>
                             <dialog id="add" className="modal">

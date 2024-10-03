@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGetTaxesQuery } from '../redux/apis/openApi';
 
 const PaymentPage = () => {
-    const [raz, { isSuccess: razSuccess, data }] = useRazorpayMutation();
+    const [raz, { isSuccess: razSuccess, data, isLoading }] = useRazorpayMutation();
     const { data: paymentMethods } = useGetAllPaymentMethodUserQuery();
     const [initiate, { isSuccess: initiateSuccess }] = useVerifyPaymentMutation();
 
@@ -115,7 +115,9 @@ const PaymentPage = () => {
     useEffect(() => {
         if (isSuccess) {
             toast.success("Order placed successfully! Thank you.");
-            // deleteFull({ userId: user._id });
+            if (cartData.cartItems.length > 1) {
+                deleteFull({ userId: user._id });
+            }
             navigate("/");
             setCartData({});
             localStorage.removeItem("cartData");
@@ -125,8 +127,11 @@ const PaymentPage = () => {
     useEffect(() => {
         if (initiateSuccess) {
             toast.success("Order placed successfully! Thank you.");
-            deleteFull({ userId: user._id });
+            if (cartData.cartItems.length > 1) {
+                deleteFull({ userId: user._id });
+            }
             setCartData({});
+            navigate("/");
             localStorage.removeItem("cartData");
         }
     }, [initiateSuccess]);
@@ -140,77 +145,87 @@ const PaymentPage = () => {
     return (
         <div className=''>
             <div className="flex justify-center items-center  bg-light-golden p-4">
-                <div className="credit-card w-full max-w-sm mb-32 shadow-md rounded-xl mt-5 bg-white">
-                    <header className="flex flex-col items-center p-4">
-                        <ul className="flex mt-2">
-                            <li className="mx-1">
-                                <img
-                                    className="w-12"
-                                    src="https://www.computop-paygate.com/Templates/imagesaboutYou_desktop/images/computop.png"
-                                    alt="computop"
-                                />
-                            </li>
-                            <li className="mx-1">
-                                <img
-                                    className="w-10"
-                                    src="https://www.computop-paygate.com/Templates/imagesaboutYou_desktop/images/verified-by-visa.png"
-                                    alt="verified by visa"
-                                />
-                            </li>
-                            <li className="mx-1">
-                                <img
-                                    className="w-6"
-                                    src="https://www.computop-paygate.com/Templates/imagesaboutYou_desktop/images/mastercard-id-check.png"
-                                    alt="mastercard id check"
-                                />
-                            </li>
-                        </ul>
-                    </header>
-                    <main className="p-4">
-                        <h1 className="text-lg font-semibold text-gray-700 text-center mb-4">
-                            Payment Options
-                        </h1>
-                        <form onSubmit={handleSubmit}>
+                {
+                    isLoading
+                        ? <>
+                            <div className="absolute inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-10">
+                                <div className="text-white text-lg">Loading...</div>
+                            </div>
+                        </>
+                        : <>
+                            <div className="credit-card w-full max-w-sm mb-32 shadow-md rounded-xl mt-5 bg-white">
+                                <header className="flex flex-col items-center p-4">
+                                    <ul className="flex mt-2">
+                                        <li className="mx-1">
+                                            <img
+                                                className="w-12"
+                                                src="https://www.computop-paygate.com/Templates/imagesaboutYou_desktop/images/computop.png"
+                                                alt="computop"
+                                            />
+                                        </li>
+                                        <li className="mx-1">
+                                            <img
+                                                className="w-10"
+                                                src="https://www.computop-paygate.com/Templates/imagesaboutYou_desktop/images/verified-by-visa.png"
+                                                alt="verified by visa"
+                                            />
+                                        </li>
+                                        <li className="mx-1">
+                                            <img
+                                                className="w-6"
+                                                src="https://www.computop-paygate.com/Templates/imagesaboutYou_desktop/images/mastercard-id-check.png"
+                                                alt="mastercard id check"
+                                            />
+                                        </li>
+                                    </ul>
+                                </header>
+                                <main className="p-4">
+                                    <h1 className="text-lg font-semibold text-gray-700 text-center mb-4">
+                                        Payment Options
+                                    </h1>
+                                    <form onSubmit={handleSubmit}>
 
-                            <div className="my-4 flex items-center">
-                                <input
-                                    type="radio"
-                                    id="cod"
-                                    name="paymentMethod"
-                                    value="cod"
-                                    checked={paymentMethod === 'cod'}
-                                    onChange={handlePaymentMethodChange}
-                                    className="form-radio size-6"
-                                    disabled={!paymentMethods?.find(pm => pm.method === 'cod' && pm.active)}
-                                />
-                                <label htmlFor="cod" className="ml-2 text-gray-700 text-2xl">
-                                    Cash On Delivery
-                                </label>
+                                        <div className="my-4 flex items-center">
+                                            <input
+                                                type="radio"
+                                                id="cod"
+                                                name="paymentMethod"
+                                                value="cod"
+                                                checked={paymentMethod === 'cod'}
+                                                onChange={handlePaymentMethodChange}
+                                                className="form-radio size-6"
+                                                disabled={!paymentMethods?.find(pm => pm.method === 'cod' && pm.active)}
+                                            />
+                                            <label htmlFor="cod" className="ml-2 text-gray-700 text-2xl">
+                                                Cash On Delivery
+                                            </label>
+                                        </div>
+                                        <div className="my-4 flex items-center">
+                                            <input
+                                                type="radio"
+                                                id="razorpay"
+                                                name="paymentMethod"
+                                                value="razorpay"
+                                                checked={paymentMethod === 'razorpay'}
+                                                onChange={handlePaymentMethodChange}
+                                                className="form-radio size-6"
+                                                disabled={!paymentMethods?.find(pm => pm.method === 'razorpay' && pm.active)}
+                                            />
+                                            <label htmlFor="razorpay" className="ml-2 text-gray-700 text-2xl">
+                                                Razorpay
+                                            </label>
+                                        </div>
+                                        <button
+                                            type="submit"
+                                            className="w-full py-2 px-4 bg-light-golden text-golden font-semibold rounded-lg shadow-md"
+                                        >
+                                            Pay Now
+                                        </button>
+                                    </form>
+                                </main>
                             </div>
-                            <div className="my-4 flex items-center">
-                                <input
-                                    type="radio"
-                                    id="razorpay"
-                                    name="paymentMethod"
-                                    value="razorpay"
-                                    checked={paymentMethod === 'razorpay'}
-                                    onChange={handlePaymentMethodChange}
-                                    className="form-radio size-6"
-                                    disabled={!paymentMethods?.find(pm => pm.method === 'razorpay' && pm.active)}
-                                />
-                                <label htmlFor="razorpay" className="ml-2 text-gray-700 text-2xl">
-                                    Razorpay
-                                </label>
-                            </div>
-                            <button
-                                type="submit"
-                                className="w-full py-2 px-4 bg-light-golden text-golden font-semibold rounded-lg shadow-md"
-                            >
-                                Pay Now
-                            </button>
-                        </form>
-                    </main>
-                </div>
+                        </>
+                }
             </div>
         </div>
     );

@@ -13,6 +13,7 @@ const Details = () => {
     const { data: reviews } = useGetReviewsQuery(id);
     const { data, isError: isDetailError, error: detailsError } = useGetDetailsQuery(id);
     const { data: taxes } = useGetTaxesQuery();
+    const [liked, setLiked] = useState(false);
 
     const navigate = useNavigate();
     const [addToCart, { isSuccess, isError: isAddError, error: addError }] = useAddCartMutation();
@@ -123,6 +124,10 @@ const Details = () => {
         setSelectedVariant(selected);
 
     };
+    const handleLikeClick = async () => {
+        setLiked((prevLiked) => !prevLiked);
+        await like({ uId: user._id, pId: id });
+    };
 
     return (
         <section className="text-gray-700 body-font overflow-hidden bg-light-golden">
@@ -142,6 +147,18 @@ const Details = () => {
                             onMouseEnter={handleMouseEnter}
                             onMouseLeave={handleMouseLeave}
                         />
+                        {/* Thumbnail Gallery */}
+                        <div className="flex flex-wrap mt-4 sm:hidden">
+                            {data?.images.map((image, index) => (
+                                <img
+                                    key={index}
+                                    src={image}
+                                    alt={`Thumbnail ${index + 1}`}
+                                    className="w-24 h-24 object-cover rounded-lg cursor-pointer m-2"
+                                    onClick={() => handleThumbnailClick(image)}
+                                />
+                            ))}
+                        </div>
                         {zoomedImage && (
                             <div
                                 className="absolute border border-gray-300 rounded-lg"
@@ -172,7 +189,7 @@ const Details = () => {
 
 
                         {/* Variant Selection Dropdown */}
-                        <select onChange={(e) => handleVariantChange(e.target.value)} className="select select-warning m-5">
+                        <select onChange={(e) => handleVariantChange(e.target.value)} className="select select-dark border-1 border-black ml-1 bg-light-golden">
                             {data && data.varient.map(item => (
                                 <option key={item._id} value={item._id}>
                                     {item.height}
@@ -196,33 +213,48 @@ const Details = () => {
                             <span className="ml-3 text-gray-600 text-sm">({calculateRating()}/5)</span>
                         </div>
 
-                        <div className="flex items-center mb-6">
-                            <h4 className="text-lg font-medium mr-4">Price: ${discountedPrice(selectedVariant?.price) || 'Price'}</h4>
-                            <button
-                                onClick={() => {
-                                    navigate(`/user/checkout/${data?._id}`)
-                                    // console.log(setselectedProd({}))
-                                    setselectedProd({ ...data, varient: selectedVariant })
+                        <div className="block md:flex items-center mb-6">
+                            <h4 className="text-lg font-medium text-center">Price: ${discountedPrice(selectedVariant?.price) || 'Price'}</h4>
+                            <div className="flex flex-col sm:flex-row">
+                                <button
+                                    onClick={() => {
+                                        navigate(`/user/checkout/${data?._id}`);
+                                        setselectedProd({ ...data, varient: selectedVariant });
+                                    }}
+                                    className=" btn flex m-4 text-white justify-center bg-red-500 border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded mb-2 sm:mb-0"
+                                >
+                                    Buy
+                                </button>
+                                <button
+                                    onClick={() => addToCart({ pId: data._id, uId: user?._id, varientId: selectedVariant._id })}
+                                    className="btn flex m-4 justify-center text-white bg-blue-500 border-0 py-2 px-6 focus:outline-none hover:bg-blue-600 rounded mb-2 sm:mb-0"
+                                >
+                                    Add to Cart
+                                </button>
 
-                                }}
-                                className="flex ml-4 text-white bg-red-500 border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded"
-                            >
-                                Buy
-                            </button>
-                            <button
-                                onClick={() => addToCart({ pId: data._id, uId: user?._id, varientId: selectedVariant._id })}
-                                className="flex ml-4 text-white bg-blue-500 border-0 py-2 px-6 focus:outline-none hover:bg-blue-600 rounded"
-                            >
-                                Add to Cart
-                            </button>
-
+                                {/* Like Button */}
+                                <div className="text-center">
+                                    <button onClick={handleLikeClick} className="m-5">
+                                        {liked ? (
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="#f44336" viewBox="0 0 24 24" className="w-8 h-8">
+                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                            </svg>
+                                        ) : (
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-8 h-8">
+                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="#f44336" strokeWidth="2" />
+                                            </svg>
+                                        )}
+                                        {/* <span className="ml-2">{liked ? "Liked" : "Like"}</span> */}
+                                    </button>
+                                </div>
+                            </div>
 
                         </div>
                     </motion.div>
                 </div>
 
                 {/* Thumbnail Gallery */}
-                <div className="flex flex-wrap mt-4">
+                <div className="hidden md:flex flex-wrap mt-4">
                     {data?.images.map((image, index) => (
                         <img
                             key={index}
@@ -233,6 +265,7 @@ const Details = () => {
                         />
                     ))}
                 </div>
+
                 <Review />
             </div>
         </section>

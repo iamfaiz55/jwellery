@@ -253,11 +253,40 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 providesTags: ["user"]
             }),
+          getProfile: builder.query({
+                query:(id) => {
+                    return {
+                        url: `/get-profile/${id}`,
+                        method: "GET",
+                        // body: reviewData
+                    }
+                },
+                transformResponse:data => data.result,
+                providesTags: ["user"]
+            }),
 
             updateProfile: builder.mutation({
                 query: data => {
                     return {
                         url: `/update-profile`,
+                        method: "PUT",
+                        body: data
+                    }
+                },
+                transformResponse:data => {
+                    const userProfile = JSON.parse(localStorage.getItem("user"));
+        
+                    if (userProfile._id == data.result._id) {
+                        // userProfile.image = data.result.image;
+                        localStorage.setItem("user", JSON.stringify(data.result));
+                    }   
+                },
+                invalidatesTags: ["user"]
+            }),
+            updateProfileData: builder.mutation({
+                query: data => {
+                    return {
+                        url: `/update-profile-data/${data._id}`,
                         method: "PUT",
                         body: data
                     }
@@ -310,6 +339,8 @@ export const {
     // useGetReviewsMutation,
     usePostReviewMutation,
     useGetReviewsQuery,
-    useGetAllPaymentMethodUserQuery
+    useGetAllPaymentMethodUserQuery,
+    useGetProfileQuery,
+    useUpdateProfileDataMutation
     
 } = userApi

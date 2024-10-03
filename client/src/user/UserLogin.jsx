@@ -62,7 +62,7 @@ const UserLogin = () => {
     return (
         <>
             {isLoading ? (
-                <div className="flex items-center justify-center min-h-screen p-5 bg-light-golden min-w-screen">
+                <div className="flex items-center justify-center  p-5 bg-light-golden ">
                     <div className="flex space-x-2 animate-pulse">
                         <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
                         <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
@@ -78,12 +78,12 @@ const UserLogin = () => {
                 >
                     <button className="hidden" ref={btnRef} onClick={() => document.getElementById('my_modal_1').showModal()}>open modal</button>
 
-                    <div className="grid place-items-center mx-2 my-20 sm:my-auto mb-96 lg:mb-24">
+                    <div className=" flex justify-center sm:mb-20  md:mb-24 ">
                         <motion.div
                             className="w-11/12 p-12 sm:w-8/12 md:w-6/12 lg:w-5/12 2xl:w-4/12 px-6 py-10 mt-10 sm:px-10 sm:py-6 bg-white rounded-lg shadow-md lg:shadow-lg"
                             variants={containerVariants}
                         >
-                            <h2 className="text-center font-semibold text-3xl lg:text-4xl text-gray-800">
+                            <h2 className=" text-center font-semibold text-3xl lg:text-4xl text-gray-800">
                                 User Login
                             </h2>
                             {/* <pre>{JSON.stringify(formik.values, null, 2)}</pre> */}
@@ -115,7 +115,7 @@ const UserLogin = () => {
                                 <motion.button
                                     onClick={e => loginUser(formik.values)}
                                     type="submit"
-                                    className="w-full py-3 mt-10 bg-gray-800 rounded-sm font-medium text-white uppercase focus:outline-none hover:bg-gray-700 hover:shadow-none"
+                                    className=" w-full btn font-bold mt-5 bg-yellow-200 rounded-lg text2xl text-golden uppercase focus:outline-none hover:bg-golden hover:text-white hover:shadow-none"
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                 >
@@ -123,17 +123,17 @@ const UserLogin = () => {
                                 </motion.button>
 
                                 <div className="sm:flex sm:flex-wrap mt-8 sm:mb-4 text-sm text-center">
-                                    <a href="#" className="flex-2 underline">
+                                    {/* <a href="#" className="flex-2 underline">
                                         Forgot password?
-                                    </a>
+                                    </a> */}
 
-                                    <p className="flex-1 text-gray-500 text-md mx-4 my-1 sm:my-auto">
+                                    {/* <p className="flex-1 text-gray-500 text-md mx-4 my-1 sm:my-auto">
                                         or
-                                    </p>
+                                    </p> */}
 
-                                    <Link to="/user/register" className="flex-2 underline">
+                                    {/* <Link to="/user/register" className="flex-2 underline">
                                         Create an Account
-                                    </Link>
+                                    </Link> */}
                                 </div>
                             </form>
                         </motion.div>
