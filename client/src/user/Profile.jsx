@@ -14,8 +14,10 @@ import {
 import { useFormik } from 'formik';
 import Liked from '../components/Liked';
 import AllOrders from './AllOrders';
+import { useLogoutUserMutation } from '../redux/apis/userAuthApi';
 
 const Profile = () => {
+    const [logoutUser, { isSuccess: logoutSuccess }] = useLogoutUserMutation()
     const [isSmallSidebarOpen, setIsSmallSidebarOpen] = useState(false);
     const [currentSection, setCurrentSection] = useState('profile');
     const [updateProfile, { isSuccess, isLoading }] = useUpdateProfileMutation();
@@ -78,6 +80,12 @@ const Profile = () => {
         }
     }, [updateSuccess])
 
+    useEffect(() => {
+        if (logoutSuccess) {
+            toast.success("User Logout Success")
+        }
+    }, [logoutSuccess])
+
     return (
         <div className="flex  bg-light-golden">
             {/* Sidebar */}
@@ -113,6 +121,9 @@ const Profile = () => {
                         setCurrentSection={setCurrentSection}
                         setIsSmallSidebarOpen={setIsSmallSidebarOpen}
                     />
+                    <div className="text-center">
+                        <button onClick={e => logoutUser(user && user._id)} className='btn w-24 mt-16 bg-gray-600 text-white'>Logout</button>
+                    </div>
                 </nav>
             </div>
 
@@ -146,7 +157,7 @@ const Profile = () => {
                         setIsSmallSidebarOpen={setIsSmallSidebarOpen}
                     />
                     <div className="text-center">
-                        <button className='btn w-24 mt-16 bg-gray-600 text-white'>Logout</button>
+                        <button onClick={e => logoutUser(user && user._id)} className='btn w-24 mt-16 bg-gray-600 text-white'>Logout</button>
                     </div>
                 </nav>
             </div>

@@ -21,8 +21,7 @@ const CartCheckOut = () => {
     // console.log(cartData.cartItems);
     const finalData = cartData && cartData.cartItems.map(item => {
         const x = item.productId.varient.find(v => v._id == item.varientId)
-        // console.log("item", item);
-        // console.log("item", );
+
 
         return { ...item, varient: x }
     })

@@ -22,7 +22,7 @@ const UserLogin = () => {
 
         },
         validationSchema: yup.object({
-            mobile: yup.string().email().required("Enter Email"),
+            mobile: yup.string().required("Enter Mobile Number"),
 
         }),
         onSubmit: (values, { resetForm }) => {

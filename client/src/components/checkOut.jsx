@@ -307,6 +307,9 @@ const Form = ({ edit }) => {
                 <button type="submit" disabled={isLoading} className="submit-button px-4 py-2 rounded-md bg-yellow-400 text-white w-full text-md font-semibold transition-colors hover:bg-yellow-500">
                     {isLoading ? "Adding..." : "Add Address"}
                 </button>
+                <button type="button" onClick={() => document.getElementById(edit ? "update" : "add").close()} className="btn">
+                    Close
+                </button>
             </div>
         </form>
     );

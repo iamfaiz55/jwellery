@@ -1,7 +1,8 @@
 const asyncHandler = require("express-async-handler")
 const jwt = require("jsonwebtoken")
 const { checkEmpty } = require("../utils/checkEmpty")
-const User = require("../models/User")
+const User = require("../models/User");
+const { sendOtpToUser } = require("../utils/otp");
 
 exports.loginUser = asyncHandler(async (req, res) => {
     const { mobile } = req.body;
@@ -11,19 +12,21 @@ exports.loginUser = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "All Fields required", error });
     }
     let user = await User.findOne({ mobile });
-    if (!user) {
+    const otp = Math.floor(10000 + Math.random() * 900000)
+    if (!user) {    
       
-           const otp = Math.floor(10000 + Math.random() * 900000)
         //    send otp to userr
+         await sendOtpToUser(mobile, otp);
 
          await User.create({mobile, otp})
            
           return res.json({ message: "OTP sent for User registration", result:  mobile  });
     } else {
-        const otp = Math.floor(10000 + Math.random() * 900000)
         //    send otp to userr
 
-        const updateUserOtp = await User.findByIdAndUpdate(user._id, {otp})
+        await sendOtpToUser(mobile, otp);
+
+         await User.findByIdAndUpdate(user._id, {otp})
 
         return res.status(200).json({message: "OTP sent Success Fir Login" ,result:mobile });
     }

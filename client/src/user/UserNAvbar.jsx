@@ -18,6 +18,8 @@ const UserNavbar = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const { user } = useSelector(state => state.userData);
     const { data: cartItems, isError, error } = useGetAllCartItemsQuery(user && user._id);
+    // console.log(cartItems);
+
     const { data: allCategories } = useGetAllCAtegoriesQuery();
 
     useEffect(() => {
@@ -26,16 +28,13 @@ const UserNavbar = () => {
         }
     }, [error, logoutUser]);
 
-    // console.log(data);
+    // console.log(cartItems);
 
     const subtotal = cartItems?.reduce((acc, item) => {
-        // Find the variant for the product
         const productVariant = item.productId.varient.find(variant => variant._id === item.varientId);
-        // If a matching variant is found, add to the subtotal
         return productVariant ? acc + (productVariant.price * item.quantity) : acc;
     }, 0);
 
-    // Calculate discounts if applicable
     const discount = taxes?.find(tax => tax.taxName === 'Discount')?.percent || 0;
     const discountAmount = (subtotal * discount) / 100;
     const totalAfterDiscount = subtotal - discountAmount;
