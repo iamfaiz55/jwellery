@@ -12,6 +12,7 @@ router
     .get("/details/:pId", userController.getDetails)
 
     .get("/get-tax", adminController.getTax)
+    .post("/post-history", userController.addHistory)
     .get("/get-company", userController.getCompanyDetails)
     .get("/get-scroll-cards", adminController.getAllScrollCards)
     .get("/get-menu-items", adminController.getAllMenuItems)

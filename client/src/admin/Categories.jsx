@@ -27,7 +27,7 @@ const Categories = () => {
     }, [deleted, refetch]);
 
     return (
-        <div className='bg-light-golden min-h-screen p-5'>
+        <div className='bg-light-golden min-h-screen p-5 dark:bg-gray-800'>
             <div className="text-center mb-5">
                 <button
                     className='btn bg-golden text-white py-2 px-4 rounded-lg hover:bg-amber-600 transition'
@@ -36,8 +36,9 @@ const Categories = () => {
                     Add Category
                 </button>
             </div>
-            <div className="overflow-hidden rounded-lg border border-gray-300 shadow-lg bg-white">
-                <table className="w-full bg-light-golden text-left text-sm text-gray-700">
+            <div className="overflow-hidden rounded-lg border border-gray-300 shadow-lg bg-white dark:bg-gray-900">
+
+                <table className="w-full bg-light-golden text-left text-sm text-gray-700 dark:bg-gray-500">
                     <thead className="bg-golden text-white">
                         <tr>
                             <th scope="col" className="px-6 py-4 font-medium">#</th>
@@ -47,7 +48,7 @@ const Categories = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {data && data.map((cat, i) => (
-                            <tr key={cat._id} className="hover:bg-gray-100 transition">
+                            <tr key={cat._id} className="hover:bg-gray-100 transition dark:hover:bg-golden">
                                 <td className="px-6 py-4">{i + 1}</td>
                                 <td className="px-6 py-4 font-bold text-gray-900">{cat.category}</td>
                                 <td className="px-6 py-4">

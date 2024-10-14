@@ -217,6 +217,17 @@ export const adminApi = createApi({
                 transformResponse:data => data.result,
                 invalidatesTags: ["admin"]
             }),
+            gethistory: builder.query({
+                query: id=> {
+                    return {
+                        url: `/get-history/${id}`,
+                        method: "GET",
+                        // body: categoryData
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
             getAllProductsAdmin: builder.query({
                 query: id=> {
                     return {
@@ -383,5 +394,6 @@ useLazyGetCompanyAddressQuery,
   useDeleteScrollCardMutation,
   useDeleteMenuItemMutation,
   useAddImagesMutation,
-  useDeleteAddImageMutation
+  useDeleteAddImageMutation,
+  useGethistoryQuery
 } = adminApi

@@ -33,12 +33,12 @@ const Contact = () => {
     }, [isSuccess])
 
     return (
-        <div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-light-golden py-6 sm:py-12">
+        <div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-900 py-6 sm:py-12">
             <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="bg-white max-w-4xl mx-auto w-full shadow-lg rounded-lg"
+                className="bg-gray-800 max-w-4xl mx-auto w-full shadow-lg rounded-lg"
             >
                 <div className="grid grid-cols-1 md:grid-cols-6 h-full">
                     <motion.div
@@ -52,7 +52,7 @@ const Contact = () => {
                         </h2>
                         <p className="font-bold text-amber-100 py-8 border-b border-amber-700">
                             Location Address
-                            <span className="font-normal text-xs text-amber-300 block">Kranti Chowk </span>
+                            <span className="font-normal text-xs text-amber-300 block">Kranti Chowk</span>
                         </p>
                         <p className="font-bold text-amber-100 py-8 border-b border-amber-700">
                             Phone Number
@@ -71,28 +71,26 @@ const Contact = () => {
                         initial={{ opacity: 0, x: 50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5, delay: 0.4 }}
-                        className="bg-amber-50 p-14 md:col-span-4 rounded-b-lg md:rounded-r-lg md:rounded-bl-none"
+                        className="bg-gray-700 p-14 md:col-span-4 rounded-b-lg md:rounded-r-lg md:rounded-bl-none"
                     >
                         <h2 className="mb-14 font-bold text-4xl text-amber-500">
                             Contact Us
                         </h2>
-                        {/* <div className="grid gap-6 mb-6 grid-cols-1 md:grid-cols-2"> */}
                         <form onSubmit={formik.handleSubmit}>
                             <div className="flex flex-col my-4">
-                                <input {...formik.getFieldProps("name")} className="py-4 bg-white rounded-full px-6 placeholder:text-xs text-amber-900" placeholder="Enter Name" />
+                                <input {...formik.getFieldProps("name")} className="py-4 bg-gray-800 rounded-full px-6 placeholder:text-xs text-amber-100 border border-amber-700" placeholder="Enter Name" />
                             </div>
-
 
                             <div className="grid gap-6 mb-6 grid-cols-1 md:grid-cols-2">
                                 <div className="flex flex-col">
-                                    <input {...formik.getFieldProps("email")} className="py-4 bg-white rounded-full px-6 placeholder:text-xs text-amber-900" placeholder="Email Address" />
+                                    <input {...formik.getFieldProps("email")} className="py-4 bg-gray-800 rounded-full px-6 placeholder:text-xs text-amber-100 border border-amber-700" placeholder="Email Address" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <input {...formik.getFieldProps("subject")} className="py-4 bg-white rounded-full px-6 placeholder:text-xs text-amber-900" placeholder="Subject" />
+                                    <input {...formik.getFieldProps("subject")} className="py-4 bg-gray-800 rounded-full px-6 placeholder:text-xs text-amber-100 border border-amber-700" placeholder="Subject" />
                                 </div>
                             </div>
                             <div className="mb-6">
-                                <textarea {...formik.getFieldProps("message")} className="w-full bg-white rounded-2xl placeholder:text-xs px-6 py-4 text-amber-900" placeholder="Your message here" rows="8"></textarea>
+                                <textarea {...formik.getFieldProps("message")} className="w-full bg-gray-800 rounded-2xl placeholder:text-xs px-6 py-4 text-amber-100 border border-amber-700" placeholder="Your message here" rows="8"></textarea>
                             </div>
                             <div className="flex justify-center">
                                 <button type='submit' className="rounded-full bg-amber-900 text-white font-bold py-4 px-6 min-w-40 hover:bg-amber-800 transition-all">
@@ -104,6 +102,7 @@ const Contact = () => {
                 </div>
             </motion.div>
         </div>
+
     );
 }
 

@@ -9,10 +9,13 @@ const PaymentMethod = () => {
 
     const handleUpdtae = (id, isActive) => {
         if (isActive) {
-            disable(id)
-        } else {
             enable(id)
+        } else {
+            disable(id)
         }
+        // console.log(id);
+        // console.log(isActive);
+
     }
     useEffect(() => {
         if (isSuccess) {
@@ -28,36 +31,40 @@ const PaymentMethod = () => {
 
     return (
         <div className="overflow-hidden rounded-lg border border-gray-200 shadow-md m-5">
-            <table className="w-full border-collapse bg-light-golden text-left text-sm text-gray-500">
-                <thead className="bg-light-golden">
+            <table className="w-full border-collapse text-left text-sm">
+                <thead className="bg-light-golden dark:bg-gray-800">
                     <tr>
-                        <th scope="col" className="px-6 py-4 font-medium text-gray-900">#</th>
-                        <th scope="col" className="px-6 py-4 font-medium text-gray-900 hidden md:table-cell">Method</th>
-                        <th scope="col" className="px-6 py-4 font-medium text-gray-900 hidden md:table-cell">Action</th>
+                        <th scope="col" className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">#</th>
+                        <th scope="col" className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100 ">Method</th>
+                        <th scope="col" className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100 ">Action</th>
                     </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 border-t border-gray-100">
+                <tbody className="divide-y divide-gray-100 border-t border-gray-100 dark:divide-gray-700 dark:border-gray-700">
                     {data && data.map((item, i) => (
-                        <tr key={item._id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 font-medium text-gray-900">
+                        <tr key={item._id} className="hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">
                                 {i + 1}
                             </td>
-                            <td className="px-6 py-4 hidden md:table-cell">
-                                <h1 className='text-2xl'>{item.method}</h1>
+                            <td className="px-6 py-4 ">
+                                <h1 className='text-2xl text-gray-900 dark:text-gray-100'>{item.method}</h1>
                             </td>
-                            <td className="px-6 py-4 hidden md:table-cell">
+                            <td className="px-6 py-4 ">
                                 <input
                                     type="checkbox"
                                     className="toggle toggle-warning"
                                     defaultChecked={item.active}
-                                    onChange={e => handleUpdtae(item._id, item.active)}
+                                    onChange={e => handleUpdtae(item._id, e.target.checked)}
                                 />
                             </td>
+                            {/* Mobile View: Stack Data */}
+
                         </tr>
                     ))}
                 </tbody>
             </table>
         </div>
+
+
     )
 }
 

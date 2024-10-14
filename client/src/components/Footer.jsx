@@ -2,17 +2,17 @@ import React from 'react';
 import { useGetCompanyDetailsQuery } from '../redux/apis/openApi';
 
 const Footer = () => {
-    const { data } = useGetCompanyDetailsQuery()
+    const { data } = useGetCompanyDetailsQuery();
     return (
-        <footer className="bg-gradient-to-r from-light-golden via-amber-100 to-light-golden">
+        <footer className="bg-light-golden dark:bg-gray-900"> {/* Dark background */}
             <div className="max-w-screen-xl px-4 py-16 mx-auto sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     <div>
-                        <img className="w-40" src={data && data.logo} alt="Jewelry Logo" />
-                        <p className="max-w-xs mt-4 text-sm text-gray-600">
+                        <img className="w-20 md:w-40 " src={data && data.logo} alt="Jewelry Logo" />
+                        <p className="max-w-xs mt-4 text-sm text-gray-900 dark:text-gray-300"> {/* Lighter text */}
                             Discover our exquisite collection of fine jewelry crafted with passion and precision. Elevate your style with our unique designs and timeless pieces.
                         </p>
-                        <div className="flex mt-8 space-x-6 text-gray-600">
+                        <div className="flex mt-8 space-x-6 text-gray-500">
                             <a className="hover:opacity-75" target="_blank" rel="noreferrer" href='https://www.facebook.com/profile.php?id=100030600582965'>
                                 <span className="sr-only"> Facebook </span>
                                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -31,70 +31,42 @@ const Footer = () => {
                                     <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
                                 </svg>
                             </a>
-                            <a href='https://github.com/iamfaiz55' className="hover:opacity-75" target="_blank" rel="noreferrer">
-                                <span className="sr-only"> GitHub </span>
-                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path fillRule="evenodd" d="M12 2C6.48 2 2 6.48 2 12c0 4.418 2.867 8.165 6.838 9.492.5.093.68-.217.68-.482v-1.835c-2.636.575-3.187-1.222-3.187-1.222-.482-1.226-1.178-1.553-1.178-1.553-.96-.662.072-.648.072-.648 1.064.074 1.622 1.088 1.622 1.088.945 1.616 2.476 1.151 3.078.88.093-.683.369-1.15.673-1.413-2.334-.265-4.8-1.167-4.8-5.188 0-1.147.407-2.085 1.08-2.82-.109-.263-.469-1.321.095-2.75 0 0 .872-.278 2.855 1.067.83-.23 1.723-.34 2.612-.344.889.004 1.779.114 2.61.344 1.985-1.345 2.84-1.067 2.84-1.067.558 1.429.208 2.487.097 2.75.677.735 1.084 1.673 1.084 2.82 0 4.033-2.464 4.917-4.805 5.173.379.328.715.977.715 1.975v2.938c0 .269.18.576.686.482C21.134 20.167 24 16.42 24 12 24 6.48 19.52 2 14 2h-2z" clipRule="evenodd" />
-                                </svg>
-                            </a>
                         </div>
                     </div>
-                    <div className="lg:col-span-2">
-                        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
-                            <div>
-                                <h3 className="text-lg font-medium text-gray-900">About</h3>
-                                <ul className="mt-4 space-y-4">
-                                    <li>
-                                        <a href='/user/about' className="text-gray-600 hover:text-gray-800">Our Story</a>
-                                    </li>
-                                    <li>
-                                        <a href='/user/contact' className="text-gray-600 hover:text-gray-800">Contact Us</a>
-                                    </li>
-                                    <li>
-                                        <a href='/user/mission' className="text-gray-600 hover:text-gray-800">Careers</a>
-                                    </li>
-
-                                </ul>
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-medium text-gray-900">Customer Care</h3>
-                                <ul className="mt-4 space-y-4">
-                                    <li>
-                                        <a className="text-gray-600 hover:text-gray-800">Returns</a>
-                                    </li>
-                                    <li>
-                                        <a className="text-gray-600 hover:text-gray-800">Shipping</a>
-                                    </li>
-                                    <li>
-                                        <a className="text-gray-600 hover:text-gray-800">Warranty</a>
-                                    </li>
-                                    <li>
-                                        <a className="text-gray-600 hover:text-gray-800">FAQ</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-medium text-gray-900">Follow Us</h3>
-                                <ul className="mt-4 space-y-4">
-                                    <li>
-                                        <a className="text-gray-600 hover:text-gray-800">Blog</a>
-                                    </li>
-                                    <li>
-                                        <a className="text-gray-600 hover:text-gray-800">Lookbook</a>
-                                    </li>
-                                    <li>
-                                        <a className="text-gray-600 hover:text-gray-800">Newsletter</a>
-                                    </li>
-                                    <li>
-                                        <a className="text-gray-600 hover:text-gray-800">Events</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                    <div>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white">Quick Links</h3>
+                        <ul className="mt-4 space-y-4 text-gray-900 dark:text-gray-400">
+                            <li>
+                                <a href="#" className="hover:underline">Home</a>
+                            </li>
+                            <li>
+                                <a href="#" className="hover:underline">About Us</a>
+                            </li>
+                            <li>
+                                <a href="#" className="hover:underline">Products</a>
+                            </li>
+                            <li>
+                                <a href="#" className="hover:underline">Contact Us</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white">Contact Us</h3> {/* Light text */}
+                        <ul className="mt-4 space-y-4 text-gray-900 dark:text-gray-400">
+                            <li>
+                                <p className="text-sm">123 Jewelry St, City, State</p>
+                            </li>
+                            <li>
+                                <p className="text-sm">faizuddinshaikh55@gmail.com</p>
+                            </li>
+                            <li>
+                                <p className="text-sm">+91 9960 669 724</p>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-                <div className="pt-8 mt-8 border-t border-gray-200 text-center">
-                    <p className="text-sm text-gray-500">© {new Date().getFullYear()} SF Jwellers. All rights reserved.</p>
+                <div className="mt-16 border-t border-gray-700 pt-8 text-center text-gray-400">
+                    <p className="text-sm">© 2024 SF Jewelry. All rights reserved.</p>
                 </div>
             </div>
         </footer>

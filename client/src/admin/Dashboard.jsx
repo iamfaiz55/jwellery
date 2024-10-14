@@ -51,35 +51,29 @@ const Dashboard = () => {
         <div className="hidden sm:block overflow-x-auto shadow-md sm:rounded-lg m-5">
           {/* Table View */}
           <table className="w-full text-sm text-left text-gray-500 border-spacing-2">
-            <thead className="text-xs text-gray-700 uppercase bg-light-golden">
-              <tr className="text-md font-semibold tracking-wide text-left text-gray-900 bg-light-golden uppercase border-b border-gray-600">
-                <th className="p-3 font-bold uppercase text-gray-600">#</th>
-                <th className="p-3 font-bold uppercase text-gray-600">Name</th>
-                <th className="p-3 font-bold uppercase text-gray-600">Image</th>
-                <th className="p-3 font-bold uppercase text-gray-600">Description</th>
-                <th className="p-3 font-bold uppercase text-gray-600">Varient</th>
-                {/* <th className="p-3 font-bold uppercase text-gray-600">Price</th> */}
-                {/* <th className="p-3 font-bold uppercase text-gray-600">MRP</th> */}
-                {/* <th className="p-3 font-bold uppercase text-gray-600">Discount</th> */}
-                {/* <th className="p-3 font-bold uppercase text-gray-600">Width</th> */}
-                {/* <th className="p-3 font-bold uppercase text-gray-600">Weight</th> */}
-                <th className="p-3 font-bold uppercase text-gray-600">Material</th>
-                <th className="p-3 font-bold uppercase text-gray-600">Type</th>
-                {/* <th className="p-3 font-bold uppercase text-gray-600">Height</th> */}
-                <th className="p-3 font-bold uppercase text-gray-600">Purity</th>
-                <th className="p-3 font-bold uppercase text-gray-600">Action</th>
+            <thead className="text-xs text-gray-700 uppercase bg-light-golden dark:bg-gray-800">
+              <tr className="text-md font-semibold tracking-wide text-left text-gray-900 bg-light-golden dark:bg-gray-800 uppercase border-b border-gray-600">
+                <th className="p-3 font-bold uppercase text-gray-600 dark:text-gray-300">#</th>
+                <th className="p-3 font-bold uppercase text-gray-600 dark:text-gray-300">Name</th>
+                <th className="p-3 font-bold uppercase text-gray-600 dark:text-gray-300">Image</th>
+                <th className="p-3 font-bold uppercase text-gray-600 dark:text-gray-300">Description</th>
+                <th className="p-3 font-bold uppercase text-gray-600 dark:text-gray-300">Variant</th>
+                <th className="p-3 font-bold uppercase text-gray-600 dark:text-gray-300">Material</th>
+                <th className="p-3 font-bold uppercase text-gray-600 dark:text-gray-300">Type</th>
+                <th className="p-3 font-bold uppercase text-gray-600 dark:text-gray-300">Purity</th>
+                <th className="p-3 font-bold uppercase text-gray-600 dark:text-gray-300">Action</th>
               </tr>
             </thead>
             <tbody>
               {data && data.map((item, i) => {
                 if (!item.isDelete) {
                   return (
-                    <tr key={item._id} className="bg-light-golden hover:bg-white transition">
-                      <td className="p-3 text-gray-800 text-center border-b">{i + 1}</td>
-                      <td className="p-3 text-gray-800 text-center border-b">{item.name}</td>
+                    <tr key={item._id} className="bg-light-golden hover:bg-white dark:bg-gray-700 dark:hover:bg-gray-800 transition">
+                      <td className="p-3 text-gray-800 dark:text-gray-200 text-center border-b">{i + 1}</td>
+                      <td className="p-3 text-gray-800 dark:text-gray-200 text-center border-b">{item.name}</td>
 
                       {/* Display multiple images */}
-                      <td className="p-3 text-gray-800 text-center border-b">
+                      <td className="p-3 text-gray-800 dark:text-gray-200 text-center border-b">
                         <div className="flex flex-wrap justify-center gap-2">
                           {item.images.map((img, idx) => (
                             <img
@@ -94,37 +88,32 @@ const Dashboard = () => {
                         </div>
                       </td>
 
-                      <td className="p-3 text-gray-800 text-center border-b">{item.mainDesc || "no description"}</td>
-                      <td className="p-3 text-gray-800 text-center border-b">
-                        <button className='btn btn-circle bg-golden hover:bg-yellow-700' onClick={e => {
+                      <td className="p-3 text-gray-800 dark:text-gray-200 text-center border-b">{item.mainDesc || "no description"}</td>
+                      <td className="p-3 text-gray-800 dark:text-gray-200 text-center border-b">
+                        <button className='btn btn-circle bg-golden dark:bg-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-500 text-black' onClick={e => {
                           document.getElementById("variant").showModal()
                           setVarients(item.varient)
                         }}>open</button>
                       </td>
-                      {/* <td className="p-3 text-gray-800 text-center border-b">{item.mrp}</td> */}
-                      {/* <td className="p-3 text-gray-800 text-center border-b">{item.discount}</td> */}
-                      {/* <td className="p-3 text-gray-800 text-center border-b">{item.width}</td> */}
-                      {/* <td className="p-3 text-gray-800 text-center border-b">{item.prductWeight}</td> */}
-                      <td className="p-3 text-gray-800 text-center border-b">{item.material}</td>
-                      <td className="p-3 text-gray-800 text-center border-b">{item.productType}</td>
-                      {/* <td className="p-3 text-gray-800 text-center border-b">{item.height}</td> */}
-                      <td className="p-3 text-gray-800 text-center border-b">{item.purity}</td>
+                      <td className="p-3 text-gray-800 dark:text-gray-200 text-center border-b">{item.material}</td>
+                      <td className="p-3 text-gray-800 dark:text-gray-200 text-center border-b">{item.productType}</td>
+                      <td className="p-3 text-gray-800 dark:text-gray-200 text-center border-b">{item.purity}</td>
 
-                      <td className="p-3 text-gray-800 text-center border-b">
+                      <td className="p-3 text-gray-800 dark:text-gray-200 text-center border-b">
                         <button
                           type="button"
                           onClick={() => {
                             document.getElementById('update').showModal();
                             setEditData(item);
                           }}
-                          className="btn bg-green-300 hover:bg-green-400 transition"
+                          className="btn bg-green-300 dark:bg-green-500 hover:bg-green-400 dark:hover:bg-green-400 transition"
                         >
                           Edit
                         </button>
                         <button
                           type="button"
                           onClick={() => deleteProduct(item._id)}
-                          className="btn bg-red-500 hover:bg-red-600 transition"
+                          className="btn bg-red-500 dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700 transition"
                         >
                           Delete
                         </button>
@@ -132,9 +121,9 @@ const Dashboard = () => {
                     </tr>
                   );
                 }
+                return null; // Handle deleted items
               })}
             </tbody>
-
           </table>
         </div>
 
@@ -143,7 +132,7 @@ const Dashboard = () => {
           {data && data.map((item) => {
             if (!item.isDelete) {
               return (
-                <div key={item._id} className="bg-light-golden p-4 rounded-lg shadow-md">
+                <div key={item._id} className="bg-light-golden dark:bg-gray-800 p-4 rounded-lg shadow-md">
                   <div className="text-center">
                     {/* Display all images */}
                     <div className="grid grid-cols-2 gap-2">
@@ -159,12 +148,12 @@ const Dashboard = () => {
                       ))}
                     </div>
                   </div>
-                  <h4 className="text-lg font-bold mb-2">{item.name}</h4>
-                  <p className="mb-2">Description: {item.mainDesc || "No description"}</p>
+                  <h4 className="text-lg font-bold mb-2 text-gray-800 dark:text-gray-200">{item.name}</h4>
+                  <p className="mb-2 text-gray-800 dark:text-gray-200">Description: {item.mainDesc || "No description"}</p>
 
                   {/* Add a button to open the variants modal */}
                   <button
-                    className="btn  bg-golden hover:bg-yellow-700 mt-2"
+                    className="btn bg-golden dark:bg-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-500 mt-2"
                     onClick={() => {
                       document.getElementById("variant").showModal();
                       setVarients(item.varient);
@@ -173,22 +162,22 @@ const Dashboard = () => {
                   </button>
 
                   <div className="mt-4">
-                    <p><strong>Material:</strong> {item.material}</p>
-                    <p><strong>Type:</strong> {item.productType}</p>
-                    <p><strong>Purity:</strong> {item.purity}</p>
+                    <p className="text-gray-800 dark:text-gray-200"><strong>Material:</strong> {item.material}</p>
+                    <p className="text-gray-800 dark:text-gray-200"><strong>Type:</strong> {item.productType}</p>
+                    <p className="text-gray-800 dark:text-gray-200"><strong>Purity:</strong> {item.purity}</p>
                     <div className="flex justify-between mt-2">
                       <button
                         onClick={() => {
                           document.getElementById('update').showModal();
                           setEditData(item);
                         }}
-                        className="btn bg-green-300 hover:bg-green-400 transition"
+                        className="btn bg-green-300 dark:bg-green-500 hover:bg-green-400 dark:hover:bg-green-400 transition"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => deleteProduct(item._id)}
-                        className="btn bg-red-500 hover:bg-red-600 transition"
+                        className="btn bg-red-500 dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700 transition"
                       >
                         Delete
                       </button>
@@ -200,6 +189,7 @@ const Dashboard = () => {
             return null; // Return null if item is deleted
           })}
         </div>
+
 
         {/* Update Modal */}
         <dialog id="update" className="modal modal-bottom sm:modal-middle">

@@ -15,20 +15,21 @@ import { useFormik } from 'formik';
 import Liked from '../components/Liked';
 import AllOrders from './AllOrders';
 import { useLogoutUserMutation } from '../redux/apis/userAuthApi';
+import BottomNav from './BottomNav';
+import { usePostHistoryMutation } from '../redux/apis/openApi';
 
 const Profile = () => {
-    const [logoutUser, { isSuccess: logoutSuccess }] = useLogoutUserMutation()
+    const [logoutUser, { isSuccess: logoutSuccess, isLoading: logoutLoading }] = useLogoutUserMutation()
     const [isSmallSidebarOpen, setIsSmallSidebarOpen] = useState(false);
     const [currentSection, setCurrentSection] = useState('profile');
     const [updateProfile, { isSuccess, isLoading }] = useUpdateProfileMutation();
     const { user } = useSelector((state) => state.userData);
-    const { data: userData } = useGetProfileQuery(user && user._id)
-    // console.log(userData);
+
     const [updateProfileData, { isSuccess: updateSuccess, isLoading: updateLoading }] = useUpdateProfileDataMutation()
     const { data, error, isError } = useGetAddressesQuery(user && user._id);
     const [deleteAdress, { isSuccess: addressDeleteSuccess }] = useDeleteAddressMutation();
     const fileInputRef = useRef();
-
+    const [postHistory] = usePostHistoryMutation()
     const handleClick = () => {
         fileInputRef.current.click();
     };
@@ -83,20 +84,34 @@ const Profile = () => {
     useEffect(() => {
         if (logoutSuccess) {
             toast.success("User Logout Success")
+            // postHistory({ userId: user._id, type: "logout" })
         }
     }, [logoutSuccess])
+    useEffect(() => {
+        if (logoutLoading) {
+            // toast.success("User Logout Success")
+            postHistory({ userId: user._id, type: "logout" })
+        }
+    }, [logoutLoading])
+
+    useEffect(() => {
+        if (user) {
+            postHistory({ userId: user._id, type: "profile" })
+        }
+    }, [])
+
 
     return (
-        <div className="flex  bg-light-golden">
+        <div className="flex  bg-light-golden h-screen dark:bg-gray-800">
             {/* Sidebar */}
-            <div className="hidden md:block inset-y-0 left-0 z-30 w-64 overflow-y-auto bg-golden rounded-lg m-2">
+            <div className="hidden md:block inset-y-0 left-0 z-30 w-64 overflow-y-auto bg-golden dark:bg-gray-800 rounded-lg m-2">
                 <div className="flex flex-col items-center mt-20">
                     {
                         user && user.name && <h2 className="text-2xl font-bold text-white">Hi, {user.name}</h2>
                     }
                 </div>
 
-                <nav className="">
+                <nav>
                     <SidebarButton
                         section="profile"
                         currentSection={currentSection}
@@ -122,7 +137,7 @@ const Profile = () => {
                         setIsSmallSidebarOpen={setIsSmallSidebarOpen}
                     />
                     <div className="text-center">
-                        <button onClick={e => logoutUser(user && user._id)} className='btn w-24 mt-16 bg-gray-600 text-white'>Logout</button>
+                        <button onClick={() => logoutUser(user && user._id)} className='btn w-24 mt-16 bg-gray-600 text-white hover:bg-gray-700'>Logout</button>
                     </div>
                 </nav>
             </div>
@@ -131,7 +146,7 @@ const Profile = () => {
                 <div className="flex flex-col items-center">
                     {/* <h2 className="text-2xl font-bold text-white">Hi, {user.mobile}</h2> */}
                 </div>
-                <nav className="">
+                <nav>
                     <SidebarButton
                         section="profile"
                         currentSection={currentSection}
@@ -157,12 +172,13 @@ const Profile = () => {
                         setIsSmallSidebarOpen={setIsSmallSidebarOpen}
                     />
                     <div className="text-center">
-                        <button onClick={e => logoutUser(user && user._id)} className='btn w-24 mt-16 bg-gray-600 text-white'>Logout</button>
+                        <button onClick={() => logoutUser(user && user._id)} className='btn w-24 mt-16 bg-gray-600 text-white hover:bg-gray-700'>Logout</button>
                     </div>
                 </nav>
             </div>
 
-            <div className="flex flex-col flex-1 p-6 overflow-hidden">
+
+            <div className="flex flex-col flex-1 p-6 overflow-hidden  dark:bg-gray-900">
                 {/* Toggle Button for Small Sidebar */}
                 {/* {
                     !isSmallSidebarOpen && <button
@@ -175,14 +191,15 @@ const Profile = () => {
                 } */}
 
 
-                <main className="flex-1 overflow-auto  mb-10">
+                <main className="flex-1 overflow-auto mb-10">
                     {currentSection === 'profile' && (
-                        <div className="p-4 bg-white rounded-lg shadow-md">
+                        <div className="p-4 bg-light-golden rounded-lg shadow-md dark:bg-gray-900">
                             <div className="flex flex-col items-center">
-                                {isLoading ? <>
-                                    <span className="loading loading-spinner text-warning loading-lg"></span>
-
-                                </> : (
+                                {isLoading ? (
+                                    <>
+                                        <span className="loading loading-spinner text-warning loading-lg"></span>
+                                    </>
+                                ) : (
                                     <motion.img
                                         src={user.image}
                                         className="w-24 h-24 rounded-full border-4 border-golden cursor-pointer"
@@ -199,195 +216,155 @@ const Profile = () => {
                                     className="hidden"
                                 />
 
-                                {/* <h4 className="text-2xl font-bold mt-4">Hi, {user && user.mobile && user.mobile}</h4> */}
                                 <div className="text-end">
-                                    <button onClick={e => {
-                                        document.getElementById("update").showModal()
-                                    }} className='btn btn-sm bg-golden m-5'>Edit Profile</button>
-
+                                    <button onClick={() => document.getElementById("update").showModal()} className='btn btn-sm bg-golden m-5 text-black hover:text-white'>Edit Profile</button>
                                 </div>
-                                <dialog id="update" className="modal border-yellow-400 rounded-lg">
-                                    <div className="modal-box  relative">
-                                        {
-                                            updateLoading
-                                                ? <>
-                                                    <div className="absolute inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-10">
-                                                        <div className="text-white text-lg">Loading...</div>
-                                                    </div>
-                                                </>
-                                                : <>
-                                                    <h3 className=" font-bold text-yellow-600">Update Profile</h3>
 
-                                                    <form onSubmit={formik.handleSubmit}>
-                                                        <input
-                                                            {...formik.getFieldProps("name")}
-                                                            type="text"
-                                                            value={formik.values.name}
-                                                            placeholder="Enter Your Name"
-                                                            className="input input-bordered input-warning w-full my-2" />
-                                                        <input
-                                                            {...formik.getFieldProps("mobile")}
-                                                            type="number"
-                                                            value={formik.values.mobile}
-                                                            placeholder="Enter Your Mobile Number"
-                                                            className="input input-bordered input-warning w-full my-2" />
-                                                        <input
-                                                            {...formik.getFieldProps("email")}
-                                                            type="email"
-                                                            value={formik.values.email}
-                                                            placeholder="Enter Your Email"
-                                                            className="input input-bordered input-warning w-full my-2" />
-                                                        <div className="text-right">
-                                                            <button type='submit' className='btn m-3 bg-golden'>Update</button>
-                                                            <button type='button' onClick={e => document.getElementById("update").close()} className='btn m-3 bg-golden'>close</button>
-                                                        </div>
-                                                    </form>
-                                                </>
-                                        }
+                                <dialog id="update" className="modal border-yellow-400 rounded-lg">
+                                    <div className="modal-box relative bg-light-golden text-black dark:text-white dark:bg-gray-900">
+                                        {updateLoading ? (
+                                            <>
+                                                <div className="absolute inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-10">
+                                                    <div className="text-white text-lg">Loading...</div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <h3 className="font-bold text-yellow-600">Update Profile</h3>
+
+                                                <form onSubmit={formik.handleSubmit}>
+                                                    <input
+                                                        {...formik.getFieldProps("name")}
+                                                        type="text"
+                                                        value={formik.values.name}
+                                                        placeholder="Enter Your Name"
+                                                        className="input input-bordered input-warning w-full my-2 dark:bg-gray-700 dark:text-white" />
+                                                    <input
+                                                        {...formik.getFieldProps("mobile")}
+                                                        type="number"
+                                                        value={formik.values.mobile}
+                                                        placeholder="Enter Your Mobile Number"
+                                                        className="input input-bordered input-warning w-full my-2 dark:bg-gray-700 dark:text-white" />
+                                                    <input
+                                                        {...formik.getFieldProps("email")}
+                                                        type="email"
+                                                        value={formik.values.email}
+                                                        placeholder="Enter Your Email"
+                                                        className="input input-bordered input-warning w-full my-2 dark:bg-gray-700 dark:text-white" />
+                                                    <div className="text-right">
+                                                        <button type='submit' className='btn m-3 bg-golden'>Update</button>
+                                                        <button type='button' onClick={() => document.getElementById("update").close()} className='btn m-3 bg-golden'>Close</button>
+                                                    </div>
+                                                </form>
+                                            </>
+                                        )}
                                     </div>
                                 </dialog>
 
-                                {/* <p className="text-gray-500">{user && user.email && user.email}</p> */}
-                            </div>
-                            {/* <!-- component --> */}
-                            <>
+                                <div className="mt-4">
+                                    <div className="relative flex flex-col items-center rounded-[20px] w-full max-w-[700px] mx-auto bg-light-golden dark:bg-gray-800 bg-clip-border shadow-3xl shadow-shadow-500 dark:!bg-navy-800 dark:text-white dark:!shadow-none p-3">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-2 w-full">
+                                            <div className="flex flex-col items-start justify-center rounded-2xl bg-golden dark:bg-gray-800 bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
+                                                <p className="text-sm text-black dark:text-gray-300 ">Name</p>
+                                                <p className="text-base font-medium text-black dark:text-gray-300 overflow-hidden">
+                                                    {user && user.name && user.name}
+                                                </p>
+                                            </div>
 
-                                < >
-                                    <div class="">
-                                        <div class="relative flex flex-col items-center rounded-[20px] w-full max-w-[700px] mx-auto bg-white bg-clip-border shadow-3xl shadow-shadow-500 dark:!bg-navy-800 dark:text-white dark:!shadow-none p-3">
+                                            <div className="flex flex-col justify-center rounded-2xl bg-golden dark:bg-gray-800 bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
+                                                <p className="text-sm text-black dark:text-gray-300">Email</p>
+                                                <p className="text-base font-medium text-black dark:text-gray-300 overflow-hidden">
+                                                    {user && user.email && user.email}
+                                                </p>
+                                            </div>
 
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-2 w-full">
-                                                <div class="flex flex-col items-start justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                    <p class="text-sm text-gray-600">Name</p>
-                                                    <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                        {user && user.name && user.name}
-                                                    </p>
-                                                </div>
-
-                                                <div class="flex flex-col justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                    <p class="text-sm text-gray-600">Email</p>
-                                                    <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                        {user && user.email && user.email}                                                    </p>
-                                                </div>
-
-                                                <div class="flex flex-col items-start justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
-                                                    <p class="text-sm text-gray-600">Mobile</p>
-                                                    <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                        {user && user.mobile}
-                                                    </p>
-                                                </div>
-
-
-
-
-
-
+                                            <div className="flex flex-col items-start justify-center rounded-2xl  bg-golden dark:bg-gray-800 bg-clip-border px-3 py-4 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
+                                                <p className="text-sm text-black dark:text-gray-300">Mobile</p>
+                                                <p className="text-base font-medium text-black dark:text-gray-300 overflow-hidden">
+                                                    {user && user.mobile}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
-
-                                </>
-                            </>
+                                </div>
+                            </div>
                         </div>
                     )}
-                    {/* address sectiomn */}
-                    {
-                        currentSection === "addresses" && <>
-                            <div className="p-4 bg-white rounded-lg shadow-md">
-                                <div className="mb-5">
-                                    <button className="btn bg-gray-400" onClick={() => document.getElementById('add').showModal()}>Add Address</button>
-                                    <dialog id="add" className="modal">
-                                        <div className="modal-box">
-                                            <h3 className="font-bold text-lg">Add New Address</h3>
-                                            <Form />
-                                        </div>
-                                    </dialog>
-                                </div>
 
-                                {isError ? (
-                                    <div className="text-center text-red-500">{error.data.message}</div>
-                                ) : (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {data &&
-                                            data.map((item, index) => (
-                                                <motion.div
-                                                    key={index}
-                                                    className="relative p-4 bg-gray-100 rounded-lg shadow-md"
-                                                    whileHover={{ scale: 1.05 }}
-                                                    transition={{ duration: 0.3 }}
-                                                >
-                                                    <button
-                                                        onClick={() => deleteAdress(item._id)}
-                                                        className="absolute top-2 right-2 p-2 bg-red-200 rounded-full"
-                                                    >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-5 w-5 text-red-500"
-                                                            viewBox="0 0 30 30"
-                                                        >
-                                                            <path d="M14.984 2.486a1 1 0 0 0-.984 1.014V4H8.5A1 1 0 0 0 7.486 5H6a1 1 0 1 0 0 2h18a1 1 0 1 0 0-2h-1.487A1 1 0 0 0 21.5 4h-5.5v-.514a1 1 0 0 0-1.016-1.014zM6 9h1.793L9.777 24.234C9.911 25.241 10.763 26 11.777 26h8.445c1.014 0 1.867-.759 1.988-1.766L22.207 9H6z" />
-                                                        </svg>
-                                                    </button>
-                                                    <h3 className="text-xl font-semibold">Home</h3>
-                                                    <p>
-                                                        <span className="font-medium">House No:</span> {item.houseNo}
-                                                    </p>
-                                                    <p>
-                                                        <span className="font-medium">Country:</span> {item.country}
-                                                    </p>
-                                                    <p>
-                                                        <span className="font-medium">State:</span> {item.state}
-                                                    </p>
-                                                    <p>
-                                                        <span className="font-medium">Pincode:</span> {item.pincode}
-                                                    </p>
-                                                </motion.div>
-                                            ))}
+                    {/* Address Section */}
+                    {currentSection === "addresses" && (
+                        <div className="p-4 bg-light-golden rounded-lg shadow-md dark:bg-gray-900">
+                            <div className="mb-5">
+                                <button className="btn bg-golden dark:bg-gray-700" onClick={() => document.getElementById('add').showModal()}>Add Address</button>
+                                <dialog id="add" className="modal">
+                                    <div className="modal-box">
+                                        <h3 className="font-bold text-lg text-gray-900 dark:text-white">Add New Address</h3>
+                                        <Form />
                                     </div>
-                                )}
+                                </dialog>
                             </div>
-                        </>
-                    }
 
-                    {/* liked section */}
-                    {
-                        currentSection === "liked" && <>
-                            <div className="p-4 bg-light-golden rounded-lg ">
-                                {/* <div className="mb-5">
-                                    <button className="btn bg-gray-400" onClick={() => document.getElementById('add').showModal()}>Add Address</button>
-                                    <dialog id="add" className="modal">
-                                        <div className="modal-box">
-                                            <h3 className="font-bold text-lg">Add New Address</h3>
-                                            <Form />
-                                        </div>
-                                    </dialog>
-                                </div> */}
+                            {isError ? (
+                                <div className="text-center text-red-500 dark:text-red-400">{error.data.message}</div>
+                            ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 bg-light-golden dark:bg-gray-800">
+                                    {data &&
+                                        data.map((item, index) => (
+                                            <motion.div
+                                                key={index}
+                                                className="relative p-4 bg-light-golden dark:bg-gray-800 rounded-lg shadow-md"
+                                                whileHover={{ scale: 1.05 }}
+                                                transition={{ duration: 0.3 }}
+                                            >
+                                                <button
+                                                    onClick={() => deleteAdress(item._id)}
+                                                    className="absolute top-2 right-2 p-2 bg-red-200 dark:bg-red-300 rounded-full"
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="h-5 w-5 text-red-500"
+                                                        viewBox="0 0 30 30"
+                                                    >
+                                                        <path d="M14.984 2.486a1 1 0 0 0-.984 1.014V4H8.5A1 1 0 0 0 7.486 5H6a1 1 0 1 0 0 2h18a1 1 0 1 0 0-2h-1.487A1 1 0 0 0 21.5 4h-5.5v-.514a1 1 0 0 0-1.016-1.014zM6 9h1.793L9.777 24.234C9.911 25.241 10.763 26 11.777 26h8.445c1.014 0 1.867-.759 1.988-1.766L22.207 9H6z" />
+                                                    </svg>
+                                                </button>
+                                                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Home</h3>
+                                                <p className="text-gray-800 dark:text-gray-300">
+                                                    <span className="font-medium">House No:</span> {item.houseNo}
+                                                </p>
+                                                <p className="text-gray-800 dark:text-gray-300">
+                                                    <span className="font-medium">Country:</span> {item.country}
+                                                </p>
+                                                <p className="text-gray-800 dark:text-gray-300">
+                                                    <span className="font-medium">State:</span> {item.state}
+                                                </p>
+                                                <p className="text-gray-800 dark:text-gray-300">
+                                                    <span className="font-medium">Pincode:</span> {item.pincode}
+                                                </p>
+                                            </motion.div>
+                                        ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
 
-                                <Liked />
-                            </div>
-                        </>
-                    }
+                    {/* Liked Section */}
+                    {currentSection === "liked" && (
+                        <div className="p-4 bg-light-golden rounded-lg shadow-md dark:bg-gray-900">
+                            <Liked />
+                        </div>
+                    )}
 
-                    {/* orders section */}
-                    {
-                        currentSection === "allOrders" && <>
-                            <div className="p-4 bg-light-golden rounded-lg ">
-                                {/* <div className="mb-5">
-                                    <button className="btn bg-gray-400" onClick={() => document.getElementById('add').showModal()}>Add Address</button>
-                                    <dialog id="add" className="modal">
-                                        <div className="modal-box">
-                                            <h3 className="font-bold text-lg">Add New Address</h3>
-                                            <Form />
-                                        </div>
-                                    </dialog>
-                                </div> */}
-
-                                <AllOrders />
-                            </div>
-                        </>
-                    }
+                    {/* Orders Section */}
+                    {currentSection === "allOrders" && (
+                        <div className="p-4 bg-light-golden rounded-lg shadow-md dark:bg-gray-900">
+                            <AllOrders />
+                        </div>
+                    )}
                 </main>
+
             </div>
+            <BottomNav />
         </div>
     );
 };

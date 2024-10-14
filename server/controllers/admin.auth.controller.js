@@ -78,7 +78,7 @@ exports.verifyOTP = asyncHandler(async (req, res) => {
     if (!validator.isEmail(email)) {
         return res.status(401).json({ message: "Invalid Email" })
     }
-    
+
 
     const result = await Admin.findOne({ email })
 // console.log(result);
@@ -90,7 +90,11 @@ exports.verifyOTP = asyncHandler(async (req, res) => {
     if (otp != result.otp) {
         return res.status(401).json({ message: "Invalid OTP" })
     }
-    const token = jwt.sign({ userId: result._id }, process.env.JWT_KEY, { expiresIn: "1d" })
+    const token = jwt.sign(
+        { userId: result._id }, 
+        process.env.JWT_KEY,
+         { expiresIn: "1d" }
+        )
 
     res.cookie("admin", token, {
         maxAge: 86400000,
@@ -109,6 +113,8 @@ exports.verifyOTP = asyncHandler(async (req, res) => {
         }
     })
 })
+
+
 
 exports.logoutAdmin = asyncHandler(async (req, res) => {
     res.clearCookie("admin")

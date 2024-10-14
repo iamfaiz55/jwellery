@@ -61,11 +61,11 @@ export const userAuthApi = createApi({
             }),
         
             logoutUser: builder.mutation({
-                query: userData => {
+                query: id => {
                     return {
-                        url: "/logout-user",
+                        url: `/logout-user/${id}`,
                         method: "POST",
-                        body: userData
+                        // body: userData
                     }
                 },
                 transformResponse:data => {

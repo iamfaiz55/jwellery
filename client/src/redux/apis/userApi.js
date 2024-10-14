@@ -241,6 +241,7 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 invalidatesTags: ["user"]
             }),
+      
             // updateProfile: builder.mutation({
           getReviews: builder.query({
                 query:(id) => {
@@ -341,6 +342,7 @@ export const {
     useGetReviewsQuery,
     useGetAllPaymentMethodUserQuery,
     useGetProfileQuery,
-    useUpdateProfileDataMutation
+    useUpdateProfileDataMutation,
+    // usePostHistoryMutation
     
 } = userApi

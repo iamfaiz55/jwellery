@@ -41,9 +41,9 @@ const UserNavbar = () => {
 
 
     return <>
-        <div className="bg-light-golden py-2">
+        <div className="bg-light-golden dark:bg-gray-800 py-2">
             <div className="m-2 md:m-5 z-20 relative">
-                <div className="navbar rounded-lg bg-light-golden ">
+                <div className="navbar rounded-lg bg-light-golden dark:bg-gray-800">
                     <div className="flex-1 flex items-center space-x-4">
                         <Link to="/">
                             <div className="justify-center">
@@ -53,24 +53,25 @@ const UserNavbar = () => {
                         <div className="md:hidden flex-none">
                             <button
                                 onClick={() => setSidebarOpen(!isSidebarOpen)}
-                                className="btn btn-ghost hover:bg-gray-200 transition duration-300 ease-in-out"
+                                className="btn btn-ghost hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 ease-in-out"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
                                 </svg>
                             </button>
                         </div>
-                        <div className="hidden md:flex  flex-grow justify-center space-x-6 ">
+                        <div className="hidden md:flex flex-grow justify-center space-x-6">
+                            {/* Products Dropdown */}
                             <div className="dropdown dropdown-hover relative">
-                                <div className="btn btn-ghost hover:bg-gray-200 transition duration-1000 ease-in-out">
+                                <div className="btn btn-ghost hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-1000 ease-in-out">
                                     Products
                                 </div>
-                                <div className="dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-[180px] p-2 shadow transition-all duration-1000 ease-in-out">
+                                <div className="dropdown-content bg-light-golden dark:bg-gray-800 rounded-box z-[1] mt-3 w-[180px] p-2 shadow transition-all duration-1000 ease-in-out">
                                     {allCategories?.map((category) => (
                                         <Link
                                             key={category._id}
                                             onClick={() => setSelectedType(category.category)}
-                                            className="block py-1 px-2 hover:bg-gray-300 rounded text-sm font-bold"
+                                            className="block py-1 px-2 hover:bg-gray-300 dark:hover:bg-gray-600 rounded text-sm font-bold"
                                         >
                                             {category.category.charAt(0).toUpperCase() + category.category.slice(1)}
                                         </Link>
@@ -78,33 +79,30 @@ const UserNavbar = () => {
                                 </div>
                             </div>
 
-
-                            {/* "Menus" Dropdown with Main Menuitems and Children */}
-                            <div className="dropdown dropdown-hover relative ">
-                                <div className="btn btn-ghost hover:bg-gray-200 transition duration-1000 ease-in-out">
+                            {/* Menus Dropdown */}
+                            <div className="dropdown dropdown-hover relative">
+                                <div className="btn btn-ghost hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-1000 ease-in-out">
                                     Menus
                                 </div>
-                                <div className="dropdown-content bg-light-golden w-96  rounded-box z-[1] mt-3 p-4 shadow transition-all duration-1000 ease-in-out">
+                                <div className="dropdown-content bg-light-golden dark:bg-gray-800 w-96 rounded-box z-[1] mt-3 p-4 shadow transition-all duration-1000 ease-in-out">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 w-96 p-5">
                                         {navmenus?.map((menu) => (
-                                            <div key={menu._id} className="">
+                                            <div key={menu._id}>
                                                 <div className="font-bold text-sm md:text-base text-center">{menu.menuitem}</div>
-                                                <div className=" ">
+                                                <div>
                                                     {menu.children?.map((child) => (
-                                                        <a
+                                                        <Link
                                                             key={child._id}
-                                                            // href={child.link}
-                                                            className="block  p-2 md:p-4 rounded-lg transition-all duration-300 ease-in-out"
+                                                            className="block p-2 md:p-4 rounded-lg transition-all duration-300 ease-in-out"
                                                         >
                                                             <img
                                                                 src={child.image}
                                                                 width={100}
                                                                 alt={child.menuitem}
-                                                                className=" rounded-lg w-8 sm:ml-5 lg:ml-2  "
+                                                                className="rounded-lg w-8 sm:ml-5 lg:ml-2"
                                                             />
-                                                            <div className="text-center  text-sm">{child.menuitem}</div>
-                                                            {/* <div className="text-xs md:text-sm text-gray-600 text-center">{child.subtitle}</div> */}
-                                                        </a>
+                                                            <div className="text-center text-sm">{child.menuitem}</div>
+                                                        </Link>
                                                     ))}
                                                 </div>
                                             </div>
@@ -113,11 +111,12 @@ const UserNavbar = () => {
                                 </div>
                             </div>
 
+                            {/* About Dropdown */}
                             <div className="dropdown dropdown-hover relative">
-                                <div className="btn btn-ghost hover:bg-gray-200 transition duration-1000 ease-in-out">
+                                <div className="btn btn-ghost hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-1000 ease-in-out">
                                     About
                                 </div>
-                                <div className="dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-[180px] p-2 shadow transition-all duration-1000 ease-in-out">
+                                <div className="dropdown-content bg-light-golden dark:bg-gray-800 rounded-box z-[1] mt-3 w-[180px] p-2 shadow transition-all duration-1000 ease-in-out">
                                     <Link to="/user/mission" className="block py-1 px-2 font-bold text-sm">Mission</Link>
                                     <Link to="/user/vision" className="block py-1 px-2 font-bold text-sm">Vision</Link>
                                     <Link to="/user/about" className="block py-1 px-2 font-bold text-sm">About</Link>
@@ -136,7 +135,7 @@ const UserNavbar = () => {
                             <div
                                 tabIndex={0}
                                 role="button"
-                                className="btn btn-ghost btn-circle hover:bg-gray-200 transition duration-300 ease-in-out"
+                                className="btn btn-ghost btn-circle hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 ease-in-out"
                             >
                                 <div className="indicator">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -154,7 +153,7 @@ const UserNavbar = () => {
                                 tabIndex={0}
                                 className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-44 shadow transition-all duration-300 ease-in-out"
                             >
-                                <div className="card-body bg-light-golden">
+                                <div className="card-body bg-light-golden dark:bg-gray-800">
                                     <span className="text-md font-bold">{cartItems && cartItems.length} Items</span>
                                     <span className="font-bold">Total: ${totalAfterDiscount ? totalAfterDiscount.toFixed(2) : ""}</span>
                                     <div className="card-actions">
@@ -165,11 +164,11 @@ const UserNavbar = () => {
                         </div>
 
                         {/* Profile Icon */}
-                        <div className=" dropdown dropdown-end hidden sm:block">
+                        <div className="dropdown dropdown-end hidden sm:block">
                             <div
                                 tabIndex={0}
                                 role="button"
-                                className="btn btn-ghost btn-circle avatar hover:bg-gray-200 transition duration-300 ease-in-out"
+                                className="btn btn-ghost btn-circle avatar hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-300 ease-in-out"
                             >
                                 {user ? (
                                     <div className="w-8 md:w-10 rounded-full">
@@ -181,7 +180,7 @@ const UserNavbar = () => {
                             </div>
                             <ul
                                 tabIndex={0}
-                                className="menu menu-sm dropdown-content bg-light-golden rounded-box z-[1] mt-3 w-40 md:w-52 p-2 shadow transition-all duration-300 ease-in-out"
+                                className="menu menu-sm dropdown-content bg-light-golden dark:bg-gray-800 rounded-box z-[1] mt-3 w-40 md:w-52 p-2 shadow transition-all duration-300 ease-in-out"
                             >
                                 {user ? (
                                     <>
@@ -189,7 +188,6 @@ const UserNavbar = () => {
                                             <Link to="/user/profile" className="justify-between text-sm">Profile</Link>
                                         </li>
                                         <li><Link to="/admin/dashboard" className="text-sm text-center">Admin Page</Link></li>
-
                                     </>
                                 ) : (
                                     <li>
@@ -202,15 +200,10 @@ const UserNavbar = () => {
                         </div>
                     </div>
                 </div>
-                <div className="">
-
-                </div>
-
-
 
                 {/* Sidebar for small screens */}
                 <div
-                    className={`fixed inset-0 z-40 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} bg-amber-200 transition-transform duration-300 ease-in-out overflow-y-auto`}
+                    className={`fixed inset-0 z-40 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} bg-amber-200 dark:bg-gray-700 transition-transform duration-300 ease-in-out overflow-y-auto`}
                     style={{ maxHeight: '100vh' }}
                 >
                     <div className="flex items-center justify-between p-4">
@@ -227,7 +220,7 @@ const UserNavbar = () => {
                                         setSidebarOpen(false);
                                         setSelectedType(category.category);
                                     }}
-                                    className="block py-1 px-2 bg-light-golden hover:bg-gray-300 rounded"
+                                    className="block py-1 px-2 bg-light-golden dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-600 rounded"
                                 >
                                     {category.category.charAt(0).toUpperCase() + category.category.slice(1)}
                                 </Link>
@@ -241,8 +234,6 @@ const UserNavbar = () => {
                     </div>
                 </div>
             </div>
-
-
         </div>
 
 

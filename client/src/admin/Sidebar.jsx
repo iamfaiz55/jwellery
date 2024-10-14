@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useSection } from '../App';
 
 const Sidebar = () => {
     const { currentSection, setCurrentSection } = useSection();
     const location = useLocation();
-
+    const [isDarkMode, setIsDarkMode] = useState(false);
     const menuItems = [
         { section: 'dashboard', label: 'Dashboard', path: '/admin/dashboard' },
         { section: 'orders', label: 'All Orders', path: '/admin/allOrders' },
@@ -16,7 +16,8 @@ const Sidebar = () => {
         { section: 'paymentMethod', label: 'Payment Methods', path: '/admin/paymentMethod' },
         { section: 'addresses', label: 'Address And Taxes', path: '/admin/addresses' },
         { section: 'addsImages', label: 'Adds Images', path: '/admin/addsImage' },
-        { section: 'navmenu', label: 'Nav MEnu', path: '/admin/navmenu' },
+        { section: 'navmenu', label: 'Nav Menu', path: '/admin/navmenu' },
+        // { section: 'history', label: 'History', path: '/admin/get-history' },
     ];
 
     useEffect(() => {
@@ -27,31 +28,54 @@ const Sidebar = () => {
         }
     }, [location.pathname, setCurrentSection, menuItems]);
 
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        setIsDarkMode(mediaQuery.matches);
+
+        const handleChange = (e) => setIsDarkMode(e.matches);
+        mediaQuery.addEventListener('change', handleChange);
+
+        return () => {
+            mediaQuery.removeEventListener('change', handleChange);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, [isDarkMode]);
+
     return (
-        <div className="hidden md:block inset-y-0 left-0 z-30 w-64 overflow-y-auto bg-golden rounded-lg m-2">
+        <div className="hidden md:block inset-y-0 left-0 z-30 w-60  overflow-y-auto bg-golden dark:bg-gray-800 rounded-lg m-2">
             <div className="flex flex-col items-center mt-8">
-                {/* Add user details if needed */}
+                {/* Add user details or logo if needed */}
             </div>
 
-            <nav className="mt-10">
+            <nav className="mt-5">
+                {/* Iterate over menu items and render them */}
                 {menuItems.map((item) => (
                     <NavLink
                         key={item.section}
                         to={item.path}
                         onClick={() => setCurrentSection(item.section)}
-                        className={`flex items-center px-6 py-2 mt-4 text-gray-100 transition-colors duration-200 ${currentSection === item.section ? 'bg-gray-700' : 'bg-transparent'} hover:bg-gray-600 rounded-lg`}
+                        className={`flex items-center px-6 py-2 mt-4 text-gray-100 dark:text-gray-200 transition-colors duration-200 ${currentSection === item.section ? 'bg-gray-700 dark:bg-gray-700' : 'bg-transparent'} hover:bg-gray-600 dark:hover:bg-gray-600 rounded-lg`}
                     >
                         {item.label}
                     </NavLink>
                 ))}
 
                 {/* Logout button */}
-                <NavLink
-                    to="/admin/logout"
-                    className="flex items-center px-6 py-2 mt-4 text-red-200 transition-colors duration-200 bg-transparent hover:bg-red-600 rounded-lg"
-                >
-                    Logout
-                </NavLink>
+                <div className="flex justify-center">
+                    <button
+                        // to="/admin/logout"
+                        className="btn bg-red-500"
+                    >
+                        Logout
+                    </button>
+                </div>
             </nav>
         </div>
     );

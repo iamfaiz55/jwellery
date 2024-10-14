@@ -24,6 +24,7 @@ const CompanyAddress = require("../models/CompanyAddress")
 const Tax = require("../models/Tax")
 const Review = require("../models/Review")
 const PaymentMethod = require("../models/PaymentMethod")
+const History = require("../models/History")
 
 // const { payment } = require("..")
 // const Liked = require("../models/Liked")
@@ -346,15 +347,15 @@ exports.addCart = asyncHandler(async (req, res) => {
     res.json({ message: 'Cart Add successfully' });
 });
 exports.like = asyncHandler(async (req, res) => {
-    const { pId, uId } = req.body;
-console.log(req.body);
+    const { pId, uId , varientId} = req.body;
+// console.log(req.body);
 
     let result = await Liked.findOne({ userId: uId, productId: pId });
 
     if (result) {
      return res.status(400).json({message:" This Product is AlReady In Liked "})
     } else {
-       await Liked.create({userId:uId, productId:pId})
+       await Liked.create({userId:uId, productId:pId, varientId})
     }
 
     res.json({ message: 'Liked successfully' });
@@ -795,4 +796,17 @@ exports.getCompanyDetails = asyncHandler(async(req, res)=> {
     const result = await CompanyAddress.findOne()
     res.json({message:"Company Details Fetch Success", result})
 
+})
+
+exports.addHistory = asyncHandler(async(req, res)=> {
+    const {userId, type, productId, cartId, ordersId}=req.body
+    const {isError, error}= checkEmpty({userId, type})
+    if(isError){
+        return res.status(410).json({message:"all fields required", error})
+    }
+    const device = req.useragent.isMobile || req.useragent.isTablet ? "mobile" : "computer";
+    console.log(device);
+    
+  await History.create({...req.body,  device})
+  res.json({message:"history create successs"})
 })

@@ -1,0 +1,9 @@
+POST /api/adminAuth/logout-admin 200 4.967 ms
+GET /api/open/get-company 304 194.533 ms
+GET /api/open/carousel 200 196.191 ms
+DELETE /api/admin/delete-carousel/6708cb763f99d09d32dcdd4d 200 4635.957 ms
+DELETE /api/admin/delete-carousel/6708d4dab67e163d3940bae0 200 642.943 ms
+GET /api/open/carousel 200 83.186 ms
+DELETE /api/admin/delete-carousel/6708cb763f99d09d32dcdd4d 200 3536.937 ms
+GET /api/open/carousel 304 122.592 ms
+GET /api/open/get-company 304 129.918 ms

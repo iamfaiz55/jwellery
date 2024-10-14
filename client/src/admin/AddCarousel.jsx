@@ -6,6 +6,7 @@ import { useGetAllAddImagesQuery, useGetCArouselQuery } from '../redux/apis/open
 
 
 const AddCarousel = () => {
+
     const [deleteCarousel, { isSuccess: carouselDelete, error: deleteError }] = useDeleteCarouselMutation();
     const { data, refetch } = useGetCArouselQuery();
     const [addCarousel, { isSuccess, isLoading }] = useAddCarouselMutation();
@@ -98,7 +99,7 @@ const AddCarousel = () => {
     }, [updateSuccess])
 
     return <>
-        <div className='bg-light-golden  '>
+        <div className='bg-light-golden  dark:bg-gray-800'>
             {/* <Outlet /> */}
             <div className='p-4'>
                 <div className="text-end mb-4">
@@ -257,8 +258,8 @@ const AddCarousel = () => {
 
                 {/* Table for larger screens */}
                 <div className="hidden lg:block overflow-x-auto shadow-md sm:rounded-lg mb-4">
-                    <table className="w-full text-sm text-left text-gray-500 border-spacing-2">
-                        <thead className="text-xs text-gray-700 uppercase bg-light-golden">
+                    <table className="w-full text-sm text-left text-gray-500 border-spacing-2 ">
+                        <thead className="text-xs text-gray-700 uppercase bg-light-golden ">
                             <tr className="text-md font-semibold tracking-wide text-left text-gray-900 bg-light-golden uppercase border-b border-gray-600">
                                 <th className="p-3 font-bold uppercase text-gray-600">#</th>
                                 <th className="p-3 font-bold uppercase text-gray-600">Image</th>
@@ -309,7 +310,7 @@ const AddCarousel = () => {
                 {/* Cards for small screens */}
                 <div className="lg:hidden grid grid-cols-1 gap-4">
                     {data && data.map((item, i) => (
-                        <div key={item.id} className="bg-light-golden shadow-lg rounded-lg p-4">
+                        <div key={item.id} className="bg-light-golden shadow-lg rounded-lg p-4 dark:bg-gray-800">
                             <img
                                 src={item.image} // Replace with appropriate image URL
                                 alt="Carousel"

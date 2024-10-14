@@ -8,17 +8,22 @@ import * as yup from 'yup';
 import { toast } from 'sonner';
 import { useCart } from '../App';
 import { useNavigate } from 'react-router-dom';
-import { useGetTaxesQuery } from '../redux/apis/openApi';
+import { useGetTaxesQuery, usePostHistoryMutation } from '../redux/apis/openApi';
+import BottomNav from '../user/BottomNav';
+import useScrollRestoration from '../hooks/useScrollRestoration';
 
 
 const CartCheckOut = () => {
+    useScrollRestoration()
+    const [postHistory] = usePostHistoryMutation()
+
     const { cartData, setCartData } = useCart();
     const { user } = useSelector(state => state.userData);
     const { data: addresses } = useGetAddressesQuery(user._id);
     const [selectedAddress, setSelectedAddress] = useState(null);
     const navigate = useNavigate();
     const { data: taxes } = useGetTaxesQuery();
-    // console.log(cartData.cartItems);
+    console.log(cartData);
     const finalData = cartData && cartData.cartItems.map(item => {
         const x = item.productId.varient.find(v => v._id == item.varientId)
 
@@ -61,18 +66,23 @@ const CartCheckOut = () => {
         }
     };
     // console.log(cartData);
+    useEffect(() => {
+        if (user) {
+            // postHistory({ userId: user._id, type: "checkout", productId: id })
+        }
+    }, [])
 
     return (
-        <div className="flex flex-col  bg-light-golden">
+        <div className="flex flex-col  bg-light-golden dark:bg-gray-800">
             {/* Header Section */}
-            <header className="bg-yellow-800 text-white p-4">
+            <header className="bg-golden text-white p-4">
                 <h1 className="text-2xl font-bold">Checkout</h1>
             </header>
 
             {/* Main Content */}
-            <main className="flex-grow p-4 flex flex-col md:flex-row">
+            <main className="flex-grow p-4 flex flex-col md:flex-row bg-light-golden dark:bg-gray-800 pb-24">
                 {/* Checkout Details */}
-                <div className="flex-grow bg-yellow-50 p-4 space-y-8 overflow-y-auto">
+                <div className="flex-grow bg-yellow-50 p-4 space-y-8 overflow-y-auto  dark:bg-gray-800">
                     <div className="p-4 bg-white shadow rounded-md">
                         <div className="text-sm mt-4 text-gray-500">Complete your shipping and payment details below.</div>
                     </div>
@@ -87,19 +97,19 @@ const CartCheckOut = () => {
                         </div>
                     </dialog>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 ">
                         {addresses && addresses.map((item) => (
-                            <div key={item._id} className="overflow-hidden group relative rounded-lg p-1 flex justify-center items-center">
-                                <label className="relative z-10 w-full bg-white p-6 rounded-lg flex items-center cursor-pointer">
+                            <div key={item._id} className="overflow-hidden  group relative rounded-lg p-1 flex  justify-center items-center">
+                                <label className="relative z-10 w-full bg-white  dark:bg-gray-800 p-6 rounded-lg flex items-center cursor-pointer ">
                                     <input type="checkbox" className="form-checkbox h-5 w-5 text-yellow-500" checked={selectedAddress === item._id} onChange={() => handleAddressChange(item._id)} />
                                     <div className="ml-4">
-                                        <h3 className="text-xl font-bold text-gray-900">{item.addressType}</h3>
-                                        <p className="mt-2 text-sm text-gray-500">House {item.houseNo}</p>
-                                        <p className="mt-2 text-sm text-gray-500">City: {item.city}</p>
-                                        <p className="mt-2 text-sm text-gray-500">Country: {item.country}</p>
-                                        <p className="mt-2 text-sm text-gray-500">State: {item.state}</p>
-                                        <p className="mt-2 text-sm text-gray-500">Pincode: {item.pincode}</p>
-                                        <p className="mt-2 text-sm text-gray-500">Mobile: {item.mobile}</p>
+                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">{item.addressType}</h3>
+                                        <p className="mt-2 text-sm text-gray-500 dark:text-white">House {item.houseNo}</p>
+                                        <p className="mt-2 text-sm text-gray-500 dark:text-white">City: {item.city}</p>
+                                        <p className="mt-2 text-sm text-gray-500 dark:text-white">Country: {item.country}</p>
+                                        <p className="mt-2 text-sm text-gray-500 dark:text-white">State: {item.state}</p>
+                                        <p className="mt-2 text-sm text-gray-500 dark:text-white">Pincode: {item.pincode}</p>
+                                        <p className="mt-2 text-sm text-gray-500 dark:text-white">Mobile: {item.mobile}</p>
                                     </div>
                                 </label>
                             </div>
@@ -112,8 +122,8 @@ const CartCheckOut = () => {
                 </div>
 
                 {/* Order Summary */}
-                <div className="hidden md:w-1/3 md:block bg-white p-4 md:ml-4 shadow-md rounded-md">
-                    <h2 className="text-xl font-semibold text-yellow-800 mb-4">Order Summary</h2>
+                <div className="hidden md:w-1/3 md:block bg-white p-4 md:ml-4 shadow-md rounded-md  dark:bg-gray-800">
+                    <h2 className="text-xl font-semibold text-yellow-800 mb-4 dark:text-white">Order Summary</h2>
                     <ul>
                         {cartData.cartItems.map(item => {
                             const variant = item.productId.varient.find(v => v._id === item.varientId);
@@ -124,8 +134,8 @@ const CartCheckOut = () => {
                                     <div className="flex items-center">
                                         <img src={item.productId.images[0]} alt={item.name} className="w-16 h-16 rounded object-cover mr-4" />
                                         <div className="text-sm">
-                                            <h3 className="font-medium text-gray-900">{item.name}</h3>
-                                            <p className="text-gray-500">₹{discountedPrice.toFixed(2)} x {item.quantity}</p>
+                                            <h3 className="font-medium text-gray-900 dark:text-white" >{item.name}</h3>
+                                            <p className="text-gray-500 dark:text-white" >₹{discountedPrice.toFixed(2)} x {item.quantity}</p>
                                         </div>
                                     </div>
                                 </li>
@@ -133,29 +143,30 @@ const CartCheckOut = () => {
                         })}
                     </ul>
                     <div className="mt-4 border-t pt-4 text-sm">
-                        <div className="flex justify-between py-2 text-gray-600">
+                        <div className="flex justify-between py-2 text-gray-600 dark:text-white">
                             <span>Subtotal</span>
                             <span className="font-semibold text-gray-500">₹{totalProductPrice.toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between py-2 text-gray-600">
+                        <div className="flex justify-between py-2 text-gray-600 dark:text-white">
                             <span>Discount</span>
-                            <span className="font-semibold text-gray-500">-₹{(totalProductPrice * (discount / 100)).toFixed(2)}</span>
+                            <span className="font-semibold text-gray-500 dark:text-white">-₹{(totalProductPrice * (discount / 100)).toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between py-2 text-gray-600">
+                        <div className="flex justify-between py-2 text-gray-600 dark:text-white">
                             <span>Making Charges</span>
-                            <span className="font-semibold text-gray-500">+₹{makingChargesAmount.toFixed(2)}</span>
+                            <span className="font-semibold text-gray-500 dark:text-white">+₹{makingChargesAmount.toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between py-2 text-gray-600">
+                        <div className="flex justify-between py-2 text-gray-600 dark:text-white">
                             <span>Sales Tax</span>
-                            <span className="font-semibold text-gray-500">+₹{salesTaxAmount.toFixed(2)}</span>
+                            <span className="font-semibold text-gray-500 dark:text-white">+₹{salesTaxAmount.toFixed(2)}</span>
                         </div>
-                        <div className="font-semibold text-xl flex justify-between py-4 text-gray-600">
+                        <div className="font-semibold text-xl flex justify-between py-4 text-gray-600 dark:text-white">
                             <span>Total</span>
                             <span>₹{total.toFixed(2)}</span>
                         </div>
                     </div>
                 </div>
             </main>
+            <BottomNav />
         </div>
     );
 };

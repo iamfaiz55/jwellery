@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 export const openApi = createApi({
     reducerPath: "openApi",
     baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:5000/api/open" }),
-    tagTypes: ["open", "admin"],
+    tagTypes: ["open", "admin", "user"],
     endpoints: (builder) => {
         return {
             getAllCAtegories: builder.query({
@@ -112,7 +112,18 @@ export const openApi = createApi({
                 }),
                 transformResponse: (data) => data.result,
                 providesTags: ["user"]
-            })
+            }),
+            postHistory: builder.mutation({
+                query:historyData => {
+                    return {
+                        url: `/post-history`,
+                        method: "POST",
+                        body: historyData
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["user"]
+            }),
         }
     }
 })
@@ -131,6 +142,7 @@ export const {
     useGetAllScrollCardsQuery,
     useGetAllMenuItemsQuery,
     useGetAllAddImagesQuery,
+    usePostHistoryMutation
     // useGetVarientQuery
 } = openApi;
 

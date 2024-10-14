@@ -11,6 +11,11 @@ const likedSchema = new mongoose.Schema({
         ref: "product",
         required: true
     },
+    varientId: {
+        type: String,
+        // ref: "product",
+        // required: true
+    },
 
 }, { timestamps: true })
 

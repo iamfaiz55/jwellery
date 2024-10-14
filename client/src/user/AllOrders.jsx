@@ -3,8 +3,10 @@ import { useCancelOrderMutation, useGetOrdersQuery } from '../redux/apis/userApi
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { usePostHistoryMutation } from '../redux/apis/openApi';
 
 const AllOrders = () => {
+    const [postHistory] = usePostHistoryMutation()
     const { user } = useSelector(state => state.userData);
     const { data, error, isError } = useGetOrdersQuery(user._id);
     const [cancelOrder, { isSuccess }] = useCancelOrderMutation()
@@ -16,15 +18,25 @@ const AllOrders = () => {
             toast.success("Order Cancel Success")
         }
     }, [isSuccess])
+    // productId, cartId, 
+    useEffect(() => {
+        if (user && data) {
+            const ordersIds = data.map(order => order._id);
 
+            postHistory({ userId: user._id, type: "allOrders", ordersId: ordersIds });
+        }
+    }, [user, data]);
     return (
-        <div className="py-14 px-8 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto space-y-8 bg-light-golden">
+        <div className="py-14 px-8 md:px-6 2xl:px-20 2xl:container dark:bg-gray-900 2xl:mx-auto space-y-8 bg-light-golden">
             {
                 isError
                     // ? <div className='text-center font-bold text-3xl'>{JSON.stringify(error.data.message)}</div>
-                    ? <div className='text-center font-bold text-3xl'>Server Error</div>
+                    ? <div className='text-center font-bold text-3xl dark:bg-gray-900'>Server Error</div>
                     : <>
-                        <h1 className="text-2xl font-semibold mb-4">Your Orders</h1>
+                        {
+                            data && data.length > 0 && <h1 className="text-2xl font-semibold mb-4 ">Your Orders</h1>
+
+                        }
                         {
                             data && data.map(order => {
                                 if (order.status != "cancelled") {
@@ -36,21 +48,47 @@ const AllOrders = () => {
                                         className="flex flex-col xl:flex-row justify-center items-stretch w-full xl:space-x-8 space-y-4 md:space-y-6 xl:space-y-0"
                                     >
                                         <div className={`flex flex-col justify-start items-start w-full space-y-4 md:space-y-6 xl:space-y-8`}>
-                                            <div className="flex flex-col justify-start items-start border border-1 border-amber-500 dark:bg-gray-800  bg-light-golden px-4 py-4 md:py-6 md:p-6 xl:p-8 w-full rounded-lg shadow-md transition-transform transform hover:-translate-y-2 hover:shadow-2xl">
+                                            <div className="flex flex-col justify-start items-start border border-1 border-golden dark:bg-gray-900  bg-light-golden px-4 py-4 md:py-6 md:p-6 xl:p-8 w-full rounded-lg shadow-md transition-transform transform hover:-translate-y-2 hover:shadow-2xl">
                                                 <div className="flex justify-between w-full">
                                                     <p className="text-lg md:text-xl dark:text-white font-semibold leading-6 xl:leading-5 text-gray-800 ">
                                                         {/* Order # */}
                                                     </p>
                                                     <button
-                                                        onClick={e => cancelOrder(order._id)}
-                                                        className="btn bg-yellow-400 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition"
+                                                        // onClick={e => cancelOrder(order._id)}
+                                                        onClick={e => document.getElementById("cancelOrder").showModal()}
+                                                        className="btn bg-yellow-400 btn-sm  md:btn-md  text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition"
                                                     >
                                                         Cancel Order
                                                     </button>
+
+
+                                                    <dialog id="cancelOrder" className="modal">
+                                                        <div className="modal-box bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg">
+                                                            <h3 className="font-bold text-lg text-gray-900 dark:text-white">Confirm Cancellation</h3>
+                                                            <p className="py-4 text-gray-700 dark:text-gray-300">
+                                                                Are you sure you want to cancel this order? This action cannot be undone.
+                                                            </p>
+                                                            <div className="modal-action">
+                                                                <button
+                                                                    onClick={() => cancelOrder(order._id)}
+                                                                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
+                                                                >
+                                                                    Confirm Cancel
+                                                                </button>
+                                                                <button
+                                                                    className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-300"
+                                                                    onClick={() => document.getElementById('cancelOrder').close()} // Close modal on cancel
+                                                                >
+                                                                    Cancel
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </dialog>
+
                                                 </div>
                                                 {order.orderItems.map((item) => {
                                                     // Find the matching variant from the product based on varientId
-                                                    console.log(item);
+                                                    // console.log(item);
 
                                                     const matchedVarient = item.productId && item.productId.varient.find(v => v._id === item.varientId);
 
@@ -62,12 +100,12 @@ const AllOrders = () => {
                                                             <div className="pb-4 md:pb-8 w-full md:w-40">
                                                                 <img
                                                                     className="w-full"
-                                                                    src={item.productId.images[0]} // First image of the product
+                                                                    src={item.productId.images[0]}
                                                                     alt={item.productId.name}
                                                                 />
                                                             </div>
                                                             <div className="border-b border-gray-200 md:flex-row flex-col flex justify-between items-start w-full pb-8 space-y-4 md:space-y-0">
-                                                                <div className="w-full flex flex-col justify-start items-start space-y-8">
+                                                                <div className="w-full flex flex-col justify-start items-start space-y-8 overflow-hidden">
                                                                     <h3 className="text-xl dark:text-white xl:text-2xl font-semibold leading-6 text-gray-800">
                                                                         {item.productId?.name}
                                                                     </h3>
@@ -84,7 +122,7 @@ const AllOrders = () => {
                                                                                     <span className="dark:text-gray-400 text-gray-300">Price: </span> ${matchedVarient?.price}
                                                                                 </p>
                                                                                 <p className="text-sm dark:text-white leading-none text-gray-800">
-                                                                                    <span className="dark:text-gray-400 text-gray-300">Description: </span> {matchedVarient.desc}
+                                                                                    <span className="dark:text-gray-400 text-gray-300 overflow-hidden">Description: </span> {matchedVarient.desc}
                                                                                 </p>
                                                                                 <p className="text-sm dark:text-white leading-none text-gray-800">
                                                                                     <span className="dark:text-gray-400 text-gray-300">Height: </span> {matchedVarient.height}
@@ -99,7 +137,8 @@ const AllOrders = () => {
                                                                         </p>
                                                                     </div>
                                                                 </div>
-                                                                <div className="flex justify-between space-x-8 items-start w-full">
+                                                                <div className="flex justify-between space-x-8 items-start w-full overflow-hidden">
+
                                                                     <p className="text-base dark:text-white xl:text-lg leading-6 text-gray-800">
                                                                         Quantity: {item.quantity}
                                                                     </p>
@@ -119,8 +158,10 @@ const AllOrders = () => {
                             }
                             )
                         }
-                        <h1 className="text-2xl font-semibold mb-4">Cancelled Orders</h1>
+                        {
+                            data && data.length > 0 && <h1 className="text-2xl font-semibold mb-4">Cancelled Orders</h1>
 
+                        }
 
                         {
                             data && data.map(order => {

@@ -15,6 +15,7 @@ const Navmenu = require("../models/Navmenu")
 const ScrollCards = require("../models/ScrollCards")
 const upload2 = require("../utils/upload2")
 const AddImages = require("../models/AddImages")
+const History = require("../models/History")
 
 
 exports.addProduct = asyncHandler(async (req, res) => {
@@ -389,12 +390,12 @@ exports.updateCompanyAddress = asyncHandler(async (req, res) => {
             await cloudinary.uploader.destroy(x);
         }
 
-        let secure_url 
+        let secure_url2
         if (req.files[0]) {
                 const {secure_url} = await cloudinary.uploader.upload(req.files[0].path);
-                secure_url = secure_url;  
+                secure_url2 = secure_url;  
         }
-          await CompanyAddress.findByIdAndUpdate(id, {...req.body,logo: secure_url});
+          await CompanyAddress.findByIdAndUpdate(id, {...req.body,logo: secure_url2});
           res.json({ message: "Company Details updated successfully" });
      
     });
@@ -628,4 +629,13 @@ exports.deleteImage = asyncHandler(async(req, res)=> {
 exports.getAddsImages = asyncHandler(async(req, res)=> {
     const result = await AddImages.find()
     res.json({message:"Adds Images feTCH success", result})
+})
+
+exports.getHistory = asyncHandler(async(req, res)=> {
+const {uId}=req.params
+    const result =await History.find({userId:uId}).populate("userId").populate("productId").populate("ordersId").populate("cartId")
+// const result = [{userId:12343}]
+    // console.log("result",result);
+    
+    res.json({message:"history feTCH success", result})
 })
