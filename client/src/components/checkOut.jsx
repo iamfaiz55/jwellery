@@ -79,9 +79,9 @@ const CheckOut = () => {
 
     return (
         <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-900"> {/* Changed background to a darker shade */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-light-golden dark:bg-gray-900"> {/* Changed background to a darker shade */}
                 {/* Order Summary on Small Screens */}
-                <div className="md:hidden col-span-1 bg-gray-800 p-4 rounded-lg"> {/* Darker background for mobile */}
+                <div className="md:hidden col-span-1 bg-light-golden dark:bg-gray-800 p-4 rounded-lg"> {/* Darker background for mobile */}
                     <h1 className="py-6 border-b-2 text-xl text-yellow-400">Order Summary</h1> {/* Adjusted title color */}
                     {product && (
                         <>
@@ -95,7 +95,7 @@ const CheckOut = () => {
                                         <span className="text-gray-400 text-sm">{product.productType}</span>
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <button onClick={minus} className="bg-gray-700 text-gray-200 border-0 py-1 px-3 rounded-l">-</button> {/* Darker button color */}
+                                        <button onClick={minus} className="bg-light-golden dark:bg-gray-700 text-gray-200 border-0 py-1 px-3 rounded-l">-</button> {/* Darker button color */}
                                         <span className="text-gray-200 px-3">{quantity}</span> {/* Changed text color */}
                                         <button onClick={plus} className="bg-gray-700 text-gray-200 border-0 py-1 px-3 rounded-r">+</button> {/* Darker button color */}
                                     </div>
@@ -131,18 +131,18 @@ const CheckOut = () => {
                     )}
                 </div>
 
-                <div className="md:col-span-2 bg-gray-800 p-4 space-y-8 mb-20 md:mb-0 rounded-lg"> {/* Darker background for desktop */}
+                <div className="md:col-span-2 bg-light-golden dark:bg-gray-800 p-4 space-y-8 mb-20 md:mb-0 rounded-lg"> {/* Darker background for desktop */}
                     {/* Checkout Message */}
-                    <div className="p-4 bg-gray-700 shadow rounded-md">
+                    <div className="p-4 bg-white dark:bg-gray-700 shadow rounded-md">
                         <div className="flex items-center border-b pb-4">
                             <div className="text-yellow-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <div className="ml-3 text-sm font-medium text-yellow-400">Checkout</div> {/* Adjusted title color */}
+                            <div className="ml-3 text-sm font-medium text-golden dark:text-yellow-400">Checkout</div> {/* Adjusted title color */}
                         </div>
-                        <div className="text-sm mt-4 text-gray-400">Complete your shipping and payment details below.</div> {/* Changed text color */}
+                        <div className="text-sm mt-4 dark:text-gray-400">Complete your shipping and payment details below.</div> {/* Changed text color */}
                     </div>
 
                     {isError ? (
@@ -153,7 +153,7 @@ const CheckOut = () => {
                                 Add Address
                             </button>
                             <dialog id="add" className="modal">
-                                <div className="modal-box bg-gray-800 text-gray-200">
+                                <div className="modal-box bg-light-golden dark:bg-gray-800 text-gray-200">
                                     <h3 className="font-bold text-lg text-yellow-400">Add Address</h3>
                                     <Form />
                                 </div>
@@ -162,9 +162,9 @@ const CheckOut = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                 {addresses && addresses.map((item) => (
                                     <div key={item._id} className="overflow-hidden group relative rounded-lg p-1 flex justify-center items-center">
-                                        <label className="relative z-10 w-full bg-gray-700 p-6 rounded-lg flex items-center cursor-pointer">
+                                        <label className="relative z-10 w-full bg-white dark:bg-gray-700 p-6 rounded-lg flex items-center cursor-pointer">
                                             <input type="checkbox" className="form-checkbox h-5 w-5 text-yellow-500" checked={selectedAddress === item._id} onChange={() => handleAddressChange(item._id)} />
-                                            <div className="ml-4 text-gray-200"> {/* Changed text color */}
+                                            <div className="ml-4 dark:text-gray-200"> {/* Changed text color */}
                                                 <h3 className="text-xl font-bold">{item.addressType}</h3>
                                                 <p className="mt-2 text-sm">{`House ${item.houseNo}`}</p>
                                                 <p className="mt-2 text-sm">{`Country ${item.country}`}</p>
@@ -184,8 +184,8 @@ const CheckOut = () => {
                 </div>
 
                 {/* Order Summary on Large Screens */}
-                <div className="hidden md:block md:col-span-1 bg-gray-800 p-4 rounded-lg"> {/* Darker background for desktop */}
-                    <h1 className="py-6 border-b-2 text-xl text-yellow-400">Order Summary</h1> {/* Adjusted title color */}
+                <div className="hidden md:block md:col-span-1 bg-white dark:bg-gray-800 p-4 rounded-lg"> {/* Darker background for desktop */}
+                    <h1 className="py-6 border-b-2 text-xl text-black dark:text-yellow-400">Order Summary</h1> {/* Adjusted title color */}
                     {product && (
                         <>
                             <ul className="py-6 border-b space-y-6">
@@ -194,38 +194,38 @@ const CheckOut = () => {
                                         <img src={product.images[0]} alt={product.name} className="rounded w-full" />
                                     </div>
                                     <div className="flex flex-col flex-grow">
-                                        <span className="text-gray-300 text-md font-semibold">{product.name}</span> {/* Changed text color */}
-                                        <span className="text-gray-400 text-sm">{product.productType}</span>
+                                        <span className="dark:text-gray-300 text-md font-semibold">{product.name}</span> {/* Changed text color */}
+                                        <span className="dark:text-gray-400 text-sm">{product.productType}</span>
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <button onClick={minus} className="bg-gray-700 text-gray-200 border-0 py-1 px-3 rounded-l">-</button> {/* Darker button color */}
-                                        <span className="text-gray-200 px-3">{quantity}</span> {/* Changed text color */}
-                                        <button onClick={plus} className="bg-gray-700 text-gray-200 border-0 py-1 px-3 rounded-r">+</button> {/* Darker button color */}
+                                        <button onClick={minus} className="bg-golden dark:bg-gray-700 dark:text-gray-200 border-0 py-1 px-3 rounded-l">-</button> {/* Darker button color */}
+                                        <span className="dark:text-gray-200 px-3">{quantity}</span> {/* Changed text color */}
+                                        <button onClick={plus} className="bg-golden dark:bg-gray-700 dark:text-gray-200 border-0 py-1 px-3 rounded-r">+</button> {/* Darker button color */}
                                     </div>
                                 </li>
                             </ul>
                             <div className="border-t pt-4">
-                                <div className="flex justify-between py-2 text-gray-400">
+                                <div className="flex justify-between py-2 dark:text-gray-400">
                                     <span>Original Price</span>
-                                    <span className="font-semibold text-gray-200">{originalPrice.toFixed(2)}</span>
+                                    <span className="font-semibold dark:text-gray-200">{originalPrice.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between py-2 text-gray-400">
                                     <span>Discount ({discountPercent}%)</span>
-                                    <span className="font-semibold text-gray-200">-{(originalPrice * discountPercent / 100).toFixed(2)}</span>
+                                    <span className="font-semibold dark:text-gray-200">-{(originalPrice * discountPercent / 100).toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between py-2 text-gray-400">
+                                <div className="flex justify-between py-2 dark:text-gray-400">
                                     <span>Discounted Price</span>
-                                    <span className="font-semibold text-gray-200">{discountedPrice.toFixed(2)}</span>
+                                    <span className="font-semibold dark:text-gray-200">{discountedPrice.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between py-2 text-gray-400">
+                                <div className="flex justify-between py-2 dark:text-gray-400">
                                     <span>Making Charges ({makingChargesPercent}%)</span>
-                                    <span className="font-semibold text-gray-200">{makingChargesAmount.toFixed(2)}</span>
+                                    <span className="font-semibold dark:text-gray-200">{makingChargesAmount.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between py-2 text-gray-400">
+                                <div className="flex justify-between py-2 dark:text-gray-400">
                                     <span>Sales Tax ({salesTaxPercent}%)</span>
-                                    <span className="font-semibold text-gray-200">{salesTaxAmount.toFixed(2)}</span>
+                                    <span className="font-semibold dark:text-gray-200">{salesTaxAmount.toFixed(2)}</span>
                                 </div>
-                                <div className="font-semibold text-xl flex justify-between py-4 text-gray-400">
+                                <div className="font-semibold text-xl flex justify-between py-4 dark:text-gray-400">
                                     <span>Total</span>
                                     <span>{total.toFixed(2)}</span>
                                 </div>
@@ -301,7 +301,7 @@ const Form = ({ edit }) => {
                 </div>
             ) : (
                 <form onSubmit={formik.handleSubmit}>
-                    <input {...formik.getFieldProps("houseNo")} type="text" placeholder="House No." className="input w-full my-2" />
+                    <input {...formik.getFieldProps("houseNo")} type="text" placeholder="House No." className="input w-full my-2 " />
                     <input {...formik.getFieldProps("state")} type="text" placeholder="State" className="input w-full my-2" />
                     <input {...formik.getFieldProps("city")} type="text" placeholder="City" className="input w-full my-2" />
                     <input {...formik.getFieldProps("pincode")} type="number" placeholder="Pincode" className="input w-full my-2" />

@@ -17,7 +17,7 @@ import CartCheckOut from './components/CartCheckOut';
 import PaymentPage from './components/PaymentPage';
 import AllOrders from './user/AllOrders';
 import AdminAllOrders from './admin/AdminAllOrders';
-import AllUsers from './admin/AllUsers';
+// import AllUsers from './admin/AllUsers';
 import AddCarousel from './admin/AddCarousel';
 import About from './admin/About';
 import OurMission from './admin/OurMission';
@@ -36,6 +36,8 @@ import UserNavbar from './user/UserNAvbar';
 import AdminAddImages from './admin/AdminAddImages';
 import { ThemeProvider } from './admin/Theme';
 import History from './admin/History';
+import AvgIncome from './admin/AvgIncome';
+import AllUsers from './admin/AllUSers';
 
 // Create Contexts
 export const CartContext = createContext();
@@ -73,6 +75,7 @@ const App = () => {
         { path: "register", element: <AdminRegister /> },
         { path: "login", element: <AdminLogin /> },
         { path: "categories", element: <AdminProtected compo={<Categories />} /> },
+        { path: "avg-income", element: <AdminProtected compo={<AvgIncome />} /> },
         { path: "dashboard", element: <AdminProtected compo={<Dashboard />} /> },
         { path: "get-contacts", element: <AdminProtected compo={<GetContacts />} /> },
         { path: "get-history/:id", element: <AdminProtected compo={<History />} /> },

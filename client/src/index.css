@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+/* Optional: Additional styling for mobile responsiveness */
+@media (max-width: 640px) {
+    .p-4 {
+        padding: 1rem;
+        /* Adjust padding for smaller screens */
+    }
+}

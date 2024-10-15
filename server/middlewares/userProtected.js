@@ -4,7 +4,7 @@ const User = require("../models/User");
 exports.userProtected = async (req, res, next) => {
     const { user } = req.cookies;
     if (!user) {
-        return res.status(401).json({ message: "Session Expired Re Login Please" });
+        return res.status(409).json({ message: "Session Expired Re Login Please" });
     }
 
     jwt.verify(user, process.env.JWT_KEY, async (err, decode) => {

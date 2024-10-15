@@ -117,7 +117,7 @@ const AdminNavbar = () => {
                                 />
                             </svg>
                         </button>
-                        <ul className="space-y-4 mt-12 dark:text-gray-200">
+                        <ul className="space-y-4 mt-12 dark:text-gray-200" onClick={() => setSidebarOpen(false)}>
                             <li>
                                 <Link to="/admin/dashboard" className="block p-2 hover:bg-yellow-200 dark:hover:bg-gray-700">Dashboard</Link>
                             </li>

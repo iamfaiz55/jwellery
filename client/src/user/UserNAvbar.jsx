@@ -23,10 +23,12 @@ const UserNavbar = () => {
     const { data: allCategories } = useGetAllCAtegoriesQuery();
 
     useEffect(() => {
-        if (error && error.status === 401) {
+        if (error && error.status === 409) {
             logoutUser();
         }
     }, [error, logoutUser]);
+    console.log(error);
+
 
     // console.log(cartItems);
 

@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useSection } from '../App';
+import { useLogoutAdminMutation } from '../redux/apis/adminAuthApi';
+import { toast } from 'sonner';
 
 const Sidebar = () => {
     const { currentSection, setCurrentSection } = useSection();
     const location = useLocation();
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const navigate = useNavigate();
+    const [logoutAdmin, { isSuccess }] = useLogoutAdminMutation();
     const menuItems = [
         { section: 'dashboard', label: 'Dashboard', path: '/admin/dashboard' },
         { section: 'orders', label: 'All Orders', path: '/admin/allOrders' },
@@ -17,6 +21,7 @@ const Sidebar = () => {
         { section: 'addresses', label: 'Address And Taxes', path: '/admin/addresses' },
         { section: 'addsImages', label: 'Adds Images', path: '/admin/addsImage' },
         { section: 'navmenu', label: 'Nav Menu', path: '/admin/navmenu' },
+        { section: 'avg-monthly-income', label: 'Avg Monthly Income', path: '/admin/avg-income' },
         // { section: 'history', label: 'History', path: '/admin/get-history' },
     ];
 
@@ -48,6 +53,15 @@ const Sidebar = () => {
         }
     }, [isDarkMode]);
 
+
+
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success("Admin Logout Success");
+            navigate("/admin/login");
+        }
+    }, [isSuccess]);
+
     return (
         <div className="hidden md:block inset-y-0 left-0 z-30 w-60  overflow-y-auto bg-golden dark:bg-gray-800 rounded-lg m-2">
             <div className="flex flex-col items-center mt-8">
@@ -71,6 +85,7 @@ const Sidebar = () => {
                 <div className="flex justify-center">
                     <button
                         // to="/admin/logout"
+                        onClick={e => logoutAdmin()}
                         className="btn bg-red-500"
                     >
                         Logout

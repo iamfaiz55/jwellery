@@ -4,6 +4,7 @@ const userController = require("./../controllers/user.controller")
 
 router
     .get("/all-orders", adminController.getAllOrders)
+    .get("/avg-of-mmonth", adminController.getMonthlyAvgIncome)
     .get("/all-user", adminController.getAllUsers)
     .get("/get-contact", userController.getContacts)
     .get("/get-all-products", adminController.getAllProductsAdmin)

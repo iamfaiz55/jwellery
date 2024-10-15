@@ -639,3 +639,87 @@ const {uId}=req.params
     
     res.json({message:"history feTCH success", result})
 })
+exports.getMonthlyAvgIncome = asyncHandler(async (req, res) => {
+
+
+    // for adding missing months 
+    function fillMissingMonths(monthlyIncome, startDate, endDate) {
+        const filledIncome = [];
+        
+        let currentDate = new Date(startDate);
+        while (currentDate <= endDate) {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1;
+    
+    console.log(year);
+    
+            const existingEntry = monthlyIncome.find(item => item.year === year && item.month === month);
+    
+            if (existingEntry) {
+                filledIncome.push(existingEntry);
+            } else {
+                filledIncome.push({
+                    year: year,
+                    month: month,
+                    totalAmount: 0,
+                    orderCount: 0
+                });
+            }
+    
+            currentDate.setMonth(currentDate.getMonth() + 1);
+        }
+    
+        return filledIncome;
+    }
+    
+    
+    
+
+
+    
+        const currentDate = new Date();
+        const startDate = new Date(currentDate);
+        startDate.setMonth(currentDate.getMonth() - 12);
+
+        const monthlyIncome = await Order.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: startDate, $lte: currentDate } 
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" }
+                    },
+                    totalAmount: { $sum: "$total" }, 
+                    orderCount: { $sum: 1 } 
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    year: "$_id.year",
+                    month: "$_id.month",
+                    totalAmount: 1,
+                    orderCount: 1
+                }
+            },
+            {
+                $sort: { year: 1, month: 1 } 
+            }
+        ]);
+        
+
+        const monthlyIncomeWithPrevYear = fillMissingMonths(monthlyIncome, startDate, currentDate);
+
+        
+
+        res.json({
+            message: "All Monthly Amount Get Success",
+            result: monthlyIncomeWithPrevYear
+        });
+   
+});
+

@@ -19,6 +19,17 @@ export const adminApi = createApi({
                 transformResponse:data => data.result,
                 providesTags: ["admin"]
             }),
+            getAvgIncome: builder.query({
+                query: pData => {
+                    return {
+                        url: "/avg-of-mmonth",
+                        method: "GET",
+                        // body: pData
+                    }
+                },
+                transformResponse:data => data.result,
+                providesTags: ["admin"]
+            }),
             getAllUsers: builder.query({
                 query: pData => {
                     return {
@@ -395,5 +406,6 @@ useLazyGetCompanyAddressQuery,
   useDeleteMenuItemMutation,
   useAddImagesMutation,
   useDeleteAddImageMutation,
-  useGethistoryQuery
+  useGethistoryQuery,
+  useGetAvgIncomeQuery
 } = adminApi
