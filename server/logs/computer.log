@@ -972,3 +972,5 @@ GET /api/admin/avg-of-mmonth 200 62.846 ms
 GET /api/open/get-company 304 101.950 ms
 GET /api/open/get-company 304 77.387 ms
 GET /api/admin/avg-of-mmonth 304 68.841 ms
+GET /api/open/get-company 304 102.483 ms
+GET /api/admin/avg-of-mmonth 304 111.273 ms
