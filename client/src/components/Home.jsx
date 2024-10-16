@@ -87,6 +87,20 @@ const Home = () => {
         setCurrentPage(page);
     };
 
+
+
+    // Scroll to top function
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
+    useEffect(() => {
+        scrollToTop();
+    }, [currentPage]);
+
     return (
         <div className='bg-light-golden dark:bg-gray-900'>
             <div className="avatar flex justify-around sm:hidden">
@@ -190,7 +204,11 @@ const Home = () => {
                                 {Array.from({ length: totalPages }, (_, index) => (
                                     <button
                                         key={index}
-                                        onClick={() => handlePageChange(index + 1)}
+                                        onClick={() => {
+                                            handlePageChange(index + 1)
+
+
+                                        }}
                                         className={`mx-1 px-4 py-2 rounded-md ${currentPage === index + 1 ? 'bg-golden text-white' : 'bg-white text-black border dark:bg-gray-700 dark:text-white'}`}
                                     >
                                         {index + 1}

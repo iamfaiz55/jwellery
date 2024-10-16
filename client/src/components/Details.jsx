@@ -424,7 +424,7 @@ const Review = () => {
                         reviews.map((review) => (
                             <div
                                 key={review._id}
-                                className="p-4 mb-4 bg-gray-800 rounded-lg shadow-lg border border-yellow-600"
+                                className="p-4 mb-4 bg-light-golden dark:bg-gray-800 rounded-lg shadow-lg border border-yellow-600"
                             >
                                 <h3 className="text-lg font-medium text-yellow-300">
                                     {review.uId && review.uId.mobile}

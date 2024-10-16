@@ -188,3 +188,17 @@ GET /api/open/get-company 304 75.254 ms
 GET /api/open/get-tax 304 74.898 ms
 GET /api/open/categories 304 74.784 ms
 GET /api/open/get-menu-items 304 255.517 ms
+GET /api/open/get-company 304 158.803 ms
+GET /api/open/get-tax 304 156.299 ms
+GET /api/admin/get-company-addresses 304 153.038 ms
+PUT /api/admin/update-company-address/67037fd964dabc951181eae4 400 6.608 ms
+GET /api/open/get-tax 304 66.973 ms
+GET /api/admin/get-company-addresses 304 105.874 ms
+GET /api/open/get-company 304 148.636 ms
+PUT /api/admin/update-company-address/67037fd964dabc951181eae4 400 5.503 ms
+GET /api/open/get-tax 304 82.106 ms
+GET /api/open/get-company 304 86.693 ms
+GET /api/open/get-tax - - ms
+GET /api/open/get-company 200 50.068 ms
+GET /api/admin/get-company-addresses 200 49.178 ms
+GET /api/open/get-tax 200 59.178 ms

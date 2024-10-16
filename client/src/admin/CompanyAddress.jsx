@@ -240,7 +240,7 @@ const CompanyAddress = () => {
                                 fd.append("state", addressData.state);
                                 fd.append("country", addressData.country);
                                 fd.append("gst", addressData.gst);
-                                fd.append("image", addressData.logo);
+                                fd.append("images", addressData.logo);
 
                                 updateAddress({ ...addressData, fd });
                             }} className="bg-yellow-500 my-5 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">Update</button>

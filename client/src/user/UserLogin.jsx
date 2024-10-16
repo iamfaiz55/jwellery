@@ -90,7 +90,7 @@ const UserLogin = () => {
                 </div>
             ) : (
                 <motion.div
-                    className="flex flex-col bg-light-golden dark:bg-gray-900"
+                    className="flex flex-col pb-14 bg-light-golden dark:bg-gray-900"
                     initial="hidden"
                     animate="visible"
                     variants={containerVariants}
@@ -114,7 +114,7 @@ const UserLogin = () => {
                                     type="number"
                                     name="mobile"
                                     placeholder="Mobile Number"
-                                    className="block w-full py-3 px-1 text-sm md:text-2xl  mt-2 bg-gray-400 text-gray-900 rounded-lg dark:text-gray-200 appearance-none border-b-2 border-gray-100 dark:border-gray-600 focus:text-gray-500 focus:outline-none focus:border-light-golden dark:focus:border-gray-400
+                                    className="block w-full py-3 px-1 text-sm md:text-2xl  mt-2 bg-light-golden dark:bg-gray-400 text-gray-900 rounded-lg dark:text-gray-200 appearance-none border-b-2 border-gray-100 dark:border-gray-600 focus:text-gray-500 focus:outline-none focus:border-light-golden dark:focus:border-gray-400
     [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
     [-moz-appearance:textfield]"
                                     required

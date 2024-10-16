@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useCart } from '../App';
-import { useCreateOrderMutation, useDeleteFullCartMutation, useGetAllPaymentMethodUserQuery, useRazorpayMutation, useVerifyPaymentMutation } from '../redux/apis/userApi';
+import { useCreateOrderMutation, useDeleteFullCartMutation, useGetAllPaymentMethodUserQuery, usePhonePeMutation, useRazorpayMutation, useVerifyPaymentMutation } from '../redux/apis/userApi';
 import { toast } from 'sonner';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,8 @@ const PaymentPage = () => {
     useScrollRestoration()
     const [raz, { isSuccess: razSuccess, data, isLoading }] = useRazorpayMutation();
     const { data: paymentMethods } = useGetAllPaymentMethodUserQuery();
+    // console.log(paymentMethods);
+    const [phonePe, { isSuccess: phonePeSuccess, isLoading: phonePeLoading, data: phonePeData }] = usePhonePeMutation()
     const [initiate, { isSuccess: initiateSuccess, isLoading: initiateLoading }] = useVerifyPaymentMutation();
     const { user } = useSelector(state => state.userData);
     const [createOrder, { isSuccess, isLoading: codLoading }] = useCreateOrderMutation();
@@ -26,6 +28,7 @@ const PaymentPage = () => {
     const [makingCharges, setMakingCharges] = useState(0);
     const [salesTax, setSalesTax] = useState(0);
 
+    // taxes ke liye
     useEffect(() => {
         if (taxes) {
             setDiscount(taxes.find(tax => tax.taxName === 'Discount')?.percent || 0);
@@ -46,6 +49,14 @@ const PaymentPage = () => {
         setPaymentMethod(e.target.value);
     };
 
+
+    const pData = {
+        name: "faiz",
+        number: 9960669624,
+        amount: 50,
+        MUID: "MUID" + Date.now(),
+        transactionId: "T" + Date.now()
+    }
     const handleSubmit = (e) => {
         e.preventDefault();
         const orderData = {
@@ -65,7 +76,7 @@ const PaymentPage = () => {
                 receipt: `${user._id}${user.name}`,
                 subtotal: totalWithTaxAndCharges.toFixed(2)
             });
-        } else {
+        } else if (paymentMethod == "cod") {
             createOrder({
                 ...orderData,
                 userId: user._id,
@@ -75,8 +86,18 @@ const PaymentPage = () => {
                     varientId: item.productId.varient._id
                 })),
             });
+        } else {
+            phonePe(pData)
         }
     };
+
+    useEffect(() => {
+        if (phonePeSuccess) {
+            console.log(phonePeData);
+
+
+        }
+    }, [phonePeSuccess])
 
     useEffect(() => {
         if (razSuccess) {
@@ -204,6 +225,19 @@ const PaymentPage = () => {
                                         disabled={!paymentMethods?.find(pm => pm.method === 'razorpay' && pm.active)}
                                     />
                                     <label htmlFor="razorpay" className="ml-2 text-gray-700 dark:text-gray-400 text-lg">Razorpay</label>
+                                </div>
+                                <div className="my-4 flex items-center">
+                                    <input
+                                        type="radio"
+                                        id="phonePay"
+                                        name="paymentMethod"
+                                        value="phonePay"
+                                        checked={paymentMethod === 'phonePay'}
+                                        onChange={handlePaymentMethodChange}
+                                        className="form-radio size-6"
+                                        disabled={!paymentMethods?.find(pm => pm.method === 'phonePay' && pm.active)}
+                                    />
+                                    <label htmlFor="phonePay" className="ml-2 text-gray-700 dark:text-gray-400 text-lg">PhonePe</label>
                                 </div>
                                 <button
                                     type="submit"

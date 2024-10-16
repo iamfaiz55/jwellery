@@ -11,6 +11,7 @@ router
     .get("/get-company-addresses", adminController.getCompanyAddress)
     .get("/get-all-payment-method", adminController.getPaymentMethods)
     .get("/get-history/:uId", adminController.getHistory)
+    .get("/get-most-viewed", adminController.getMostViewedPage)
 
     .put("/update-order-status", adminController.updateOrderStatus)
     .put("/unblock-user/:uId", adminController.unblockUser)

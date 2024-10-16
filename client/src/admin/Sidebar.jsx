@@ -22,6 +22,7 @@ const Sidebar = () => {
         { section: 'addsImages', label: 'Adds Images', path: '/admin/addsImage' },
         { section: 'navmenu', label: 'Nav Menu', path: '/admin/navmenu' },
         { section: 'avg-monthly-income', label: 'Avg Monthly Income', path: '/admin/avg-income' },
+        { section: 'most-viewed', label: 'Most Viewed Page', path: '/admin/most-viewed' },
         // { section: 'history', label: 'History', path: '/admin/get-history' },
     ];
 

@@ -38,6 +38,7 @@ import { ThemeProvider } from './admin/Theme';
 import History from './admin/History';
 import AvgIncome from './admin/AvgIncome';
 import AllUsers from './admin/AllUSers';
+import MostViewed from './admin/MostViewed';
 
 // Create Contexts
 export const CartContext = createContext();
@@ -77,6 +78,7 @@ const App = () => {
         { path: "categories", element: <AdminProtected compo={<Categories />} /> },
         { path: "avg-income", element: <AdminProtected compo={<AvgIncome />} /> },
         { path: "dashboard", element: <AdminProtected compo={<Dashboard />} /> },
+        { path: "most-viewed", element: <AdminProtected compo={<MostViewed />} /> },
         { path: "get-contacts", element: <AdminProtected compo={<GetContacts />} /> },
         { path: "get-history/:id", element: <AdminProtected compo={<History />} /> },
         { path: "addsImage", element: <AdminProtected compo={<AdminAddImages />} /> },

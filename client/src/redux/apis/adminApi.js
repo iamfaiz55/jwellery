@@ -228,6 +228,17 @@ export const adminApi = createApi({
                 transformResponse:data => data.result,
                 invalidatesTags: ["admin"]
             }),
+            getMostViewed: builder.query({
+                query: id=> {
+                    return {
+                        url: `/get-most-viewed`,
+                        method: "GET",
+                        // body: categoryData
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["admin"]
+            }),
             gethistory: builder.query({
                 query: id=> {
                     return {
@@ -407,5 +418,6 @@ useLazyGetCompanyAddressQuery,
   useAddImagesMutation,
   useDeleteAddImageMutation,
   useGethistoryQuery,
-  useGetAvgIncomeQuery
+  useGetAvgIncomeQuery,
+  useGetMostViewedQuery
 } = adminApi

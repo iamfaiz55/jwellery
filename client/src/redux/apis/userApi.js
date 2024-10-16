@@ -219,6 +219,17 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 invalidatesTags: ["user"]
             }),
+           phonePe: builder.mutation({
+                query: data => {
+                    return {
+                        url: `/payment`,
+                        method: "POST",
+                        body: data
+                    }
+                },
+                transformResponse:data => data.result,
+                invalidatesTags: ["user"]
+            }),
           verifyPayment: builder.mutation({
                 query: verifydata => {
                     return {
@@ -343,6 +354,7 @@ export const {
     useGetAllPaymentMethodUserQuery,
     useGetProfileQuery,
     useUpdateProfileDataMutation,
-    // usePostHistoryMutation
+    // usePostHistoryMutation,
+    usePhonePeMutation
     
 } = userApi

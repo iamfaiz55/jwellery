@@ -140,7 +140,19 @@ const AdminNavbar = () => {
                                 <Link to="/admin/paymentMethod" className="block p-2 hover:bg-yellow-200 dark:hover:bg-gray-700">Payment Method</Link>
                             </li>
                             <li>
+                                <Link to="/admin/addsImage" className="block p-2 hover:bg-yellow-200 dark:hover:bg-gray-700">Adds Images</Link>
+                            </li>
+                            <li>
                                 <Link to="/admin/addresses" className="block p-2 hover:bg-yellow-200 dark:hover:bg-gray-700">Address And Taxes</Link>
+                            </li>
+                            <li>
+                                <Link to="/admin/navmenu" className="block p-2 hover:bg-yellow-200 dark:hover:bg-gray-700">Nav Menus</Link>
+                            </li>
+                            <li>
+                                <Link to="/admin/avg-income" className="block p-2 hover:bg-yellow-200 dark:hover:bg-gray-700">Monthly Income</Link>
+                            </li>
+                            <li>
+                                <Link to="/admin/most-viewed" className="block p-2 hover:bg-yellow-200 dark:hover:bg-gray-700">Most Viewed Page</Link>
                             </li>
                             <li>
                                 <button

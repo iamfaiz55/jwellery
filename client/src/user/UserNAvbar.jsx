@@ -18,16 +18,15 @@ const UserNavbar = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const { user } = useSelector(state => state.userData);
     const { data: cartItems, isError, error } = useGetAllCartItemsQuery(user && user._id);
-    // console.log(cartItems);
 
     const { data: allCategories } = useGetAllCAtegoriesQuery();
 
     useEffect(() => {
         if (error && error.status === 409) {
-            logoutUser();
+            logoutUser(user && user._id);
         }
     }, [error, logoutUser]);
-    console.log(error);
+    // console.log(error);
 
 
     // console.log(cartItems);

@@ -722,4 +722,25 @@ exports.getMonthlyAvgIncome = asyncHandler(async (req, res) => {
         });
    
 });
-
+exports.getMostViewedPage = asyncHandler(async (req, res) => {
+  
+        const result = await History.aggregate([
+            {
+                $group: {
+                    _id: "$type", 
+                    users: { $addToSet: "$userId" }
+                }
+            },
+            {
+                $project: {
+                    _id: 1, 
+                    numberOfUsers: { $size: "$users" } 
+                }
+            },
+            {
+                $sort: { numberOfUsers: -1 } 
+            }
+        ]);
+        res.json({message: "Most viewed ", result});
+ 
+});

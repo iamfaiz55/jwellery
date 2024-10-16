@@ -26,6 +26,8 @@ router
 
     .post("/razorpay", userController.razorpay)
     .post("/verify-payment", userController.verifyPayment)
+    .post("/payment", userController.usePhonePe)
+    .post("/status", userController.initiatePhonePe)
 
     .post("/post-review", userController.postReview)
     .put("/update-profile-data/:id", userController.updateProfileData)

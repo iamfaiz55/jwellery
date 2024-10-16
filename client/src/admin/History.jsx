@@ -1,5 +1,5 @@
 import React from 'react'
-import { useGethistoryQuery } from '../redux/apis/adminApi'
+import { useGethistoryQuery, useGetMostViewedQuery } from '../redux/apis/adminApi'
 import useScrollRestoration from '../hooks/useScrollRestoration'
 import { useParams } from 'react-router-dom'
 
@@ -7,7 +7,11 @@ const History = () => {
     useScrollRestoration()
     const { id } = useParams()
     const { data } = useGethistoryQuery(id)
-    console.log(data);
+    // console.log(data);
+    // const { data: mostViewed } = useGetMostViewedQuery()
+
+    // console.log("most viewed", mostViewed);
+
 
     return <>
         {/* Table for Medium and Large Screens */}

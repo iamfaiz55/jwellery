@@ -18,6 +18,8 @@ const sendEmail = require("../utils/email")
 const PDFDocument = require('pdfkit-table');
 // require('pdfkit-table');
 const fs = require('fs');
+const https = require('https');
+// const crypto= require('crypto');
 const path = require('path');
 const mongoose= require("mongoose")
 const CompanyAddress = require("../models/CompanyAddress")
@@ -25,7 +27,7 @@ const Tax = require("../models/Tax")
 const Review = require("../models/Review")
 const PaymentMethod = require("../models/PaymentMethod")
 const History = require("../models/History")
-
+const axios = require('axios');
 // const { payment } = require("..")
 // const Liked = require("../models/Liked")
 
@@ -809,4 +811,69 @@ exports.addHistory = asyncHandler(async(req, res)=> {
     
   await History.create({...req.body,  device})
   res.json({message:"history create successs"})
+})
+
+
+
+
+exports.usePhonePe = asyncHandler(async (req, res) => {
+    const generateTransactionId = () => {
+        const timeStamps = Date.now();
+        const randomNum = Math.floor(Math.random() * 1000000);
+        const merchantPrefix = "T";
+        return `${merchantPrefix}${timeStamps}${randomNum}`;
+    }
+    const { name, number, amount, transactionId, MUID } = req.body;
+    const merchantTransectionId = transactionId
+    const data = {
+        "merchantId": "PGTESTPAYUAT",
+        "merchantTransactionId": generateTransactionId(),
+        "merchantUserId": MUID,
+        "amount": amount * 100,  
+        "redirectUrl": `http://localhost:5000/api/user/status/${merchantTransectionId}`,
+        "redirectMode": "POST",
+        "mobileNumber": number.toString().trim(), 
+        "paymentInstrument": {
+            "type": "PAY_PAGE"
+        }
+    };
+
+    const payload = JSON.stringify(data);
+    const mainPayload = Buffer.from(payload).toString("base64")
+    const key = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399"
+    const keyIndex = 1
+    const string = mainPayload + '/pg/v1/pay' + key
+    const sha256 = crypto.createHash('sha256').update(string).digest('hex')
+    const checkSum = sha256 + '###' + keyIndex
+
+    console.log("checksum",checkSum);
+    console.log("mainPayload",mainPayload);
+    
+    const options = {
+        method: 'post',
+        url: 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay',
+        headers: {
+            accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X_VERIFY': checkSum
+        },
+        data: {
+            request: mainPayload 
+        }
+    };
+
+    try {
+        const response = await axios.request(options);
+        console.log(response.data);
+        res.json({ message: "done", result: response.data.data.instrumentResponse.redirectInfo.url });
+    } catch (error) {
+        console.log("Payment error:", error.response?.data || error.message); 
+        res.status(500).json({ message: "Error processing paent", error: error.message });
+    }
+});
+
+
+
+exports.initiatePhonePe = asyncHandler(async(req, res)=> {
+
 })
