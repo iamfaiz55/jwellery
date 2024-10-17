@@ -46,8 +46,8 @@ exports.verifyOTPUser = asyncHandler(async (req, res) => {
     const token = jwt.sign({ userId: result._id }, process.env.JWT_KEY, { expiresIn: "1d" })
 
     res.cookie("user", token, {
-        // maxAge: 86400000,
-        maxAge: 60000,
+        maxAge: 86400000,
+        // maxAge: 60000,
         httpOnly: true,
     });
  

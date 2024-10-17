@@ -816,64 +816,131 @@ exports.addHistory = asyncHandler(async(req, res)=> {
 
 
 
+
 exports.usePhonePe = asyncHandler(async (req, res) => {
-    const generateTransactionId = () => {
-        const timeStamps = Date.now();
-        const randomNum = Math.floor(Math.random() * 1000000);
-        const merchantPrefix = "T";
-        return `${merchantPrefix}${timeStamps}${randomNum}`;
-    }
+
     const { name, number, amount, transactionId, MUID } = req.body;
-    const merchantTransectionId = transactionId
+    const merchantTransactionId = transactionId;
+// console.log("req.body",req.body );
+
     const data = {
-        "merchantId": "PGTESTPAYUAT",
-        "merchantTransactionId": generateTransactionId(),
+        "merchantId":process.env.PHONEPE_MERCHANT_ID, 
+        "merchantTransactionId": merchantTransactionId,
         "merchantUserId": MUID,
         "amount": amount * 100,  
-        "redirectUrl": `http://localhost:5000/api/user/status/${merchantTransectionId}`,
+        // "redirectUrl": `http://localhost:5000/api/user/status/${merchantTransactionId}`,
         "redirectMode": "POST",
-        "mobileNumber": number.toString().trim(), 
+        "mobileNumber": number, 
         "paymentInstrument": {
             "type": "PAY_PAGE"
         }
     };
 
-    const payload = JSON.stringify(data);
-    const mainPayload = Buffer.from(payload).toString("base64")
-    const key = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399"
-    const keyIndex = 1
-    const string = mainPayload + '/pg/v1/pay' + key
-    const sha256 = crypto.createHash('sha256').update(string).digest('hex')
-    const checkSum = sha256 + '###' + keyIndex
+ 
+    const payload = Buffer.from(JSON.stringify(data)).toString('base64');
 
-    console.log("checksum",checkSum);
-    console.log("mainPayload",mainPayload);
-    
+    const saltKey = process.env.PHONEPE_SALT_KEY;  
+    const saltIndex = 1;  
+
+    const string = payload +  "/pg/v1/pay" + saltKey;
+
+    // console.log("String to hash for checksum:", string);
+
+    const sha256Hash = crypto.createHash('sha256').update(string).digest('hex');
+
+    const checkSum = sha256Hash + '###' + saltIndex;
+// 	SHA256(base64 encoded payload + “/pg/v1/pay” +salt key) + ### + salt index
+    console.log("Generated Checksum:", checkSum);
+
+    console.log("Base64 Payload:", payload);
+
     const options = {
         method: 'post',
         url: 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay',
         headers: {
-            accept: 'application/json',
+            accept: 'text/plain',
             'Content-Type': 'application/json',
-            'X_VERIFY': checkSum
+            'X-VERIFY': checkSum 
         },
-        data: {
-            request: mainPayload 
-        }
+        data:{
+              request: payload
+             }  
     };
 
+    /**
+     * 
+     * 
+     * 
+const axios = require('axios');
+const options = {
+  method: 'post',
+  url: 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay',
+  headers: {
+        accept: 'text/plain',
+        'Content-Type': 'application/json',
+				},
+data: {
+}
+};
+axios
+  .request(options)
+      .then(function (response) {
+      console.log(response.data);
+  })
+  .catch(function (error) {
+    console.error(error);
+  });
+     */
+    const response = await axios.request(options);
+
     try {
-        const response = await axios.request(options);
-        console.log(response.data);
+        console.log("Payment Response:", response.data);
+
         res.json({ message: "done", result: response.data.data.instrumentResponse.redirectInfo.url });
     } catch (error) {
-        console.log("Payment error:", error.response?.data || error.message); 
-        res.status(500).json({ message: "Error processing paent", error: error.message });
+        console.log("Payment error:", error.message);
+        res.status(500).json({ message: "Error processing payment", error: error.message });
     }
-});
-
+})
 
 
 exports.initiatePhonePe = asyncHandler(async(req, res)=> {
+    const {id}= req.params
+     console.log("initiate status id", id);
+      const merchantTransactionId =id
 
-})
+    const saltKey = process.env.PHONEPE_SALT_KEY;  
+    const saltIndex = 1;  
+
+    const string =  `/pg/v1/status/${process.env.PHONEPE_MERCHANT_ID}` + saltKey;
+
+
+    const sha256Hash = crypto.createHash('sha256').update(string).digest('hex');  
+    const checkSum = sha256Hash + '###' + saltIndex;
+
+    console.log("checksum:", checkSum);
+
+    console.log("payload:", payload);
+
+    const options = {
+        method: 'GET',
+        url: `https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status/${process.env.PHONEPE_MERCHANT_ID}/${merchantTransactionId}`,
+        headers: {
+            accept: 'application/json',  
+            'Content-Type': 'application/json',
+            'X-VERIFY': checkSum ,
+            'X-MERCHANT-ID': process.env.PHONEPE_MERCHANT_ID ,
+        } 
+    };
+
+    
+
+
+    const result = await axios.request(options)
+     if(result.data.success  == true){
+        return res.json({message:"paument Success"})
+     }else{
+        return res.status(505).json({message:"payment Failed"})
+     }
+     
+    })

@@ -1,4 +1,8 @@
 const router = require("express").Router()
+const asyncHandler = require("express-async-handler")
+const axios = require('axios');
+const crypto = require("crypto");
+
 const userController = require("./../controllers/user.controller")
 const adminController = require("./../controllers/admin.controller")
 
@@ -27,7 +31,7 @@ router
     .post("/razorpay", userController.razorpay)
     .post("/verify-payment", userController.verifyPayment)
     .post("/payment", userController.usePhonePe)
-    .post("/status", userController.initiatePhonePe)
+    .post("/status/:id", userController.initiatePhonePe)
 
     .post("/post-review", userController.postReview)
     .put("/update-profile-data/:id", userController.updateProfileData)
