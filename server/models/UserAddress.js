@@ -10,7 +10,7 @@ const userAddressSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    houseNo:{
+    address:{
         type:String,
     },
     city:{
@@ -24,6 +24,15 @@ const userAddressSchema = new mongoose.Schema({
     country:{
         type:String,
         required:true
+    },
+    
+lastName:{
+        type:String,
+        // required:true
+    },
+    firstname:{
+        type:String,
+        // required:true
     },
     addressType:{
         type:String,

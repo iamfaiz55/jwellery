@@ -6,6 +6,7 @@ router
     .post("/login-admin", authController.loginAdmin)
     .post("/verify-otp-admin", authController.verifyOTP)
     .post("/logout-admin", authController.logoutAdmin)
-
+    
+    .post("/login-socket", authController.loginSocket)
 
 module.exports = router

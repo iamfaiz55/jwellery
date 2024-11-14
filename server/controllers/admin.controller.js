@@ -1,5 +1,4 @@
 const asyncHandler = require("express-async-handler")
-const multer = require("multer")
 const { checkEmpty } = require("../utils/checkEmpty")
 const Product = require("../models/Product")
 const Order = require("../models/Order")
@@ -16,6 +15,10 @@ const ScrollCards = require("../models/ScrollCards")
 const upload2 = require("../utils/upload2")
 const AddImages = require("../models/AddImages")
 const History = require("../models/History")
+const MostViewed = require("../models/MostViewed")
+const ProductType = require("../models/ProductType")
+const ProductMaterial = require("../models/ProductMaterial")
+const ProductPurity = require("../models/ProductPurity")
 
 
 exports.addProduct = asyncHandler(async (req, res) => {
@@ -107,32 +110,40 @@ exports.updateProduct = asyncHandler(async (req, res) => {
             );
 
             secure_urls = imageUploads.map(upload => upload.secure_url);
-            public_ids = imageUploads.map(upload => upload.public_id);
+
         }
 
         const {
-            name, mrp, price, discount, height, width, prductWeight, material,
-            productType, desc, purity
+            name, material, productType, desc, purity, varient
         } = req.body;
 
+        if (varient && Array.isArray(varient)) {
+            product.varient.forEach((variant, index) => {
+                const updatedVariant = varient[index];
+
+                if (updatedVariant) {
+                    variant.price = updatedVariant.price || variant.price;
+                    variant.mrp = updatedVariant.mrp || variant.mrp;
+                    variant.discount = updatedVariant.discount || variant.discount;
+                    variant.height = updatedVariant.height || variant.height;
+                    variant.width = updatedVariant.width || variant.width;
+                    variant.prductWeight = updatedVariant.prductWeight || variant.prductWeight;
+                    variant.quantity = updatedVariant.quantity || variant.quantity;
+                }
+            });
+        }
+
         const updatedProduct = await Product.findByIdAndUpdate(
-            pUId,
+            product._id,
             {
                 name,
-                mrp,
                 images: secure_urls,
-                cloudinary_ids: public_ids,
-                price,
-                discount,
-                height,
-                width,
-                prductWeight,
                 material,
                 productType,
                 desc,
                 purity,
-            },
-            { new: true } 
+                varient: product.varient}
+           
         );
 
         res.json({ message: "Product updated successfully", updatedProduct });
@@ -144,6 +155,16 @@ exports.deleteProduct = asyncHandler(async(req, res)=> {
     const {pDId}= req.params
     await Product.findByIdAndUpdate(pDId, {isDelete:true})
     res.json({message:"Product Delete Success"})
+})
+exports.recycleProduct = asyncHandler(async(req, res)=> {
+    const {pId}= req.params
+    await Product.findByIdAndUpdate(pId, {isDelete:false})
+    res.json({message:"Product Recycle Success"})
+})
+exports.permanentDeleteProduct = asyncHandler(async(req, res)=> {
+    const {pId}= req.params
+    await Product.findByIdAndDelete(pId)
+    res.json({message:"Product Permanent Delete Success"})
 })
 
 
@@ -164,10 +185,6 @@ exports.updateOrderStatus =asyncHandler(async(req, res)=> {
     res.json({message:"Order Update Success"})
 })
 
-// exports.addEvenOffers = asyncHandler(async(req, res)=> {
-//     const {image, offPercents} = req.body
-
-// })
 
 exports.getAllUsers = asyncHandler(async(req, res)=> {
     const result = await User.find()
@@ -722,25 +739,128 @@ exports.getMonthlyAvgIncome = asyncHandler(async (req, res) => {
         });
    
 });
-exports.getMostViewedPage = asyncHandler(async (req, res) => {
-  
-        const result = await History.aggregate([
-            {
-                $group: {
-                    _id: "$type", 
-                    users: { $addToSet: "$userId" }
-                }
-            },
-            {
-                $project: {
-                    _id: 1, 
-                    numberOfUsers: { $size: "$users" } 
-                }
-            },
-            {
-                $sort: { numberOfUsers: -1 } 
-            }
-        ]);
-        res.json({message: "Most viewed ", result});
- 
+
+
+exports.addView = asyncHandler(async (req, res) => {
+    const { type } = req.body;
+    
+    let result = await MostViewed.findOne({ type });    
+    if (!result) {
+        result = await MostViewed.create({ type });
+        return res.json({ message: "type added successfully"});
+    }
+    result.views += 1;    
+    await result.save();
+    
+    return res.json({ message:"view updated successfully"});
 });
+
+exports.getViews = asyncHandler(async(req, res)=> {
+    const result = await MostViewed.find()
+    res.json({message:"all Viewed pages get succeess", result})
+})
+
+
+// TODO: purity / material / type CRUD
+exports.addPurity = asyncHandler(async (req, res) => {
+    const { name } = req.body
+    const { error, isError } = checkEmpty({ name })
+    if (isError) {
+        return res.status(400).json({ message: "Error", error })
+    }
+    await ProductPurity.create({ name });
+    res.json({ message: "Product Purity Create Success" });
+})
+exports.updatePurity = asyncHandler(async (req, res) => {
+    const { name } = req.body
+    const { error, isError } = checkEmpty({ name })
+    if (isError) {
+        return res.status(400).json({ message: "Error", error })
+    }
+    await ProductPurity.findByIdAndUpdate(req.params.id, { name });
+    res.json({ message: "Product Purity Update Success" });
+})
+exports.deletePurity = asyncHandler(async (req, res) => {
+    await ProductPurity.findByIdAndUpdate(req.params.id, { isDeleted: true });
+    res.json({ message: "Product Purity Delete Success" });
+})
+exports.getPurity = asyncHandler(async (req, res) => {
+    const result = await ProductPurity.find()
+    res.json({ message: "Product Purity fetch Success", result })
+})
+
+// material
+exports.addMaterial = asyncHandler(async (req, res) => {
+    const { name } = req.body
+    const { error, isError } = checkEmpty({ name })
+    if (isError) {
+        return res.status(400).json({ message: "Error", error })
+    }
+    await ProductMaterial.create({ name });
+    res.json({ message: "Product Material Create Success" });
+})
+exports.updateMaterial = asyncHandler(async (req, res) => {
+    const { name } = req.body
+    const { error, isError } = checkEmpty({ name })
+    if (isError) {
+        return res.status(400).json({ message: "Error", error })
+    }
+    await ProductMaterial.findByIdAndUpdate(req.params.id, { name });
+    res.json({ message: "Product Material Update Success" });
+})
+exports.deleteMaterial = asyncHandler(async (req, res) => {
+    await ProductMaterial.findByIdAndUpdate(req.params.id, { isDeleted: true });
+    res.json({ message: "Product Material Delete Success" });
+})
+exports.getMaterial = asyncHandler(async (req, res) => {
+    const result = await ProductMaterial.find()
+    res.json({ message: "Product Material fetch Success", result })
+})
+
+// type
+exports.addProductType = asyncHandler(async (req, res) => {
+    const { name } = req.body
+    const { error, isError } = checkEmpty({ name })
+    if (isError) {
+        return res.status(400).json({ message: "Error", error })
+    }
+    await ProductType.create({ name });
+    res.json({ message: "Product Type Create Success" });
+})
+exports.updateProductType = asyncHandler(async (req, res) => {
+    const { name } = req.body
+    const { error, isError } = checkEmpty({ name })
+    if (isError) {
+        return res.status(400).json({ message: "Error", error })
+    }
+    await ProductType.findByIdAndUpdate(req.params.id, { name });
+    res.json({ message: "Product Type Update Success" });
+})
+
+
+exports.deleteProductType = asyncHandler(async (req, res) => {
+    await ProductType.findByIdAndUpdate(req.params.id, { isDeleted: true });
+    res.json({ message: "Product Type Delete Success" });
+})
+
+
+exports.getProductType = asyncHandler(async (req, res) => {
+    const result = await ProductType.find()
+    res.json({ message: "Product Type fetch Success", result })
+})
+
+
+
+
+exports.getProductGeneralSettings = asyncHandler(async (req, res) => {
+    const productTypeResult = await ProductType.find({ isDeleted: false })
+    const productMaterialResult = await ProductMaterial.find({ isDeleted: false })
+    const productPurityResult = await ProductPurity.find({ isDeleted: false })
+    res.json({
+        message: "Product General Setting fetch Success", result: {
+            type: productTypeResult,
+            material: productMaterialResult,
+            purity: productPurityResult
+        }
+    })
+})

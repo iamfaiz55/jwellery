@@ -13,7 +13,8 @@ const orderItemSchema = new mongoose.Schema({
     varientId: {
         type: String,
         // required: true
-    }
+    },
+  
 });
 
 
@@ -57,6 +58,10 @@ const orderSchema = new mongoose.Schema({
     },
     razorpay_order_id:{
         type:String
+    },
+    trackingId: {
+        type: String,
+        required: true
     }
 }, { timestamps: true });
 

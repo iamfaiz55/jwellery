@@ -2,10 +2,15 @@ const asyncHandler = require("express-async-handler")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const validator = require("validator")
+const crypto = require("crypto")
 
 const { checkEmpty } = require("../utils/checkEmpty")
 const Admin = require("../models/Admin")
 const sendEmail = require("../utils/email")
+
+
+
+
 
 
 
@@ -29,58 +34,61 @@ exports.registerAdmin = asyncHandler(async (req, res) => {
 })
 
 exports.loginAdmin = asyncHandler(async (req, res) => {
-    const { email, password } = req.body
+    const { mobile } = req.body;
 
-    const { isError, error } = checkEmpty({ email, password })
-    if (isError) {
-        return res.status(401).json({ message: "All Fields required", error })
-    }
-    if (!validator.isEmail(email)) {
-        return res.status(401).json({ message: "Invalid Email" })
-    }
-    const result = await Admin.findOne({ email })
+    // const { isError, error } = checkEmpty({ email, password });
+    // if (isError) {
+    //     return res.status(401).json({ message: "All Fields required", error });
+    // }
+    // if (!validator.isEmail(email)) {
+    //     return res.status(401).json({ message: "Invalid Email" });
+    // }
+    const result = await Admin.findOne({ mobile });
 
     if (!result) {
-        return res.status(401).json({ message:"Invalid Email"  })
+        return res.status(401).json({ message: "Invalid number" });
     }
-    const isVerify = await bcrypt.compare(password, result.password)
+    // const isVerify = await bcrypt.compare(password, result.password);
 
-    if (!isVerify) {
-        return res.status(401).json({ message:"Invalid Password"  })
-    }
+    // if (!isVerify) {
+    //     return res.status(401).json({ message: "Invalid Password" });
+    // }
 
-    const otp = Math.floor(10000 + Math.random() * 900000)
+    // Generate a 4-digit OTP
+    // const otp = crypto.randomInt(1000, 10000); 
+    const otp = crypto.randomInt(100000, 1000000);
 
-    await Admin.findByIdAndUpdate(result._id, { otp })
 
-    await sendEmail({
-        to: email,
-        subject: `Login OTP`,
-        message: `
-            <h1>Do Not Share Your Account OTP</h1>
-            <p>your login otp ${otp}</p>
-        ` })
-     // send also to mobile👇
-    //  /////////////////////////////////////
+    await Admin.findByIdAndUpdate(result._id, { otp });
 
-    res.json({ message: "Credentials Verify Success. OTP send to your registered email.", result:{
-        email
-    } })
-})
+    // await sendEmail({
+    //     to: email,
+    //     subject: `Login OTP`,
+    //     message: `
+    //         <h1>Do Not Share Your Account OTP</h1>
+    //         <p>Your login OTP is ${otp}</p>
+    //     `
+    // });
+    // Optionally send to mobile (you can add your SMS sending logic here)
+console.log("result data", result);
+
+    res.json({
+        message: "Credentials Verify Success. OTP sent to your registered email.",
+        result: result.mobile
+    });
+});
 
 exports.verifyOTP = asyncHandler(async (req, res) => {
-    const { otp, email } = req.body
-    // console.log(otp, email);
-    const { isError, error } = checkEmpty({ email, otp })
+    const { otp, mobile } = req.body
+    console.log("from verify",req.body);
+    const { isError, error } = checkEmpty({ mobile, otp })
     if (isError) {
         return res.status(401).json({ message: "All Fields required", error })
     }
-    if (!validator.isEmail(email)) {
-        return res.status(401).json({ message: "Invalid Email" })
-    }
+   
 
 
-    const result = await Admin.findOne({ email })
+    const result = await Admin.findOne({ mobile })
 // console.log(result);
 
     if (!result) {
@@ -121,3 +129,43 @@ exports.logoutAdmin = asyncHandler(async (req, res) => {
     res.json({ message: "Admin Logout Success" })
 })
 
+
+
+exports.loginSocket = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+
+    const {isError, error}= checkEmpty({email, password})
+    if(isError){
+        return res.status(408).json({message:"all Fields required", error})
+    }
+
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+      return res.status(401).json({ message: "Invalid Email" });
+    }
+
+    const isVerify = await bcrypt.compare(password, admin.password);
+    if (!isVerify) {
+      return res.status(401).json({ message: "Invalid Password" });
+    }
+
+    const adminSocketId = req.adminId
+    console.log("socket id in coontroller",adminSocketId);
+    
+    // console.log(getSocketIdByAdminId);
+
+    if (adminSocketId) {
+        console.log("socket Called", adminSocketId);
+        
+        req.io.to(adminSocketId).emit("mobileLoginConfirmation", {
+            email,
+        });
+
+        return res.json({
+            message: "Waiting for mobile confirmation",
+            result: { email },
+        });
+    }
+
+    return res.status(401).json({ message: "Admin is not connect on mobile" });
+});

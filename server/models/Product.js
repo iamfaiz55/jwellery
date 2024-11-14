@@ -10,9 +10,6 @@ const productSchema = new mongoose.Schema({
                   desc:{
                         type:String
                   },
-                  discount:{
-                        type:Number
-                  },
                   mrp:{
                         type:Number
                   },
@@ -27,15 +24,20 @@ const productSchema = new mongoose.Schema({
                   },
                   quantity:{
                         type:Number
+                  },
+                  prevPrice:{
+                        type:Number
                   }
          }
       ],
       images: { type: [String], required: true },
       // discount:{type:String,required:true},
-      material:{type:String,enum:["gold", "diamond", "bronz", "white-gold", "rose-gold", "platinum"],required:true},
+      material:{type:String,
+            // enum:["gold", "diamond", "bronz", "white-gold", "rose-gold", "platinum"],
+            required:true},
       productType:{
          type:String,
-         enum:["rings", "earings", "necklace", "mangalsutra", "chain", "pendent", "nose-pin", "bangles","forehead-ornament","anklet","coins" ],
+      //    enum:["rings", "earings", "necklace", "mangalsutra", "chain", "pendent", "nose-pin", "bangles","forehead-ornament","anklet","coins" ],
          required:true
       },
       mainDesc:{type:String,},
