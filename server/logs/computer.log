@@ -3123,6 +3123,7 @@ GET /api/open/get-menu-items 304 377.551 ms
 POST /api/user/payment 500 796.909 ms
 GET /api/user/get-all-payment-method 304 213.572 ms
 GET /api/user/get-cart/670652bbd92c8041760d4730 304 306.378 ms
+<<<<<<< HEAD
 GET /api/open/get-company 304 100.586 ms
 GET /api/open/get-tax 304 80.595 ms
 GET /api/open/get-adds-images 304 73.029 ms
@@ -11052,3 +11053,5 @@ GET /api/open/carousel 304 76.544 ms
 GET /api/user/get-cart/6713cdac565856b74db1df71 304 134.669 ms
 GET /api/open/get-scroll-cards 304 280.302 ms
 GET /api/open/get-products?page=1&limit=8 304 285.008 ms
+=======
+>>>>>>> 3e3f81b2c8cb676bfa0e3d9b8401218d81c6fab3

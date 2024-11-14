@@ -869,10 +869,11 @@ exports.usePhonePe = asyncHandler(async (req, res) => {
         method: 'post',
         url: 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay',
         headers: {
-            accept: 'application/json',
+            accept: 'text/plain',
             'Content-Type': 'application/json',
             'X-VERIFY': checkSum 
         },
+<<<<<<< HEAD
         data: { 
             request: payload 
         }
@@ -880,6 +881,37 @@ exports.usePhonePe = asyncHandler(async (req, res) => {
     };
 
 
+=======
+        data:{
+              request: payload
+             }  
+    };
+
+    /**
+     * 
+     * 
+     * 
+const axios = require('axios');
+const options = {
+  method: 'post',
+  url: 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay',
+  headers: {
+        accept: 'text/plain',
+        'Content-Type': 'application/json',
+				},
+data: {
+}
+};
+axios
+  .request(options)
+      .then(function (response) {
+      console.log(response.data);
+  })
+  .catch(function (error) {
+    console.error(error);
+  });
+     */
+>>>>>>> 3e3f81b2c8cb676bfa0e3d9b8401218d81c6fab3
     const response = await axios.request(options);
 
     try {
@@ -932,6 +964,7 @@ exports.initiatePhonePe = asyncHandler(async(req, res)=> {
         return res.status(505).json({message:"payment Failed"})
      }
      
+<<<<<<< HEAD
 })
 
 
@@ -1125,3 +1158,6 @@ doc.text(`Order Date: ${order.createdAt.toDateString()}`, orderInfoX, doc.y, { w
         }
     });
 });
+=======
+    })
+>>>>>>> 3e3f81b2c8cb676bfa0e3d9b8401218d81c6fab3
