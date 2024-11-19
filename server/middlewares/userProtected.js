@@ -3,6 +3,8 @@ const User = require("../models/User");
 
 exports.userProtected = async (req, res, next) => {
     const { user } = req.cookies;
+    console.log("check protected", user);
+    
     if (!user) {
         return res.status(409).json({ message: "Session Expired Re Login Please" });
     }
@@ -22,6 +24,11 @@ exports.userProtected = async (req, res, next) => {
 
             if (loggedInUser.isBlock) {
                 return res.status(406).json({ message: "You are blocked From Admin" });
+            }
+            console.log("loggedinUser", loggedInUser);
+            
+            if (loggedInUser.isDelete === true) {
+                return res.status(410).json({ message: "Account Is Deactivated" });
             }
 
             req.loggedInUser = loggedInUser._id;

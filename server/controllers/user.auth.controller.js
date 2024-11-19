@@ -23,6 +23,9 @@ exports.loginUser = asyncHandler(async (req, res) => {
           return res.json({ message: "OTP sent for User registration", result:  mobile  });
         }else if(user.isBlock){
             return res.status(406).json({ message: "You Are Blocked By Admin" });
+        
+        }else if(user.isDelete === true){
+            return res.status(410).json({ message: "Your ------- Account Was Deactivated" });
         }
     
     

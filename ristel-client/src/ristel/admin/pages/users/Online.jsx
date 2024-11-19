@@ -48,118 +48,57 @@ const Online = () => {
     }, [unblockSuccess]);
     return <>
         <Container fluid className="bg-white p-5">
-            {/* Online Users Table */}
+            {/* Online Users List */}
             <Row className="mb-4">
                 <Col>
                     <h2 className="text-primary mb-3">Online Users</h2>
                     <div className="overflow-auto">
                         {onlineUsers.length > 0 ? (
-                            <Table responsive bordered variant='primary' className="bg-white">
-                                <thead className="bg-primary text-white">
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Mobile</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {onlineUsers.map((user, i) => (
-                                        <tr key={user._id} className="table-light">
-                                            <td>{i + 1}</td>
-                                            <td>{user.mobile}</td>
-                                            <td>
-                                                {user.isBlock ? (
-                                                    <Button
-                                                        variant="outline-success"
-                                                        className="me-2"
-                                                        onClick={() => unblockUser(user._id)}
-                                                    >
-                                                        Unblock
-                                                    </Button>
-                                                ) : (
-                                                    <Button
-                                                        variant="outline-danger"
-                                                        className="me-2"
-                                                        onClick={() => blockUser(user._id)}
-                                                    >
-                                                        Block
-                                                    </Button>
-                                                )}
+                            <ul className="list-group">
+                                {onlineUsers.map((user, i) => (
+                                    <li key={user._id} className="list-group-item d-flex justify-content-between align-items-center shadow-sm mb-3 bg-light rounded-3">
+                                        <div className="d-flex align-items-center">
+                                            <span className="badge bg-primary text-white rounded-pill me-3">
+                                                {i + 1}
+                                            </span>
+                                            <div>
+                                                <h5 className="mb-0">Mobile: {user.mobile}</h5>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            {user.isBlock ? (
                                                 <Button
-                                                    variant="outline-primary"
-                                                    onClick={() => navigate(`/admin/get-history/${user._id}`)}
+                                                    variant="outline-success"
+                                                    className="me-2"
+                                                    onClick={() => unblockUser(user._id)}
                                                 >
-                                                    Details
+                                                    Unblock
                                                 </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
+                                            ) : (
+                                                <Button
+                                                    variant="outline-danger"
+                                                    className="me-2"
+                                                    onClick={() => blockUser(user._id)}
+                                                >
+                                                    Block
+                                                </Button>
+                                            )}
+                                            <Button
+                                                variant="outline-primary"
+                                                onClick={() => navigate(`/admin/get-history/${user._id}`)}
+                                            >
+                                                Details
+                                            </Button>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
                         ) : (
                             <p className="text-muted">No users are online at the moment.</p>
                         )}
                     </div>
                 </Col>
             </Row>
-
-            {/* All Users Table */}
-            {/* <Row>
-                <Col>
-                    <h2 className="text-primary mb-3">All Users</h2>
-                    <div className="overflow-auto">
-                        {allUsers ? (
-                            <Table responsive bordered hover className="bg-white">
-                                <thead className="bg-primary text-white">
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Mobile</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {allUsers.map((user, i) => (
-                                        <tr key={user._id} className="table-light">
-                                            <td>{i + 1}</td>
-                                            <td>{user.mobile}</td>
-                                            <td>
-                                                {user.isBlock ? (
-                                                    <Button
-                                                        variant="outline-success"
-                                                        className="me-2"
-                                                        onClick={() => unblockUser(user._id)}
-                                                    >
-                                                        Unblock
-                                                    </Button>
-                                                ) : (
-                                                    <Button
-                                                        variant="outline-danger"
-                                                        className="me-2"
-                                                        onClick={() => blockUser(user._id)}
-                                                    >
-                                                        Block
-                                                    </Button>
-                                                )}
-                                                <Button
-                                                    variant="outline-primary"
-                                                    onClick={() => navigate(`/admin/get-history/${user._id}`)}
-                                                >
-                                                    Details
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                        ) : (
-                            <div className="text-center text-muted">
-                                <Spinner animation="border" role="status" size="sm" />
-                                <span className="ms-2">Loading users...</span>
-                            </div>
-                        )}
-                    </div>
-                </Col>
-            </Row> */}
         </Container>
     </>
 }

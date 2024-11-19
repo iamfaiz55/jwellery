@@ -664,6 +664,17 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 providesTags: ["user"]
             }),
+            deactivate: builder.mutation({
+                query: id=> {
+                    return {
+                        url: `/deactivate/${id}`,
+                        method: "PUT",
+                        // body: categoryData
+                    }
+                },
+                transformResponse:data => data.result,
+                providesTags: ["user"]
+            }),
         
         
         }
@@ -697,6 +708,7 @@ export const {
     // usePostHistoryMutation,
     usePhonePeMutation,
     useSendInvoiceAgainMutation,
-    useUpdateAddressMutation
+    useUpdateAddressMutation,
+    useDeactivateMutation
     
 } = userApi

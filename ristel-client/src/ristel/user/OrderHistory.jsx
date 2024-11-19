@@ -1,5 +1,5 @@
-import { Fragment, useEffect } from 'react';
-import { Col, Row, Card, Image, Breadcrumb, Container, Spinner } from 'react-bootstrap';
+import { Fragment, useEffect, useState } from 'react';
+import { Col, Row, Card, Image, Breadcrumb, Container, Spinner, Modal, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 
@@ -63,7 +63,7 @@ const OrderHistory = () => {
     const [sendInoice, { isSuccess: sendSuccess, isLoading }] = useSendInvoiceAgainMutation()
     const { data: orders, error, isError } = useGetOrdersQuery(user._id);
     const [cancelOrder, { isSuccess }] = useCancelOrderMutation()
-    console.log(orders);
+    // console.log(orders);
 
 
     useEffect(() => {
@@ -92,6 +92,28 @@ const OrderHistory = () => {
             toast.success("Invoice Sended To Your Registered Email")
         }
     }, [sendSuccess])
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success("Order Cancel Success")
+        }
+    }, [isSuccess])
+
+    const [showModal, setShowModal] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState(null);
+
+    const handleCancelClick = (orderId) => {
+        setSelectedOrder(orderId); // Store the order ID
+        setShowModal(true); // Show the modal
+    };
+
+    const handleConfirmCancel = () => {
+        if (selectedOrder) {
+            cancelOrder(selectedOrder); // Call the cancel order function
+            setShowModal(false); // Close the modal
+            setSelectedOrder(null); // Reset the selected order
+        }
+    };
+
 
     return (
         <Container className='min-vh-100'>
@@ -121,8 +143,20 @@ const OrderHistory = () => {
                                     <div className="d-flex align-items-center justify-content-between mb-3">
                                         <h5 className="mb-0">Order #{order._id}</h5>
                                         <div className="d-flex justify-content-center w-100">
-                                            <Link to="#" className="mx-auto">Cancel Order</Link>
-                                        </div>
+                                            {
+                                                order.status !== "pending" || "shipped" && <>
+                                                    <Link
+                                                        to="#"
+                                                        className="mx-auto text-danger"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            handleCancelClick(order._id);
+                                                        }}
+                                                    >
+                                                        Cancel Order
+                                                    </Link>
+                                                </>
+                                            }                                        </div>
                                         <div>
                                             {
                                                 isLoading
@@ -176,7 +210,7 @@ const OrderHistory = () => {
 
                                                     {/* Action Buttons */}
                                                     <Col lg={4} xs={12} className="d-flex flex-column align-items-start align-items-lg-end">
-                                                        <Link to="/dashboard/ecommerce/products" className="btn btn-primary mb-2 w-100 w-lg-auto">Buy again</Link>
+                                                        <Link to={`/product-details/${item.productId._id}`} className="btn btn-primary mb-2 w-100 w-lg-auto">Buy again</Link>
                                                         <Link to="#" className="btn btn-secondary w-100 w-lg-auto">Shop similar</Link>
                                                     </Col>
                                                 </Row>
@@ -192,6 +226,25 @@ const OrderHistory = () => {
                     </Card>
                 </Col>
             </Row>
+
+
+            {/* Cancel Order Confirmation Modal */}
+            <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Cancel Order</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>Are you sure you want to cancel this order?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        Close
+                    </Button>
+                    <Button variant="danger" onClick={handleConfirmCancel}>
+                        Confirm Cancel
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
 
     );

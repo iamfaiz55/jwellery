@@ -536,16 +536,16 @@ exports.addScrollCard = asyncHandler(async(req, res)=> {
             return res.status(400).json({ message: "File upload failed", error: err.message });
         }
 
-        const {title,  link}=req.body
-console.log(req.body);
+        const {title,  link, mentorRole}=req.body
+// console.log(req.body);
 
-const {isError, error}= checkEmpty({title,  link})
+const {isError, error}= checkEmpty({title,  link ,mentorRole})
 if(isError){
     return res.status(400).json({message:"All Filds Required", error})
 } 
 const {secure_url}=await cloudinary.uploader.upload(req.files[0].path)
 // console.log(await img);
-         await ScrollCards.create({title, link, image:secure_url})
+         await ScrollCards.create({mentorRole, title, link, image:secure_url})
 
          res.json({message:"ScrollCard Create Sucecss"})
     })

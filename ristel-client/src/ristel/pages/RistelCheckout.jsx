@@ -608,93 +608,6 @@ const PaymentSelection = (props) => {
 
 
                     {/* Paypal Payment Method */}
-                    <Card className="card-bordered shadow-none mb-2">
-                        <Card.Body>
-                            <div className="d-flex">
-                                <Form.Check className="mb-2">
-                                    <Form.Check.Input type="radio" name="paymentMethod" id="paypal" />
-                                    <Form.Check.Label className="ms-2 w-100" ></Form.Check.Label>
-                                </Form.Check>
-                                <div>
-                                    <h5 className="mb-1"> Payment with Paypal</h5>
-                                    <p className="mb-0 fs-6">You will be redirected to PayPal website to complete your purchase securely.</p>
-                                </div>
-                            </div>
-                        </Card.Body>
-                    </Card>
-
-                    {/* Credit / Debit Card Payment Method */}
-                    <Card className="card-bordered shadow-none mb-2">
-                        <Card.Body>
-                            <div className="d-flex mb-4">
-                                <Form.Check className="mb-2" >
-                                    <Form.Check.Input type="radio" name="paymentMethod" id="paypal" />
-                                    <Form.Check.Label className="ms-2 w-100" ></Form.Check.Label>
-                                </Form.Check>
-                                <div>
-                                    <h5 className="mb-1"> Credit / Debit Card</h5>
-                                    <p className="mb-0 fs-6">Safe money transfer using your bank accou k account. We support
-                                        Mastercard tercard, Visa, Discover and Stripe.</p>
-                                </div>
-                            </div>
-                            <Row>
-                                <Col xs={12}>
-                                    <Form.Group className="mb-3" >
-                                        <Form.Label htmlFor='cardNumber'>Card Number</Form.Label>
-                                        <Form.Control as={CardNumberInput} id="cardNumber" />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6} xs={12}>
-                                    <Form.Group className="mb-3 mb-lg-0" >
-                                        <Form.Label htmlFor='nameOnCard'>Name on card</Form.Label>
-                                        <Form.Control type="text" placeholder="Enter your first name" id="nameOnCard" />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={3} xs={12}>
-                                    <Form.Group className="mb-3" >
-                                        <Form.Label htmlFor='expiryDate'>Expiry date</Form.Label>
-                                        <Form.Control as={ExpiryDate} mask="99/99" placeholder="xx/xx" id="expiryDate" />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={3} xs={12}>
-                                    <Form.Group className="mb-3 mb-lg-0" >
-                                        <Form.Label htmlFor='cvvCode'>CVV Code
-                                            <OverlayTrigger
-                                                overlay={<Tooltip
-                                                    id="cvvTooltip">
-                                                    A 3 - digit number, typically printed on the back of a card.
-                                                </Tooltip>}>
-                                                <Link to="#"><i className="fe fe-help-circle ms-1"></i></Link>
-                                            </OverlayTrigger>
-                                        </Form.Label>
-                                        <Form.Control as={InputMask}
-                                            type="password"
-                                            mask="999"
-                                            maskChar={null}
-                                            className="form-control"
-                                            placeholder="xxx" id="cvvCode" />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                        </Card.Body>
-                    </Card>
-
-                    {/* Payoneer Payment Method */}
-                    <Card className="card-bordered shadow-none mb-2">
-                        <Card.Body>
-                            <div className="d-flex">
-                                <Form.Check className="mb-2">
-                                    <Form.Check.Input type="radio" name="paymentMethod" id="payoneer" />
-                                    <Form.Check.Label className="ms-2 w-100" ></Form.Check.Label>
-                                </Form.Check>
-                                <div>
-                                    <h5 className="mb-1"> Pay with Payoneer</h5>
-                                    <p className="mb-0 fs-6">You will be redirected to Payoneer website to complete your
-                                        purchase securely.</p>
-                                </div>
-                            </div>
-                        </Card.Body>
-                    </Card>
 
 
 
@@ -960,128 +873,72 @@ const ShippingInformation = (props) => {
 
     return (
         <Form>
-            {/* Content for second tab */}
-            <div className="bs-stepper-content">
-                <div role="tabpanel" className="bs-stepper-pane" >
+            <div className="bs-stepper-content w-100">
+                <div role="tabpanel" className="bs-stepper-pane">
+                    {/* Section Header */}
                     <div className="mb-5">
                         <h3 className="mb-1">Shipping Information</h3>
-                        <p className="mb-0">Fill the form below in order to send you the orders invoice.
-                        </p>
-                    </div>
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h4 className="mb-0">Saved Address</h4>
-                        <Button variant="secondary" onClick={() => setModalShow(true)}>
-                            Add new address
-                        </Button>
-
-                        <AddNewAddressModal
-                            show={modalShow}
-                            setModalShow={setModalShow}
-                        />
-
+                        <p className="mb-0">Fill the form below to send you the orders invoice.</p>
                     </div>
 
+                    {/* Saved Address Section */}
+                    <div className="d-flex  justify-content-between align-items-center mb-3">
+                        <h4 className="mb-0 flex-grow-1">Saved Address</h4>
+                        <div>
+                            <Button variant="outline-primary" onClick={() => setModalShow(true)}>
+                                + Add New Address
+                            </Button>
+                        </div>
+
+                        {/* Add New Address Modal */}
+                        <AddNewAddressModal show={modalShow} setModalShow={setModalShow} />
+                    </div>
+
+                    {/* Address List */}
                     <Row>
-                        {
-                            addresses && addresses.map((item, i) => <>
-                                <Col lg={6} xs={12} className="mb-4">
-                                    <div className="border p-4 rounded-3">
+                        {addresses &&
+                            addresses.map((item, i) => (
+                                <Col lg={6} xs={12} className="mb-4" key={item._id}>
+                                    <div
+                                        className={`border p-4 rounded-3 ${selectedAddress === item._id ? "border-primary shadow-sm" : ""
+                                            }`}
+                                    >
                                         <Form.Check className="mb-2">
-                                            <Form.Check.Input checked={selectedAddress === item._id} onChange={() => handleAddressChange(item._id)} type="radio" name="addressRadio" id="addressRadio1" />
-                                            <Form.Check.Label className="text-dark fw-semibold" >{item.addressType}</Form.Check.Label>
-                                            <p className="mb-0">
-                                                {item.address}<br />
-                                                {item.state},<br />
-                                                {item.city} {item.pincode},<br />
-                                                {item.country}
-                                            </p>
+                                            <Form.Check.Input
+                                                checked={selectedAddress === item._id || (!selectedAddress && i === 0)}
+                                                onChange={() => handleAddressChange(item._id)}
+                                                type="radio"
+                                                name="addressRadio"
+                                                id={`addressRadio-${i}`}
+                                            />
+                                            <Form.Check.Label className="text-dark fw-semibold">
+                                                {item.addressType}
+                                            </Form.Check.Label>
                                         </Form.Check>
+                                        <p className="mb-0 text-muted">
+                                            {item.address}<br />
+                                            {item.city}, {item.state} {item.pincode}<br />
+                                            {item.country}
+                                        </p>
                                     </div>
                                 </Col>
-                            </>)
-                        }
-                        {/* <Col lg={6} xs={12} className="mb-4">
-                            <div className="border p-4 rounded-3">
-                                <Form.Check className="mb-2">
-                                    <Form.Check.Input type="radio" name="addressRadio" id="addressRadio2" />
-                                    <Form.Check.Label className="text-dark fw-semibold" >Office</Form.Check.Label>
-                                    <p className="mb-0">
-                                        3853 Coal Road<br />
-                                        Tannersville, <br />
-                                        Pennsylvania, 18372 <br />
-                                        United States</p>
-                                </Form.Check>
-                            </div>
-                        </Col> */}
+                            ))}
                     </Row>
-                    <div>
-                        <h4 className="mb-4">Shipping Method</h4>
-                        <Card className="card-bordered shadow-none mb-2">
-                            <Card.Body>
-                                <div className="d-flex">
-                                    <Form.Check className="mb-2" >
-                                        <Form.Check.Input type="radio" name="shippingMethod" id="freeDelivery" />
-                                        <Form.Check.Label className="ms-2 w-100" ></Form.Check.Label>
-                                    </Form.Check>
-                                    <div className="">
-                                        <h5 className="mb-1"> Free Delivery</h5>
-                                        <span className="fs-6">Expected Delivery 3 to 5 Days</span>
-                                    </div>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                        <Card className="card-bordered shadow-none mb-2">
-                            <Card.Body>
-                                <div className="d-md-flex">
-                                    <Form.Check className="mb-2">
-                                        <Form.Check.Input type="radio" name="shippingMethod" id="nextDelivery" />
-                                        <Form.Check.Label className="ms-2 w-100" ></Form.Check.Label>
-                                    </Form.Check>
-                                    <div className="d-flex justify-content-between align-items-center w-100">
-                                        <div className="d-flex align-items-start">
-                                            <Image src={FedEx} alt="" />
-                                            <div className="ms-2">
-                                                <h5 className="mb-1"> FedEx Next Day Delivery</h5>
-                                                <p className="mb-0 fs-6">No Delivery on Public Holidays</p>
-                                            </div>
-                                        </div>
-                                        <div><h3 className="mb-0">$19.99</h3></div>
-                                    </div>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                        <Card className="card-bordered shadow-none">
-                            <Card.Body>
-                                <div className="d-md-flex">
-                                    <Form.Check className="mb-2">
-                                        <Form.Check.Input type="radio" name="shippingMethod" id="DHLExpress" />
-                                        <Form.Check.Label className="ms-2 w-100" ></Form.Check.Label>
-                                    </Form.Check>
-                                    <div className="d-flex justify-content-between align-items-center w-100">
-                                        <div className="d-flex align-items-start">
-                                            <Image src={DHL} alt="" />
-                                            <div className="ms-2">
-                                                <h5 className="mb-1">DHL Express</h5>
-                                                <p className="mb-0 fs-6">1 Day Delivery</p>
-                                            </div>
-                                        </div>
-                                        <div><h3 className="mb-0">$8.99</h3></div>
-                                    </div>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </div>
-                    <div className="d-md-flex justify-content-between  mt-4">
-                        <Button variant='outline-primary' className="mb-2 mb-md-0" onClick={previous}>
+
+                    {/* Navigation Buttons */}
+                    <div className="d-md-flex justify-content-between mt-4">
+                        <Button variant="outline-secondary" className="mb-2 mb-md-0" onClick={previous}>
                             Back to Info
                         </Button>
-                        <Button onClick={handlePayNow}>
+                        <Button variant="primary" onClick={handlePayNow}>
                             Continue to Payment <i className="fe fe-credit-card ms-2"></i>
                         </Button>
                     </div>
                 </div>
             </div>
         </Form>
+
+
     );
 }
 // overview

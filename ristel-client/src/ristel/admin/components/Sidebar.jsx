@@ -20,10 +20,11 @@ const DashboardMenu = [
         id: uuid(),
         title: 'Dashboard',
         icon: 'home',
-        children: [
-            { id: uuid(), link: '/admin/dashboard', name: 'Overview' },
-            { id: uuid(), link: '#', name: 'Analytics' }
-        ]
+        link: '/admin/dashboard'
+        // children: [
+        //     { id: uuid(), link: '/admin/dashboard', name: 'Overview' },
+        //     { id: uuid(), link: '#', name: 'Analytics' }
+        // ]
     },
 
     // {
@@ -42,7 +43,7 @@ const DashboardMenu = [
         icon: 'user',
         children: [
             { id: uuid(), link: '/admin/user/management', name: 'User Management' },
-            { id: uuid(), link: '/admin/user/address', name: 'User Address' },
+            // { id: uuid(), link: '/admin/user/address', name: 'User Address' },
             // { id: uuid(), link: '/admin/user/reviews', name: 'User Reviews' },
             { id: uuid(), link: '/admin/user/active', name: 'Active Users' },
             { id: uuid(), link: '/admin/user/inactive', name: 'Inactive Users' },
@@ -57,6 +58,7 @@ const DashboardMenu = [
         children: [
             { id: uuid(), link: '/admin/cms/slider', name: 'Slider' },
             { id: uuid(), link: '/admin/cms/address', name: 'Address' },
+            { id: uuid(), link: '/admin/cms/mentor', name: 'Mentor' },
             { id: uuid(), link: '/admin/cms/logo', name: 'Logo' },
             { id: uuid(), link: '/admin/cms/gallery', name: 'Gallery' },
             // { id: uuid(), link: '/admin/cms/reviews', name: 'Reviews' },
@@ -73,9 +75,10 @@ const DashboardMenu = [
         title: 'Orders',
         icon: 'shopping-bag',
         children: [
-            { id: uuid(), link: '/admin/order/overview', name: 'Order Overview' },
-            { id: uuid(), link: '/admin/order/cart', name: 'Cart Orders' },
-            { id: uuid(), link: '/admin/order/checkout', name: 'Checkout Orders' },
+            // { id: uuid(), link: '/admin/order/overview', name: 'Order Overview' },
+            // { id: uuid(), link: '/admin/order/cart', name: 'Cart Orders' },
+            { id: uuid(), link: '/admin/order/all-orders', name: 'All Orders' },
+            // { id: uuid(), link: '/admin/order/checkout', name: 'Checkout Orders' },
         ]
     },
 

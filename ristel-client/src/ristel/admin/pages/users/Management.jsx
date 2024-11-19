@@ -37,52 +37,48 @@ const UserManagement = () => {
         <Container>
             <Row>
                 <Col>
-                    <h2 className="text-primary mb-3">All Users</h2>
+                    <h2 className="text-primary mb-4">All Users</h2>
                     <div className="overflow-auto">
                         {allUsers ? (
-                            <Table responsive bordered variant='primary'
-                                className="bg-white">
-                                <thead className="bg-primary text-white">
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Mobile</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {allUsers.map((user, i) => (
-                                        <tr key={user._id} className="table-light">
-                                            <td>{i + 1}</td>
-                                            <td>{user.mobile}</td>
-                                            <td>
-                                                {user.isBlock ? (
-                                                    <Button
-                                                        variant="outline-success"
-                                                        className="me-2"
-                                                        onClick={() => unblockUser(user._id)}
-                                                    >
-                                                        Unblock
-                                                    </Button>
-                                                ) : (
-                                                    <Button
-                                                        variant="outline-danger"
-                                                        className="me-2"
-                                                        onClick={() => blockUser(user._id)}
-                                                    >
-                                                        Block
-                                                    </Button>
-                                                )}
+                            <ul className="list-group">
+                                {allUsers.map((user, i) => (
+                                    <li key={user._id} className="list-group-item d-flex justify-content-between align-items-center shadow-sm mb-3 bg-light border-0 rounded-3">
+                                        <div className="d-flex align-items-center">
+                                            <span className="badge bg-primary text-white rounded-pill me-3">
+                                                {i + 1}
+                                            </span>
+                                            <div>
+                                                <h5 className="mb-0 text-dark">Mobile: {user.mobile}</h5>
+                                            </div>
+                                        </div>
+                                        <div className="d-flex">
+                                            {user.isBlock ? (
                                                 <Button
-                                                    variant="outline-primary"
-                                                    onClick={() => navigate(`/admin/get-history/${user._id}`)}
+                                                    variant="outline-success"
+                                                    className="me-2"
+                                                    onClick={() => unblockUser(user._id)}
                                                 >
-                                                    Details
+                                                    Unblock
                                                 </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
+                                            ) : (
+                                                <Button
+                                                    variant="outline-danger"
+                                                    className="me-2"
+                                                    onClick={() => blockUser(user._id)}
+                                                >
+                                                    Block
+                                                </Button>
+                                            )}
+                                            <Button
+                                                variant="outline-primary"
+                                                onClick={() => navigate(`/admin/get-history/${user._id}`)}
+                                            >
+                                                Details
+                                            </Button>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
                         ) : (
                             <div className="text-center text-muted">
                                 <Spinner animation="border" role="status" size="sm" />
@@ -93,6 +89,7 @@ const UserManagement = () => {
                 </Col>
             </Row>
         </Container>
+
     </>
 }
 

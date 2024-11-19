@@ -106,9 +106,10 @@ const Hero = () => {
 
 const ProductMarquee = () => {
     const { data } = useGetAllScrollCardsQuery()
-    console.log("product marquee", data);
+    // console.log("product marquee", data);
 
     return (
+
         <section className="py-md-8 py-6 bg-white"
             style={{
                 backgroundImage: `url(${MentorHeroGlow})`,
@@ -130,9 +131,9 @@ const ProductMarquee = () => {
                                 <Link key={index} to="#" className="bg-white text-center shadow-sm text-wrap rounded-4 w-100 border card-lift border mentor-card">
                                     <div className="p-3">
                                         <Image src={mentor.image} alt="mentor 1" className="avatar avatar-xl rounded-circle" />
-                                        <div className="mt-3">
-                                            <h3 className="mb-0 h4">{mentor.title}</h3>
-                                            {/* <span className="text-gray-800">{mentor.mentorRole}</span> */}
+                                        <div className="mt-3 text-center">
+                                            <h4 className="mb-0 ">{mentor.title}</h4>
+                                            <span className="text-gray-800">{mentor.mentorRole}</span>
                                         </div>
                                     </div>
                                 </Link>
@@ -154,75 +155,21 @@ const MentorListData = [
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/solitaires.png",
         mentorName: 'Solitaires',
         mentorRole: 'Quality Assurance Engineer',
-        company: 'Microsoft',
-        experience: 5,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 35, // price per month
-        allowFreeTrial: true,
-        mentees: '40+',
-        skills: [
-            'Problem Solving',
-            'Automation',
-            'Analytical',
-            'Time Management',
-            'Accuracy',
-            'Critical Thinking',
-            'Flexibility'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/watch-jewellery.png",
         mentorName: 'Mangalsutras',
         mentorRole: 'Senior Business Analyst',
-        company: 'Amazon',
-        experience: 5,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 0,
-        ratings: 0,
-        verified: true,
-        new: true,
-        price: 40, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'BI tools',
-            'Data Analysis',
-            'ERP',
-            'CRM Systems',
-            'SDLC',
-            'SQL',
-            'MS Excel'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/mens_v1.png",
         mentorName: "Men's Jewellery",
         mentorRole: 'Senior Data Engineer',
-        company: 'InstaCart',
-        experience: 5,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 10,
-        ratings: 4.5,
-        verified: true,
-        new: false,
-        price: 60, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'Problem Solving',
-            'Automation',
-            'Analytical',
-            'Time Management',
-            'Accuracy',
-            'Critical Thinking',
-            'Flexibility'
-        ]
+
     },
 
     {
@@ -230,373 +177,105 @@ const MentorListData = [
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/mangalsutras.png",
         mentorName: "Solitaires",
         mentorRole: "Solitaires",
-        company: 'Zoom',
-        experience: 5,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 112,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 25, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'Frontend',
-            'HTML',
-            'CSS',
-            'React',
-            'Javascript',
-            'Vuejs',
-            'Next.js'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/nose-pins.png",
         mentorName: "Mangalsutras",
         mentorRole: "Mangalsutras",
-        company: 'InstaCart',
-        experience: 5,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 55, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'Figma',
-            'Product Designing',
-            'Prototyping',
-            'Wireframing',
-            'Microinteractions',
-            'VR Prototyping'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/coins.png",
         mentorName: "Men's Jewellery",
         mentorRole: "Men's Jewellery",
-        company: 'Target',
-        experience: 5,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 44, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'Frontend',
-            'HTML',
-            'CSS',
-            'React',
-            'Javascript',
-            'Vuejs',
-            'Next.js'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/anklets.png",
         mentorName: "Kids Jewellery",
         mentorRole: "Kids Jewellery",
-        company: 'Microsoft',
-        experience: 5,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 54, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'Problem Solving',
-            'Automation',
-            'Analytical',
-            'Time Management',
-            'Accuracy',
-            'Critical Thinking',
-            'Flexibility'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/nose-pins.png",
         mentorName: "Nose Pins",
         mentorRole: "Nose Pins",
-        company: 'Figma',
-        experience: 5,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 0,
-        ratings: 0,
-        verified: true,
-        new: true,
-        price: 30, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'Frontend',
-            'HTML',
-            'CSS',
-            'React',
-            'Javascript',
-            'Vuejs',
-            'Next.js'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/kids.png",
         mentorName: "Anklets",
         mentorRole: "Anklets",
-        company: 'Amazon',
-        experience: 6,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 50, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'Problem Solving',
-            'Automation',
-            'Analytical',
-            'Time Management',
-            'Accuracy',
-            'Critical Thinking',
-            'Flexibility'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/nose-pins.png",
         mentorName: "Gold Coins",
         mentorRole: "Gold Coins",
-        company: 'InstaCart',
-        experience: 4.5,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 50, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'BI tools',
-            'Data Analysis',
-            'ERP',
-            'CRM Systems',
-            'SDLC',
-            'SQL',
-            'MS Excel'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/pendants.png",
         mentorName: "Rings",
         mentorRole: "Rings",
-        company: 'Zoom',
-        experience: 3,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 30, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'Figma',
-            'Product Designing',
-            'Prototyping',
-            'Wireframing',
-            'Microinteractions',
-            'VR Prototyping'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/rings_v1.png",
         mentorName: "Pendants",
         mentorRole: "Pendants",
-        company: 'Microsoft',
-        experience: 6,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 66, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'BI tools',
-            'Data Analysis',
-            'ERP',
-            'CRM Systems',
-            'SDLC',
-            'SQL',
-            'MS Excel'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/necklaces.png",
         mentorName: "Earrings",
         mentorRole: "Earrings",
-        company: 'InstaCart',
-        experience: 5,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 45, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'Frontend',
-            'HTML',
-            'CSS',
-            'React',
-            'Javascript',
-            'Vuejs',
-            'Next.js'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/earrings.png",
         mentorName: "Necklaces",
         mentorRole: "Necklaces",
-        company: 'Amazon',
-        experience: 8,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 25, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'Problem Solving',
-            'Automation',
-            'Analytical',
-            'Time Management',
-            'Accuracy',
-            'Critical Thinking',
-            'Flexibility'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/bangles.png",
         mentorName: "Bracelets",
         mentorRole: "Bracelets",
-        company: 'Microsoft',
-        experience: 5,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 55, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'Frontend',
-            'HTML',
-            'CSS',
-            'React',
-            'Javascript',
-            'Vuejs',
-            'Next.js'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/bracelets.png",
         mentorName: "Bangles",
         mentorRole: "Bangles",
-        company: 'Figma',
-        experience: 7,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 25, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'Frontend',
-            'HTML',
-            'CSS',
-            'React',
-            'Javascript',
-            'Vuejs',
-            'Next.js'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/chains.png",
         mentorName: "Kada",
         mentorRole: "Kada",
-        company: 'InstaCart',
-        experience: 5,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 29, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'Problem Solving',
-            'Automation',
-            'Analytical',
-            'Time Management',
-            'Accuracy',
-            'Critical Thinking',
-            'Flexibility'
-        ]
+
     },
     {
         id: uuid(),
         image: "https://kinclimg5.bluestone.com/f_webp/static/hp/d/kada.png",
         mentorName: "Gold Chains",
         mentorRole: "Gold Chains",
-        company: 'Amazon',
-        experience: 5,
-        description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ligula magna, gravida id suscipit vitae, condimentum ac mauris. Mauris nibh leo, aliquet vel turpiscing elit. Nam ligula magcing elit. Nam ligula magcing elit. Nam ligula mag eget, tempus faucibus felis`,
-        reviews: 12,
-        ratings: 5.0,
-        verified: true,
-        new: false,
-        price: 50, // price per month
-        allowFreeTrial: false,
-        mentees: '40+',
-        skills: [
-            'BI tools',
-            'Data Analysis',
-            'ERP',
-            'CRM Systems',
-            'SDLC',
-            'SQL',
-            'MS Excel'
-        ]
+
     }
 ]
 

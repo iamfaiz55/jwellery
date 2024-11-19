@@ -33,6 +33,7 @@ router
 
     .post("/post-review", userController.postReview)
     .put("/update-profile-data/:id", userController.updateProfileData)
+    .put("/deactivate/:uId", userController.deactivateMyAccount)
     .post("/update-address", userController.updateAddress)
     .get("/get-profile/:id", userController.getProfile)
     .get("/get-all-reviews/:id", userController.getReviews)

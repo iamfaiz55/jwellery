@@ -16,8 +16,8 @@ import AddProduct from '../ristel/admin/pages/products/AddProduct';
 import Details from '../ristel/admin/pages/products/Details';
 import Draft from '../ristel/admin/pages/products/Draft';
 import UserManagement from '../ristel/admin/pages/users/Management';
-import Address from '../ristel/admin/pages/users/Address';
-import Reviews from '../ristel/admin/pages/users/Reviews';
+// import Address from '../ristel/admin/pages/users/Address';
+// import Reviews from '../ristel/admin/pages/users/Reviews';
 import ActiveInactive from '../ristel/admin/pages/users/ActiveInactive';
 import Online from '../ristel/admin/pages/users/Online';
 import Slider from '../ristel/admin/pages/cms/Slider';
@@ -59,6 +59,8 @@ import AddressInfo from '../ristel/user/AddressInfo';
 import Profile from '../ristel/user/Profile';
 import Watchlist from '../ristel/user/Watchlist';
 import Coupon from '../ristel/user/Coupon';
+import Mentor from '../ristel/admin/pages/cms/Mentor';
+import AllOrders from '../ristel/admin/pages/orders/AllOrders';
 
 
 export const CartContext = createContext();
@@ -101,16 +103,18 @@ const AllRoutes = () => {
 				<Route path="product/draft" element={<Draft />} />
 
 				<Route path="user/management" element={<UserManagement />} />
-				<Route path="user/address" element={<Address />} />
-				<Route path="user/reviews" element={<Reviews />} />
+				{/* <Route path="user/address" element={<Address />} /> */}
+				{/* <Route path="user/reviews" element={<Reviews />} /> */}
 				<Route path="user/active" element={<ActiveInactive type="active" />} />
 				<Route path="user/inactive" element={<ActiveInactive type="inactive" />} />
 				<Route path="user/online" element={<Online />} />
+
 				<Route path="cms/slider" element={<Slider />} />
 				<Route path="cms/gallery" element={<Gallery />} />
 				<Route path="cms/address" element={<CmsAddress />} />
 				<Route path="cms/logo" element={<Logo />} />
 				<Route path="cms/reviews" element={<CmsReviews />} />
+				<Route path="cms/mentor" element={<Mentor />} />
 				<Route path="cms/about" element={<About />} />
 				<Route path="cms/contact" element={<Contact />} />
 				<Route path="cms/privacy-policy" element={<PrivacyPolicy />} />
@@ -118,6 +122,7 @@ const AllRoutes = () => {
 				<Route path="cms/faq" element={<Faq />} />
 
 				<Route path="order/cart" element={<ActiveCart />} />
+				<Route path="order/all-orders" element={<AllOrders />} />
 				<Route path="order/checkout" element={<CheckoutOrders />} />
 				<Route path="dashboard" element={<AdminDashboard />} />
 				<Route path="order/overview" element={<OrderOverview />} />

@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema({
     isBlock:{
         type:Boolean,
         default:false
+    },
+    isDelete:{
+        type:Boolean,
+        default:false
     }
 
 },{timestamps:true})

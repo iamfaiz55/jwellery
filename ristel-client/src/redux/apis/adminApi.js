@@ -435,6 +435,39 @@ export const adminApi = createApi({
             transformResponse:data => data.result,
             invalidatesTags: ["admin"]
         }),
+        updateScrollCard: builder.mutation({
+            query: scrollCardData=> {
+                return {
+                    url: `/update-scroll-card/${scrollCardData._id}`,
+                    method: "PUT",
+                    body: scrollCardData.fd
+                }
+            },
+            transformResponse:data => data.result,
+            invalidatesTags: ["admin"]
+        }),
+        deleteScrollCard: builder.mutation({
+            query: id=> {
+                return {
+                    url: `/delete-scroll-card/${id}`,
+                    method: "DELETE",
+                    // body: scrollCardData.fd
+                }
+            },
+            transformResponse:data => data.result,
+            invalidatesTags: ["admin"]
+        }),
+        addScrollCard: builder.mutation({
+            query: scrollCardData=> {
+                return {
+                    url: `/add-scroll-card`,
+                    method: "POST",
+                    body: scrollCardData
+                }
+            },
+            transformResponse:data => data.result,
+            invalidatesTags: ["admin"]
+        }),
         }
     }
 })
@@ -492,5 +525,12 @@ export const {
 
     // gallery
     useAddGalleryImagesMutation,
-    useDeleteGalleryImageMutation
+    useDeleteGalleryImageMutation,
+
+
+
+    // mentor
+    useAddScrollCardMutation,
+    useUpdateScrollCardMutation,
+    useDeleteScrollCardMutation
 } = adminApi

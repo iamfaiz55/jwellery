@@ -1228,6 +1228,24 @@ doc.text(`Order Date: ${order.createdAt.toDateString()}`, orderInfoX, doc.y, { w
         }
     });
 });
+
+
+
+exports.deactivateMyAccount = asyncHandler(async(req, res)=> {
+    const {uId}= req.params
+    const result = await User.findById(uId)
+    console.log(uId);
+    console.log(result);
+    
+    if(!result){
+        return res.json({message:"No Have Data"})
+    }
+   
+    const x = await User.findByIdAndUpdate(uId, {isDelete:true})
+
+    res.json({message:"Account Deleted Successfuly"})
+
+})
 // =======
     // })
 // >>>>>>> 3e3f81b2c8cb676bfa0e3d9b8401218d81c6fab3

@@ -51,6 +51,11 @@ const Login = () => {
             toast.error(error.data.message)
         }
     }, [isError])
+    useEffect(() => {
+        if (error && error.status === 410) {
+            toast.error(error.data.message)
+        }
+    }, [isError])
 
     return (
         <Fragment>

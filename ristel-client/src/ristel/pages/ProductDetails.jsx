@@ -21,7 +21,10 @@ const ProductDetails = () => {
     // const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
     const { id } = useParams()
+    // console.log("getting id", id);
+
     const { data, isLoading } = useGetDetailsQuery(id)
+    // console.log("data", data);
 
 
     // const [addView] = useAddViewMutation()
@@ -157,7 +160,7 @@ const ProductDetails = () => {
                     <Card.Body className="p-5">
                         <Row>
                             <Col lg={6} xs={12}>
-                                <ProductGallery2 sliderImages={data.images} />
+                                <ProductGallery2 sliderImages={data && data.images} />
                             </Col>
                             <Col lg={6} xs={12}>
                                 <div className="my-5 mx-lg-10">
@@ -192,7 +195,7 @@ const ProductBriefInfo = ({ data, selectedVariant, setSelectedVariant }) => {
     const getFormattedPrice = amount => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(amount)
     const getFormattedDiscount = (mrp, price) => (((mrp - price) / mrp) * 100).toFixed(0)
     useEffect(() => {
-        setSelectedVariant(data.varient[0])
+        setSelectedVariant(data && data.varient[0])
     }, [])
     const { user } = useSelector((state) => state.user);
     // console.log("user from redux", user);
@@ -244,9 +247,9 @@ const ProductBriefInfo = ({ data, selectedVariant, setSelectedVariant }) => {
         {
             selectedVariant && <Fragment>
                 <div>
-                    <h1>{data.name} ({data.purity}) ({selectedVariant.prductWeight})</h1>
+                    <h1>{data && data.name} ({data && data.purity}) ({selectedVariant.prductWeight})</h1>
                     <div>
-                        <span><span className="me-1 text-dark fw-semibold">{data.rating} <Icon path={mdiStar} size={0.6} className="text-success" />
+                        <span><span className="me-1 text-dark fw-semibold">{data && data.rating} <Icon path={mdiStar} size={0.6} className="text-success" />
                         </span>592 Customer Reviews</span>
                     </div>
                 </div>
@@ -261,7 +264,7 @@ const ProductBriefInfo = ({ data, selectedVariant, setSelectedVariant }) => {
 
                     <p className='pt-3'>Varients</p>
                     <div className='d-flex gap-2 overflow-x-auto'>
-                        {data.varient && data.varient.map((item, i) => <div onClick={e => setSelectedVariant(item)} className={`alert border border-2 ${selectedVariant._id === item._id && " alert-success"}`} style={{ cursor: "pointer" }}>
+                        {data && data.varient && data.varient.map((item, i) => <div onClick={e => setSelectedVariant(item)} className={`alert border border-2 ${selectedVariant._id === item._id && " alert-success"}`} style={{ cursor: "pointer" }}>
                             <h5 className='d-flex justify-content-between'>{data.name} {item.prductWeight}  <span className='text-danger fs-5 fw-medium'>-{getFormattedDiscount(item.mrp, item.price)}%</span></h5>
 
                             <p className='m-0'> <strong>₹{getFormattedPrice(item.price)}</strong> MRP: <del>₹{getFormattedPrice(item.mrp)}</del>
@@ -307,19 +310,19 @@ const ProductDetailsAccordion = ({ data, selectedVariant, setSelectedVariant }) 
                     <Accordion.Item eventKey="1" className='border-end-0 border-start-0'>
                         <Accordion.Header ><span className='fw-bold'>Specifications</span></Accordion.Header>
                         <Accordion.Body>
-                            {data.specification}
+                            {data && data.specification}
                         </Accordion.Body>
                     </Accordion.Item>
                     <Accordion.Item eventKey="2" className='border-end-0 border-start-0'>
                         <Accordion.Header ><span className='fw-bold'>Free Shipping Policy</span></Accordion.Header>
                         <Accordion.Body>
-                            {data.freeShippingPolicy}
+                            {data && data.freeShippingPolicy}
                         </Accordion.Body>
                     </Accordion.Item>
                     <Accordion.Item eventKey="3" className='border-end-0 border-start-0'>
                         <Accordion.Header ><span className='fw-bold'>Refund Policy</span></Accordion.Header>
                         <Accordion.Body>
-                            {data.refundPolicy}
+                            {data && data.refundPolicy}
                         </Accordion.Body>
                     </Accordion.Item>
                 </Accordion>
@@ -415,7 +418,7 @@ const ProductGallery2 = ({ sliderImages = [] }) => {
                         <div id="product-iw">
                             <div className="product" id="product" >
                                 <Slider {...settings} ref={carousel}>
-                                    {sliderImages.map((image, index) => {
+                                    {sliderImages && sliderImages.map((image, index) => {
                                         return (
                                             <div key={index}>
                                                 <Image src={image} alt='Product 1' className='rounded-2 ' style={{ height: "70vh", width: "100%", objectFit: "cover" }} />
@@ -429,7 +432,7 @@ const ProductGallery2 = ({ sliderImages = [] }) => {
                 </div>
                 <div className="product-tools">
                     <Row className="thumbnails g-3" id="product-thumbnails" aria-label="Carousel Pagination">
-                        {sliderImages.map((image, index) => {
+                        {sliderImages && sliderImages.map((image, index) => {
                             return (
                                 <Col key={index} xs={3} className={active === index ? 'nav-active' : ''} data-nav={index} aria-controls="product">
                                     <div className="thumbnails-img">
