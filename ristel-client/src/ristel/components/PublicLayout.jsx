@@ -29,7 +29,7 @@ const PublicLayout = () => {
 }
 
 
-const RistelNavbarMegaMenu = () => {
+export const RistelNavbarMegaMenu = () => {
     const { data: companyDetails } = useGetCompanyDetailsQuery();
 
     const [expandedMenu, setExpandedMenu] = useState(false);
@@ -42,7 +42,7 @@ const RistelNavbarMegaMenu = () => {
                 onToggle={(collapsed) => setExpandedMenu(collapsed)}
                 expanded={expandedMenu}
                 expand="lg"
-                className="navbar-default"
+                className="navbar-default "
             >
                 <Container className="px-0 ps-2">
                     <div className="d-flex">
@@ -85,7 +85,7 @@ const RistelNavbarMegaMenu = () => {
                         <div className="ms-auto mt-3 mt-lg-0">
                             <div className="d-flex align-items-center">
                                 {/* <DarkLightMode /> */}
-                                <Link to="/login" className="btn btn-outline-primary ms-3">
+                                <Link to="/user" className="btn btn-outline-primary ms-3">
                                     <Icon path={mdiAccount} size={0.7} />
                                 </Link>
                                 <Link to="/cart" className="btn btn-outline-primary ms-3 position-relative">

@@ -26,16 +26,16 @@ const DashboardMenu = [
         ]
     },
 
-    {
-        id: uuid(),
-        title: 'Revenue',
-        icon: 'book',
-        children: [
-            { id: uuid(), link: '', name: 'Overview' },
-            { id: uuid(), link: '', name: 'Monthly' },
-            { id: uuid(), link: '', name: 'Yearly' },
-        ]
-    },
+    // {
+    //     id: uuid(),
+    //     title: 'Revenue',
+    //     icon: 'book',
+    //     children: [
+    //         { id: uuid(), link: '', name: 'Overview' },
+    //         { id: uuid(), link: '', name: 'Monthly' },
+    //         { id: uuid(), link: '', name: 'Yearly' },
+    //     ]
+    // },
     {
         id: uuid(),
         title: 'User',
@@ -43,7 +43,7 @@ const DashboardMenu = [
         children: [
             { id: uuid(), link: '/admin/user/management', name: 'User Management' },
             { id: uuid(), link: '/admin/user/address', name: 'User Address' },
-            { id: uuid(), link: '/admin/user/reviews', name: 'User Reviews' },
+            // { id: uuid(), link: '/admin/user/reviews', name: 'User Reviews' },
             { id: uuid(), link: '/admin/user/active', name: 'Active Users' },
             { id: uuid(), link: '/admin/user/inactive', name: 'Inactive Users' },
             { id: uuid(), link: '/admin/user/online', name: 'Online Users' },
@@ -59,7 +59,7 @@ const DashboardMenu = [
             { id: uuid(), link: '/admin/cms/address', name: 'Address' },
             { id: uuid(), link: '/admin/cms/logo', name: 'Logo' },
             { id: uuid(), link: '/admin/cms/gallery', name: 'Gallery' },
-            { id: uuid(), link: '/admin/cms/reviews', name: 'Reviews' },
+            // { id: uuid(), link: '/admin/cms/reviews', name: 'Reviews' },
             { id: uuid(), link: '/admin/cms/about', name: 'About' },
             { id: uuid(), link: '/admin/cms/contact', name: 'Contact' },
             { id: uuid(), link: '/admin/cms/privacy-policy', name: 'Privacy Policy' },
@@ -89,20 +89,9 @@ const DashboardMenu = [
             { id: uuid(), link: '/admin/product/details', name: 'Product Details' },
             { id: uuid(), link: '/admin/product/draft', name: 'Product Draft' },
             { id: uuid(), link: '/admin/product/schedule', name: 'Product Schedule' },
-
-
-
         ]
     },
-    {
-        id: uuid(),
-        title: 'Employee',
-        icon: 'user',
-        children: [
-            { id: uuid(), link: '/admin/employee/add', name: 'Add Employee' },
-            { id: uuid(), link: '/admin/employee/details', name: 'Employee Details' },
-        ]
-    },
+
     {
         id: uuid(),
         title: 'General',

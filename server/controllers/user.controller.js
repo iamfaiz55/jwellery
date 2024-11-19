@@ -315,6 +315,76 @@ if(!user.email){
     res.json({ message: "Address Created Successfully" });
 });
 
+exports.updateAddress = asyncHandler(async (req, res) => {
+    // console.log(req.ody);
+    
+    const {
+        _id,  // ID of the address to update
+        email,      // Optional: Update user email if provided
+        pincode,
+        city,
+        state,
+        country,
+        addressType,
+        mobile,
+        address,
+        firstname,
+        lastName
+    } = req.body;
+
+    const { isError, error } = checkEmpty({
+        // addressId,/ // Ensure addressId is provided
+        pincode,
+        city,
+        state,
+        country,
+        addressType,
+        mobile,
+        address,
+        firstname,
+        lastName,
+    });
+
+    if (isError) {
+        return res.status(400).json({ message: "All Fields Required", error });
+    }
+
+    let existingAddress = await UserAddress.findById(_id);
+
+    if (!existingAddress) {
+        return res.status(404).json({ message: "Address not found" });
+    }
+
+    let user = await User.findById(existingAddress.userId);
+
+    if (!user) {
+        return res.status(404).json({ message: "User not found" });
+    }
+
+    // If email is provided and the user's email is empty, update the email
+    if (email && !user.email) {
+        user.email = email;
+        await user.save();
+    }
+
+    // Update the address fields
+    existingAddress.city = city;
+    existingAddress.state = state;
+    existingAddress.pincode = pincode;
+    existingAddress.country = country;
+    existingAddress.addressType = addressType;
+    existingAddress.mobile = mobile;
+    existingAddress.address = address;
+    existingAddress.firstname = firstname;
+    existingAddress.lastName = lastName;
+
+    // Save the updated address
+    await existingAddress.save();
+
+    res.json({ message: "Address Updated Successfully", updatedAddress: existingAddress });
+});
+
+
 
 exports.getAddresses = asyncHandler(async(req, res)=> {
     const {id} = req.params
@@ -828,64 +898,64 @@ exports.addHistory = asyncHandler(async(req, res)=> {
 
 
 
-exports.usePhonePe = asyncHandler(async (req, res) => {
+// exports.usePhonePe = asyncHandler(async (req, res) => {
 
-    const { name, number, amount, transactionId, MUID } = req.body;
-    const merchantTransactionId = transactionId;
-// console.log("req.body",req.body );
+//     const { name, number, amount, transactionId, MUID } = req.body;
+//     const merchantTransactionId = transactionId;
+// // console.log("req.body",req.body );
 
-    const data = {
-        "merchantId":process.env.PHONEPE_MERCHANT_ID, 
-        "merchantTransactionId": merchantTransactionId,
-        "merchantUserId": MUID,
-        "amount": amount * 100,  
-        // "redirectUrl": `http://localhost:5000/api/user/status/${merchantTransactionId}`,
-        "redirectMode": "POST",
-        "mobileNumber": number, 
-        "paymentInstrument": {
-            "type": "PAY_PAGE"
-        }
-    };
+//     const data = {
+//         "merchantId":process.env.PHONEPE_MERCHANT_ID, 
+//         "merchantTransactionId": merchantTransactionId,
+//         "merchantUserId": MUID,
+//         "amount": amount * 100,  
+//         // "redirectUrl": `http://localhost:5000/api/user/status/${merchantTransactionId}`,
+//         "redirectMode": "POST",
+//         "mobileNumber": number, 
+//         "paymentInstrument": {
+//             "type": "PAY_PAGE"
+//         }
+//     };
 
  
-    const payload = Buffer.from(JSON.stringify(data)).toString('base64');
+//     const payload = Buffer.from(JSON.stringify(data)).toString('base64');
 
-    const saltKey = process.env.PHONEPE_SALT_KEY;  
-    const saltIndex = 1;  
+//     const saltKey = process.env.PHONEPE_SALT_KEY;  
+//     const saltIndex = 1;  
 
-    const string = payload +  "/pg/v1/pay" + saltKey;
+//     const string = payload +  "/pg/v1/pay" + saltKey;
 
-    // console.log("String to hash for checksum:", string);
+//     // console.log("String to hash for checksum:", string);
 
-    const sha256Hash = crypto.createHash('sha256').update(string).digest('hex');
+//     const sha256Hash = crypto.createHash('sha256').update(string).digest('hex');
 
-    const checkSum = sha256Hash + '###' + saltIndex;
-// 	SHA256(base64 encoded payload + “/pg/v1/pay” +salt key) + ### + salt index
-    console.log("Generated Checksum:", checkSum);
+//     const checkSum = sha256Hash + '###' + saltIndex;
+// // 	SHA256(base64 encoded payload + “/pg/v1/pay” +salt key) + ### + salt index
+//     console.log("Generated Checksum:", checkSum);
 
-    console.log("Base64 Payload:", payload);
+//     console.log("Base64 Payload:", payload);
 
-    const options = {
-        method: 'post',
-        url: 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay',
-        headers: {
-            accept: 'text/plain',
-            'Content-Type': 'application/json',
-            'X-VERIFY': checkSum 
-        },
-<<<<<<< HEAD
-        data: { 
-            request: payload 
-        }
+//     const options = {
+//         method: 'post',
+//         url: 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay',
+//         headers: {
+//             accept: 'text/plain',
+//             'Content-Type': 'application/json',
+//             'X-VERIFY': checkSum 
+//         },
+//  HEAD
+//         data: { 
+//             request: payload 
+//         }
 
-    };
+//     };
 
 
-=======
-        data:{
-              request: payload
-             }  
-    };
+
+//         data:{
+//               request: payload
+//              }  
+//     };
 
     /**
      * 
@@ -911,61 +981,61 @@ axios
     console.error(error);
   });
      */
->>>>>>> 3e3f81b2c8cb676bfa0e3d9b8401218d81c6fab3
-    const response = await axios.request(options);
+// >>>>>>> 3e3f81b2c8cb676bfa0e3d9b8401218d81c6fab3
+//     const response = await axios.request(options);
 
-    try {
-        console.log("Payment Response:", response.data);
+//     try {
+//         console.log("Payment Response:", response.data);
 
-        res.json({ message: "done", result: response.data.data.instrumentResponse.redirectInfo.url });
-    } catch (error) {
-        console.log("Payment error:", error.message);
-        res.status(500).json({ message: "Error processing payment", error: error.message });
-    }
-})
-
-
-exports.initiatePhonePe = asyncHandler(async(req, res)=> {
-    const {id}= req.params
-     console.log("initiate status id", id);
-      const merchantTransactionId =id
-
-    const saltKey = process.env.PHONEPE_SALT_KEY;  
-    const saltIndex = 1;  
-
-    const string =  `/pg/v1/status/${process.env.PHONEPE_MERCHANT_ID}` + saltKey;
+//         res.json({ message: "done", result: response.data.data.instrumentResponse.redirectInfo.url });
+//     } catch (error) {
+//         console.log("Payment error:", error.message);
+//         res.status(500).json({ message: "Error processing payment", error: error.message });
+//     }
+// })
 
 
-    const sha256Hash = crypto.createHash('sha256').update(string).digest('hex');  
-    const checkSum = sha256Hash + '###' + saltIndex;
+// exports.initiatePhonePe = asyncHandler(async(req, res)=> {
+//     const {id}= req.params
+//      console.log("initiate status id", id);
+//       const merchantTransactionId =id
 
-    console.log("checksum:", checkSum);
+//     const saltKey = process.env.PHONEPE_SALT_KEY;  
+//     const saltIndex = 1;  
 
-    console.log("payload:", payload);
+//     const string =  `/pg/v1/status/${process.env.PHONEPE_MERCHANT_ID}` + saltKey;
 
-    const options = {
-        method: 'GET',
-        url: `https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status/${process.env.PHONEPE_MERCHANT_ID}/${merchantTransactionId}`,
-        headers: {
-            accept: 'application/json',  
-            'Content-Type': 'application/json',
-            'X-VERIFY': checkSum ,
-            'X-MERCHANT-ID': process.env.PHONEPE_MERCHANT_ID ,
-        } 
-    };
+
+//     const sha256Hash = crypto.createHash('sha256').update(string).digest('hex');  
+//     const checkSum = sha256Hash + '###' + saltIndex;
+
+//     console.log("checksum:", checkSum);
+
+//     console.log("payload:", payload);
+
+//     const options = {
+//         method: 'GET',
+//         url: `https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status/${process.env.PHONEPE_MERCHANT_ID}/${merchantTransactionId}`,
+//         headers: {
+//             accept: 'application/json',  
+//             'Content-Type': 'application/json',
+//             'X-VERIFY': checkSum ,
+//             'X-MERCHANT-ID': process.env.PHONEPE_MERCHANT_ID ,
+//         } 
+//     };
 
     
 
 
-    const result = await axios.request(options)
-     if(result.data.success  == true){
-        return res.json({message:"paument Success"})
-     }else{
-        return res.status(505).json({message:"payment Failed"})
-     }
+//     const result = await axios.request(options)
+//      if(result.data.success  == true){
+//         return res.json({message:"paument Success"})
+//      }else{
+//         return res.status(505).json({message:"payment Failed"})
+//      }
      
-<<<<<<< HEAD
-})
+// // <<<<<<< HEAD
+// })
 
 
 
@@ -1158,6 +1228,6 @@ doc.text(`Order Date: ${order.createdAt.toDateString()}`, orderInfoX, doc.y, { w
         }
     });
 });
-=======
-    })
->>>>>>> 3e3f81b2c8cb676bfa0e3d9b8401218d81c6fab3
+// =======
+    // })
+// >>>>>>> 3e3f81b2c8cb676bfa0e3d9b8401218d81c6fab3

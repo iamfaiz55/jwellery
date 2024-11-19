@@ -1,0 +1,72 @@
+/* Sidebar Container */
+.simplebar-content {
+    padding: 20px;
+    background-color: #ffffff;
+    /* White theme */
+}
+
+/* Header Section */
+.user-sidebar-header {
+    background-color: #003366;
+    /* Royal blue background */
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Profile Image */
+.user-sidebar-header img {
+    border: 2px solid #ffffff;
+}
+
+/* Menu Items */
+.user-sidebar-menu {
+    margin-left: 10px;
+}
+
+.user-sidebar-item {
+    margin-bottom: 15px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: #003366;
+    /* Royal blue text */
+    font-weight: 500;
+    background-color: #f8f9fa;
+    /* Light background for links */
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    background-color: #e0e7ff;
+    /* Light royal blue hover effect */
+    color: #003366;
+}
+
+.nav-link.active {
+    background-color: #003366;
+    /* Active royal blue */
+    color: white;
+    /* White text for active link */
+}
+
+.nav-icon {
+    font-size: 18px;
+}
+
+/* Badges */
+.badge {
+    font-size: 12px;
+    padding: 3px 6px;
+}
+
+/* Box Shadow for Elevated Look */
+.shadow-sm {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

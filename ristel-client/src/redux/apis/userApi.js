@@ -438,6 +438,17 @@ export const userApi = createApi({
                 transformResponse:data => data.result,
                 providesTags: ["user"]
             }),
+            updateAddress: builder.mutation({
+                query: addressData => {
+                    return {
+                        url: "/update-address",
+                        method: "POST",
+                        body: addressData
+                    }
+                },
+                transformResponse:data => data.result,
+                providesTags: ["user"]
+            }),
             addCart: builder.mutation({
                 query: cartData => {
                     return {
@@ -685,6 +696,7 @@ export const {
     useUpdateProfileDataMutation,
     // usePostHistoryMutation,
     usePhonePeMutation,
-    useSendInvoiceAgainMutation
+    useSendInvoiceAgainMutation,
+    useUpdateAddressMutation
     
 } = userApi

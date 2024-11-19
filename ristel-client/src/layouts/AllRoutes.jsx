@@ -43,10 +43,22 @@ import AdminProtected from '../ristel/share/AdminProtected';
 import ProductForm from '../ristel/admin/pages/products/ProductForm';
 import ProductSettings from '../ristel/admin/pages/general/ProductSettings';
 import { createContext, useContext, useEffect, useState } from 'react';
-import OrderHistory from '../ristel/pages/OrderHistory';
+import OrderHistory from '../ristel/user/OrderHistory';
 import AdminDashboard from '../ristel/admin/AdminDashboard/AdminDashboard';
 import Gallery from '../ristel/admin/pages/users/Gallery';
 import Schedule from '../ristel/admin/pages/products/Schedule';
+import CustomerProtected from '../ristel/share/UserProtected';
+import UserLayout from '../ristel/user/components/UserLayout';
+// import ProfilePrivacy from '../ristel/user/Profile';
+// import BillingInfo from '../ristel/user/AddressInfo';
+// import SocialProfiles from '../ristel/user/StudentSocialProfiles';
+// import Security from '../ristel/user/Security';
+// import Invoice from '../ristel/user/Invoice';
+import DeleteProfile from '../ristel/user/DeleteProfile';
+import AddressInfo from '../ristel/user/AddressInfo';
+import Profile from '../ristel/user/Profile';
+import Watchlist from '../ristel/user/Watchlist';
+import Coupon from '../ristel/user/Coupon';
 
 
 export const CartContext = createContext();
@@ -67,7 +79,7 @@ const AllRoutes = () => {
 				<Route path="filter" element={<FilterJewellery />} />
 				<Route path="product-details/:id" element={<ProductDetails />} />
 				<Route path="success" element={<PaymentSuccess />} />
-				<Route path="user-order-history" element={<OrderHistory />} />
+
 				<Route path="checkout" element={<CartProvider>
 					<RistelCheckout />
 				</CartProvider>} />
@@ -116,6 +128,51 @@ const AllRoutes = () => {
 				<Route path="task" element={<Tasks />} />
 				<Route path="calendar" element={<Calendar />} />
 				<Route path="general-product-settings" element={<ProductSettings />} />
+			</Route>
+			<Route path='/user' element={<CustomerProtected compo={<UserLayout />} />}>
+				<Route index element={<Profile />} />
+				<Route path="address" element={<AddressInfo />} />
+				<Route path="watchlist" element={<Watchlist />} />
+				<Route path="coupons" element={<Coupon />} />
+				{/* <Route path="social-profile" element={<SocialProfiles />} /> */}
+				{/* <Route path="security" element={<Security />} /> */}
+				{/* <Route path="invoice" element={<Invoice />} /> */}
+				<Route path="delete-profile" element={<DeleteProfile />} />
+				<Route path="all-orders" element={<OrderHistory />} />
+				{/* <Route path="product/add" element={<AddProduct />} />
+				<Route path="product/schedule" element={<Schedule />} />
+				<Route path="product/add-form" element={<ProductForm />} />
+				<Route path="product/details" element={<Details />} />
+				<Route path="product/draft" element={<Draft />} />
+
+				<Route path="user/management" element={<UserManagement />} />
+				<Route path="user/address" element={<Address />} />
+				<Route path="user/reviews" element={<Reviews />} />
+				<Route path="user/active" element={<ActiveInactive type="active" />} />
+				<Route path="user/inactive" element={<ActiveInactive type="inactive" />} />
+				<Route path="user/online" element={<Online />} />
+				<Route path="cms/slider" element={<Slider />} />
+				<Route path="cms/gallery" element={<Gallery />} />
+				<Route path="cms/address" element={<CmsAddress />} />
+				<Route path="cms/logo" element={<Logo />} />
+				<Route path="cms/reviews" element={<CmsReviews />} />
+				<Route path="cms/about" element={<About />} />
+				<Route path="cms/contact" element={<Contact />} />
+				<Route path="cms/privacy-policy" element={<PrivacyPolicy />} />
+				<Route path="cms/terms-conditions" element={<Tnc />} />
+				<Route path="cms/faq" element={<Faq />} />
+
+				<Route path="order/cart" element={<ActiveCart />} />
+				<Route path="order/checkout" element={<CheckoutOrders />} />
+				<Route path="dashboard" element={<AdminDashboard />} />
+				<Route path="order/overview" element={<OrderOverview />} />
+
+				<Route path="employee/add" element={<AddEmployee />} />
+				<Route path="employee/details" element={<EmployeeDetails />} />
+
+				<Route path="task" element={<Tasks />} />
+				<Route path="calendar" element={<Calendar />} />
+				<Route path="general-product-settings" element={<ProductSettings />} /> */}
 			</Route>
 
 			<Route

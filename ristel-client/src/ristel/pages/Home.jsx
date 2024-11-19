@@ -751,7 +751,7 @@ const MostPopularProducts = () => {
                                 <Nav className="nav-lb-tab  mb-6 bg-gray-200 px-5 rounded-3 ">
                                     {tabs.map((tab, index) => (
                                         <Nav.Item key={index} className={index === 0 ? 'ms-0' : ''}>
-                                            <Nav.Link eventKey={tab} className="mb-sm-3 mb-md-0">
+                                            <Nav.Link eventKey={tab} className="mb-sm-3 mb-md-0 bg-gray-200">
                                                 {tab}
                                             </Nav.Link>
                                         </Nav.Item>
@@ -1306,9 +1306,9 @@ const ProductCard = ({ item }) => {
                         </Link>
                     </div>
                     <h4 className="mb-2 text-truncate-line-2 ">
-                        <Link to="/marketing/course-category/" className="text-inherit">
+                        <div className="text-inherit">
                             {item.name}
-                        </Link>
+                        </div>
                     </h4>
                     {/* <small>By: {item.instructor_name}</small> */}
                     <div className="lh-1 mt-3">

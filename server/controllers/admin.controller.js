@@ -618,7 +618,7 @@ exports.addImage = asyncHandler(async(req, res)=> {
         if (err) {
             return res.status(400).json({ message: "File upload failed", error: err.message });
         }
-console.log(req.files[0]);
+        // console.log(req.files[0]);
 
         if(!req.files[0]){
             return res.status(501).json({message:"please add image"})

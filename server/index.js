@@ -9,8 +9,9 @@ const morgan = require("morgan")
 const cookieparser = require("cookie-parser")
 const useragent = require("express-useragent")
 const { adminProtected } = require("./middlewares/admin.protected")
-const { userProtected } = require("./middlewares/userProtected")
+// const { userProtected } = require("./middlewares/userProtected")
 const User = require("./models/User")
+const { userProtected } = require("./middlewares/userProtected")
 
 require("dotenv").config()
 
