@@ -108,16 +108,16 @@ export const adminApi = createApi({
                     }
                 },
                 transformResponse: data => {
-                    const x = JSON.parse(localStorage.getItem("user"))
-                    //    console.log(x._id);
-                    //    console.log(data.result._id);
+                    // const x = JSON.parse(localStorage.getItem("user"))
+                    // //    console.log(x._id);
+                    // //    console.log(data.result._id);
 
 
-                    if (x._id == data.result._id) {
-                        // console.log(x);
-                        // console.log(data.result); 
-                        localStorage.setItem("user", JSON.stringify(data.result));
-                    }
+                    // if (x._id == data.result._id) {
+                    //     // console.log(x);
+                    //     // console.log(data.result); 
+                    //     localStorage.setItem("user", JSON.stringify(data.result));
+                    // }
                 },
                 invalidatesTags: ["admin"]
             }),
@@ -130,12 +130,12 @@ export const adminApi = createApi({
                     }
                 },
                 transformResponse: data => {
-                    const x = JSON.parse(localStorage.getItem("user"))
-                    // console.log(x);
+                    // const x = JSON.parse(localStorage.getItem("user"))
+                    // // console.log(x);
 
-                    if (x._id == data.result._id) {
-                        localStorage.setItem("user", JSON.stringify(data.result));
-                    }
+                    // if (x._id == data.result._id) {
+                    //     localStorage.setItem("user", JSON.stringify(data.result));
+                    // }
                 },
                 invalidatesTags: ["admin"]
             }),

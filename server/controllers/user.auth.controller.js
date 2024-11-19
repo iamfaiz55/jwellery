@@ -4,6 +4,7 @@ const { checkEmpty } = require("../utils/checkEmpty")
 const User = require("../models/User");
 const History = require("../models/History");
 const mongoose  = require("mongoose");
+const crypto = require("crypto")
 
 exports.loginUser = asyncHandler(async (req, res) => {
     const { mobile } = req.body;
@@ -13,14 +14,20 @@ exports.loginUser = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "All Fields required", error });
     }
     let user = await User.findOne({ mobile });
-    const otp = Math.floor(10000 + Math.random() * 900000)
+    const otp = crypto.randomInt(100000, 1000000);
     if (!user) {    
       
         //    send otp to userr
 
          await User.create({mobile, otp})
           return res.json({ message: "OTP sent for User registration", result:  mobile  });
-    } else {
+        }else if(user.isBlock){
+            return res.status(406).json({ message: "You Are Blocked By Admin" });
+        }
+    
+    
+    
+    else {
         //    send otp to userr
          await User.findByIdAndUpdate(user._id, {otp})
 
@@ -85,9 +92,9 @@ exports.verifyOTPUser = asyncHandler(async (req, res) => {
 exports.logoutUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: "Invalid user ID format" });
-    }
+    // if (!mongoose.Types.ObjectId.isValid(id)) {
+    //     return res.status(400).json({ message: "Invalid user ID format" });
+    // }
 
     res.clearCookie("user");
 

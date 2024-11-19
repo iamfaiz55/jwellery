@@ -2,6 +2,7 @@ import { Table, Button, Container, Row, Col, Spinner } from 'react-bootstrap';
 import { useBlockUserMutation, useGetAllUsersQuery, useUnblockUserMutation } from '../../../../redux/apis/adminApi';
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 const UserManagement = () => {
     const { data: allUsers, refetch } = useGetAllUsersQuery();
@@ -16,6 +17,7 @@ const UserManagement = () => {
                 icon: <span style={{ color: 'blue', fontSize: '1.5em' }}>✔️</span>,
                 progressStyle: { backgroundColor: 'blue' }
             });
+            refetch()
         }
     }, [blockSuccess]);
 
@@ -27,6 +29,7 @@ const UserManagement = () => {
                 icon: <span style={{ color: 'blue', fontSize: '1.5em' }}>✔️</span>,
                 progressStyle: { backgroundColor: 'blue' }
             });
+            refetch()
         }
     }, [unblockSuccess]);
 

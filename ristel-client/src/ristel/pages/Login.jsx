@@ -10,6 +10,7 @@ import { mdiArrowLeft, mdiCheck } from '@mdi/js';
 import InputMask from 'react-input-mask';
 import { useForm } from 'react-hook-form';
 import { useLoginUserMutation, useVerifyOTPUserMutation } from '../../redux/apis/userAuthApi';
+import { toast } from 'react-toastify';
 const Login = () => {
     const [otp, setOtp] = useState()
     const navigate = useNavigate()
@@ -45,9 +46,15 @@ const Login = () => {
             navigate("/")
         }
     }, [verifySuccess])
+    useEffect(() => {
+        if (error && error.status === 406) {
+            toast.error(error.data.message)
+        }
+    }, [isError])
+
     return (
         <Fragment>
-            <pre>{JSON.stringify(data, null, 2)}</pre>
+            {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
             <Row className="align-items-center justify-content-center g-0 min-vh-100">
                 <Col lg={5} md={5} className="py-8 py-xl-0">
                     <Card>

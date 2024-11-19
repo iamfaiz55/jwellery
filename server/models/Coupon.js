@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-const contactSchema = new mongoose.Schema({
+const couponSchema = new mongoose.Schema({
     code: {
         type:String,
         required: true
@@ -13,7 +13,7 @@ const contactSchema = new mongoose.Schema({
         type:String,
         required: true
     },
-    message: {
+    desc: {
         type:String,
         required: true
     },
@@ -22,4 +22,4 @@ const contactSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 
-module.exports = mongoose.model("contact", contactSchema)
+module.exports = mongoose.model("coupon", couponSchema)
