@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 // import { useAddScrollCardMutation, useDeleteScrollCardMutation, useUpdateScrollCardMutation } from '../redux/apis/adminApi';
 // import { toast } from 'sonner';
 
-const Mentor = () => {
+const ScrollCards = () => {
     const { data, refetch } = useGetAllScrollCardsQuery();
     const [selectedData, setSelectedData] = useState({});
     const [showModal, setShowModal] = useState(false);
@@ -42,7 +42,7 @@ const Mentor = () => {
                     onClick={() => handleShowModal()}
                     className="btn-lg"
                 >
-                    Add Mentor
+                    Add ScrollCards
                 </Button>
             </div>
             <Table bordered hover className="text-blue-700">
@@ -69,7 +69,7 @@ const Mentor = () => {
                                     {item.link}
                                 </a>
                             </td>
-                            <td>{item.mentorRole}</td>
+                            <td>{item.desc}</td>
                             <td>
                                 <Button
                                     variant="outline-primary"
@@ -92,7 +92,7 @@ const Mentor = () => {
                 </tbody>
             </Table>
 
-            <MentorForm
+            <ScrollCardsForm
                 show={showModal}
                 onHide={handleCloseModal}
                 edit={selectedData}
@@ -103,7 +103,7 @@ const Mentor = () => {
     );
 };
 
-const MentorForm = ({ show, onHide, edit, isEditing, refetch }) => {
+const ScrollCardsForm = ({ show, onHide, edit, isEditing, refetch }) => {
     const [addScrollCard, { isSuccess: addSuccess, isLoading: addLoading }] = useAddScrollCardMutation();
     const [updateScrollCard, { isSuccess: updateSuccess, isLoading: updateLoading }] = useUpdateScrollCardMutation();
 
@@ -113,20 +113,20 @@ const MentorForm = ({ show, onHide, edit, isEditing, refetch }) => {
             title: edit?.title || '',
             link: edit?.link || '',
             image: '',
-            mentorRole: edit?.mentorRole || '',
+            desc: edit?.desc || '',
         },
         validationSchema: yup.object({
             title: yup.string().required('Enter title'),
             link: yup.string().required('Enter link'),
             image: yup.mixed().required('Upload an image'),
-            mentorRole: yup.string().required('Enter role'),
+            desc: yup.string().required('Enter Description'),
         }),
         onSubmit: async (values, { resetForm }) => {
             const fd = new FormData();
             fd.append('title', values.title);
             fd.append('link', values.link);
             fd.append('images', values.image);
-            fd.append('mentorRole', values.mentorRole);
+            fd.append('desc', values.desc);
 
             if (isEditing) {
                 await updateScrollCard({ fd, _id: edit._id });
@@ -141,17 +141,17 @@ const MentorForm = ({ show, onHide, edit, isEditing, refetch }) => {
     });
 
     useEffect(() => {
-        if (addSuccess) toast.success("Mentor added successfully");
+        if (addSuccess) toast.success("ScrollCards added successfully");
     }, [addSuccess]);
 
     useEffect(() => {
-        if (updateSuccess) toast.success("Mentor updated successfully");
+        if (updateSuccess) toast.success("ScrollCards updated successfully");
     }, [updateSuccess]);
 
     return (
         <Modal show={show} onHide={onHide} centered>
             <Modal.Header closeButton>
-                <Modal.Title>{isEditing ? 'Edit Mentor' : 'Add Mentor'}</Modal.Title>
+                <Modal.Title>{isEditing ? 'Edit ScrollCards' : 'Add ScrollCards'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={formik.handleSubmit}>
@@ -190,19 +190,19 @@ const MentorForm = ({ show, onHide, edit, isEditing, refetch }) => {
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group className="mb-3">
-                        <Form.Label>Role</Form.Label>
+                        <Form.Label>DESC</Form.Label>
                         <Form.Control
                             type="text"
-                            {...formik.getFieldProps('mentorRole')}
-                            isInvalid={formik.touched.mentorRole && !!formik.errors.mentorRole}
+                            {...formik.getFieldProps('desc')}
+                            isInvalid={formik.touched.desc && !!formik.errors.desc}
                         />
                         <Form.Control.Feedback type="invalid">
-                            {formik.errors.mentorRole}
+                            {formik.errors.desc}
                         </Form.Control.Feedback>
                     </Form.Group>
                     {isEditing && edit.image && (
                         <div className="mb-3">
-                            <img src={edit.image} alt="mentor" width={100} />
+                            <img src={edit.image} alt="Scroll Card" width={100} />
                         </div>
                     )}
                     <Button
@@ -214,9 +214,9 @@ const MentorForm = ({ show, onHide, edit, isEditing, refetch }) => {
                         {addLoading || updateLoading ? (
                             <Spinner animation="border" size="sm" />
                         ) : isEditing ? (
-                            'Update Mentor'
+                            'Update ScrollCard'
                         ) : (
-                            'Add Mentor'
+                            'Add ScrollCard'
                         )}
                     </Button>
                 </Form>
@@ -225,4 +225,4 @@ const MentorForm = ({ show, onHide, edit, isEditing, refetch }) => {
     );
 };
 
-export default Mentor;
+export default ScrollCards;

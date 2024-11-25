@@ -527,27 +527,37 @@ exports.cancelOrder = asyncHandler(async(req, res)=> {
 })
 
 exports.getFilteredProducts = asyncHandler(async (req, res) => {
-    const { productType } = req.query;
+    const page = parseInt(req.query.page) || 1; 
+    const limit = parseInt(req.query.limit) || 12;
+    const skip = (page - 1) * limit; 
 
- 
-console.log("product type",productType);
+    const { material } = req.query;
 
-const result = await Categories.find()
-//    console.log(result);
-const types = result.map(item => {
-    return item.category
-})
-console.log("types",types);
+    // console.log("Material Filter:", material);
 
-    //   console.log(types);
-        if (!types.includes(productType)) {
-        return res.status(400).json({ message: "Invalid product type" });
+    const query = {};
+    if (material) {
+        query.material = material; 
     }
-   
-        const products = await Product.find({ productType });
 
-        res.status(200).json({message:"filter Success", result:products});
- 
+    const products = await Product.find(query).skip(skip).limit(limit);
+
+    const totalProducts = await Product.countDocuments(query);
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    res.json({
+        message: "Filtered Products Fetch Success",
+        result: products,
+        pagination: {
+            currentPage: page,
+            totalPages,
+            totalProducts,
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1,
+            nextPage: page < totalPages ? page + 1 : null,
+            prevPage: page > 1 ? page - 1 : null
+        }
+    });
 });
 
 

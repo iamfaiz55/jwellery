@@ -59,6 +59,9 @@ const productSchema = new mongoose.Schema({
       ratingReviews: {
             type:String
       }, 
+      slug: {
+            type:String
+      }, 
 }, {timestamps:true})
 
 module.exports = mongoose.model("product", productSchema)

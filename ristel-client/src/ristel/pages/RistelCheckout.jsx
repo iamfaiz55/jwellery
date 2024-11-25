@@ -870,6 +870,13 @@ const ShippingInformation = (props) => {
         setSelectedAddress(addressId);
     };
 
+    useEffect(() => {
+        // const handleAddressChange = (addressId) => {
+        setSelectedAddress(addresses && addresses[0]._id);
+
+
+    }, [])
+
 
     return (
         <Form>
@@ -877,6 +884,7 @@ const ShippingInformation = (props) => {
                 <div role="tabpanel" className="bs-stepper-pane">
                     {/* Section Header */}
                     <div className="mb-5">
+                        <pre>{JSON.stringify(selectedAddress, null, 2)}</pre>
                         <h3 className="mb-1">Shipping Information</h3>
                         <p className="mb-0">Fill the form below to send you the orders invoice.</p>
                     </div>

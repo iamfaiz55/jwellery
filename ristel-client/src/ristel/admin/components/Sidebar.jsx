@@ -4,8 +4,8 @@ import { mdiTrello, mdiCalendar } from '@mdi/js';
 
 
 // import node module libraries
-import { Fragment, useContext } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Fragment, useContext, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useMediaQuery } from 'react-responsive';
 import { ListGroup, Accordion, Card, Image, Badge, useAccordionButton, AccordionContext } from 'react-bootstrap';
 
@@ -14,6 +14,8 @@ import 'simplebar/dist/simplebar.min.css';
 
 import InverseLogo from './../../../assets/images/brand/logo/logo.png';
 import GiftBox from './../../../assets/images/background/giftbox.png';
+import { useLogoutAdminMutation } from '../../../redux/apis/adminAuthApi';
+import { toast } from 'react-toastify';
 
 const DashboardMenu = [
     {
@@ -58,9 +60,10 @@ const DashboardMenu = [
         children: [
             { id: uuid(), link: '/admin/cms/slider', name: 'Slider' },
             { id: uuid(), link: '/admin/cms/address', name: 'Address' },
-            { id: uuid(), link: '/admin/cms/mentor', name: 'Mentor' },
+            { id: uuid(), link: '/admin/cms/scroll-cards', name: 'Scrolling Cards' },
             { id: uuid(), link: '/admin/cms/logo', name: 'Logo' },
             { id: uuid(), link: '/admin/cms/gallery', name: 'Gallery' },
+            { id: uuid(), link: '/admin/cms/navbar-manage', name: 'Navbar Manage' },
             // { id: uuid(), link: '/admin/cms/reviews', name: 'Reviews' },
             { id: uuid(), link: '/admin/cms/about', name: 'About' },
             { id: uuid(), link: '/admin/cms/contact', name: 'Contact' },
@@ -137,6 +140,8 @@ const DashboardMenu = [
 const Sidebar = (props) => {
     const location = useLocation();
 
+    const [logoutAdmin, { isSuccess }] = useLogoutAdminMutation()
+
     const CustomToggle = ({ children, eventKey, icon }) => {
         const { activeEventKey } = useContext(AccordionContext);
         const decoratedOnClick = useAccordionButton(eventKey, () =>
@@ -186,6 +191,14 @@ const Sidebar = (props) => {
             </Link>
         );
     };
+    const navigate = useNavigate()
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success("Logout Success")
+            navigate("/admin-login")
+        }
+    }, [isSuccess])
+
 
     const isMobile = useMediaQuery({ maxWidth: 767 });
 
@@ -198,31 +211,29 @@ const Sidebar = (props) => {
                     </Link>
                 </div>
                 {/* Dashboard Menu */}
-                <Accordion
-                    defaultActiveKey="0"
-                    as="ul"
-                    className="navbar-nav flex-column"
-                >
-                    {DashboardMenu.map(function (menu, index) {
-                        if (menu.grouptitle) {
-                            return (
-                                <Card bsPrefix="nav-item" key={index}>
-                                    {/* group title item */}
-                                    <div className="navbar-heading">{menu.title}</div>
-                                    {/* end of group title item */}
-                                </Card>
-                            );
-                        } else {
-                            if (menu.children) {
+                {/* Sidebar Content */}
+                <div className="flex-grow-1">
+                    <Accordion
+                        defaultActiveKey="0"
+                        as="ul"
+                        className="navbar-nav flex-column"
+                    >
+                        {DashboardMenu.map(function (menu, index) {
+                            if (menu.grouptitle) {
+                                return (
+                                    <Card bsPrefix="nav-item" key={index}>
+                                        <div className="navbar-heading">{menu.title}</div>
+                                    </Card>
+                                );
+                            } else if (menu.children) {
                                 return (
                                     <Fragment key={index}>
-                                        {/* main menu / menu level 1 / root items */}
                                         <CustomToggle eventKey={menu.id} icon={menu.icon}>
                                             {menu.title}
                                             {menu.badge ? (
                                                 <Badge
                                                     className="ms-1"
-                                                    bg={menu.badgecolor ? menu.badgecolor : 'primary'}
+                                                    bg={menu.badgecolor || 'primary'}
                                                 >
                                                     {menu.badge}
                                                 </Badge>
@@ -236,167 +247,34 @@ const Sidebar = (props) => {
                                             bsPrefix="nav-item"
                                         >
                                             <Accordion className="navbar-nav flex-column" as="ul">
-                                                <ListGroup
-                                                    as="ul"
-                                                    bsPrefix=""
-                                                    className="nav flex-column"
-                                                >
-                                                    {menu.children.map(function (
-                                                        menuItem,
-                                                        menuItemIndex
-                                                    ) {
-                                                        if (menuItem.children) {
-                                                            return (
-                                                                <Fragment key={menuItemIndex}>
-                                                                    {/* second level with children */}
-                                                                    <CustomToggle eventKey={menuItem.id}>
-                                                                        {menuItem.title}
-                                                                        {menuItem.badge ? (
-                                                                            <Badge
-                                                                                className="ms-1"
-                                                                                bg={
-                                                                                    menuItem.badgecolor
-                                                                                        ? menuItem.badgecolor
-                                                                                        : 'primary'
-                                                                                }
-                                                                            >
-                                                                                {menuItem.badge}
-                                                                            </Badge>
-                                                                        ) : (
-                                                                            ''
-                                                                        )}
-                                                                    </CustomToggle>
-                                                                    <Accordion.Collapse
-                                                                        eventKey={menuItem.id}
-                                                                        bsPrefix="nav-item"
-                                                                        as="li"
-                                                                    >
-                                                                        <Accordion
-                                                                            className="navbar-nav flex-column"
-                                                                            as="ul"
-                                                                        >
-                                                                            <ListGroup
-                                                                                as="ul"
-                                                                                bsPrefix=""
-                                                                                className="nav flex-column"
-                                                                            >
-                                                                                {/* third level menu started  */}
-                                                                                {menuItem.children.map(function (
-                                                                                    subMenuItem,
-                                                                                    subMenuItemIndex
-                                                                                ) {
-                                                                                    return subMenuItem.children ? (
-                                                                                        <Fragment key={subMenuItemIndex}>
-                                                                                            <CustomToggle
-                                                                                                eventKey={subMenuItem.id}
-                                                                                            >
-                                                                                                {subMenuItem.title}
-                                                                                                {subMenuItem.badge ? (
-                                                                                                    <Badge
-                                                                                                        className="ms-1"
-                                                                                                        bg={
-                                                                                                            subMenuItem.badgecolor
-                                                                                                                ? subMenuItem.badgecolor
-                                                                                                                : 'primary'
-                                                                                                        }
-                                                                                                    >
-                                                                                                        {subMenuItem.badge}
-                                                                                                    </Badge>
-                                                                                                ) : (
-                                                                                                    ''
-                                                                                                )}
-                                                                                            </CustomToggle>
-                                                                                            <Accordion.Collapse
-                                                                                                eventKey={subMenuItem.id}
-                                                                                                bsPrefix="nav-item"
-                                                                                                as="li"
-                                                                                            >
-                                                                                                <ListGroup
-                                                                                                    as="ul"
-                                                                                                    bsPrefix=""
-                                                                                                    className="nav flex-column"
-                                                                                                >
-                                                                                                    {subMenuItem.children.map(
-                                                                                                        function (
-                                                                                                            thirdLevelItem,
-                                                                                                            thirdLevelItemIndex
-                                                                                                        ) {
-                                                                                                            return (
-                                                                                                                <ListGroup.Item
-                                                                                                                    key={
-                                                                                                                        thirdLevelItemIndex
-                                                                                                                    }
-                                                                                                                    as="li"
-                                                                                                                    bsPrefix="nav-item"
-                                                                                                                >
-                                                                                                                    {/* third level with children */}
-                                                                                                                    {generateLink(
-                                                                                                                        thirdLevelItem
-                                                                                                                    )}
-                                                                                                                </ListGroup.Item>
-                                                                                                            );
-                                                                                                        }
-                                                                                                    )}
-                                                                                                </ListGroup>
-                                                                                            </Accordion.Collapse>
-                                                                                        </Fragment>
-                                                                                    ) : (
-                                                                                        <ListGroup.Item
-                                                                                            key={subMenuItemIndex}
-                                                                                            as="li"
-                                                                                            bsPrefix="nav-item"
-                                                                                        >
-                                                                                            {/* third level without children */}
-                                                                                            {generateLink(subMenuItem)}
-                                                                                        </ListGroup.Item>
-                                                                                    );
-                                                                                })}
-                                                                                {/* end of third level menu  */}
-                                                                            </ListGroup>
-                                                                        </Accordion>
-                                                                    </Accordion.Collapse>
-                                                                    {/* end of second level with children */}
-                                                                </Fragment>
-                                                            );
-                                                        } else {
-                                                            return (
-                                                                <ListGroup.Item
-                                                                    as="li"
-                                                                    bsPrefix="nav-item"
-                                                                    key={menuItemIndex}
-                                                                >
-                                                                    {/* second level without children */}
-                                                                    {generateLink(menuItem)}
-                                                                    {/* end of second level without children  */}
-                                                                </ListGroup.Item>
-                                                            );
-                                                        }
-                                                    })}
+                                                <ListGroup as="ul" className="nav flex-column">
+                                                    {menu.children.map((menuItem, menuItemIndex) => (
+                                                        <ListGroup.Item
+                                                            key={menuItemIndex}
+                                                            as="li"
+                                                            bsPrefix="nav-item"
+                                                        >
+                                                            {generateLink(menuItem)}
+                                                        </ListGroup.Item>
+                                                    ))}
                                                 </ListGroup>
                                             </Accordion>
                                         </Accordion.Collapse>
-                                        {/* end of main menu / menu level 1 / root items */}
                                     </Fragment>
                                 );
                             } else {
                                 return (
                                     <Card bsPrefix="nav-item" key={index}>
-                                        {/* menu item without any childern items like Help Center, Documentation and Changelog items*/}
                                         <Link
                                             to={menu.link}
-                                            className={`nav-link ${location.pathname === menu.link ? 'active' : ''
-                                                }`}
+                                            className={`nav-link ${location.pathname === menu.link ? 'active' : ''}`}
                                         >
-                                            {typeof menu.icon === 'string' ? (
-                                                <i className={`nav-icon fe fe-${menu.icon} me-2`}></i>
-                                            ) : (
-                                                menu.icon
-                                            )}
+                                            <i className={`nav-icon fe fe-${menu.icon} me-2`}></i>
                                             {menu.title}
                                             {menu.badge ? (
                                                 <Badge
                                                     className="ms-1"
-                                                    bg={menu.badgecolor ? menu.badgecolor : 'primary'}
+                                                    bg={menu.badgecolor || 'primary'}
                                                 >
                                                     {menu.badge}
                                                 </Badge>
@@ -404,14 +282,26 @@ const Sidebar = (props) => {
                                                 ''
                                             )}
                                         </Link>
-                                        {/* end of menu item without any childern items */}
                                     </Card>
                                 );
                             }
-                        }
-                    })}
-                </Accordion>
+                        })}
+                    </Accordion>
+                </div>
                 {/* end of Dashboard Menu */}
+
+
+                {/* Sidebar Footer */}
+                <div className="sidebar-footer p-4">
+                    <button
+                        className="btn btn-danger w-100"
+                        onClick={() => {
+                            logoutAdmin()
+                        }}
+                    >
+                        <i className="fe fe-power me-2"></i> Logout
+                    </button>
+                </div>
 
                 <Card className="bg-dark-primary shadow-none text-center mx-4 my-8">
                     <Card.Body className="py-6">

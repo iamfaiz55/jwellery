@@ -15,7 +15,7 @@ const CustomerProtected = ({ compo }) => {
     console.log(error);
 
     useEffect(() => {
-        if (error && error.status === 406) {
+        if (error && error.status === 409) {
             logout()
         }
     }, [isError])

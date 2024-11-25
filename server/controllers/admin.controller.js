@@ -46,7 +46,7 @@ exports.addProduct = asyncHandler(async (req, res) => {
         const imageUrls = imageUploads.map(upload => upload.secure_url);
         
         // const { name, mrp, price, discount, height, width, prductWeight, material, productType, desc, purity } = req.body;
-        const { name, varient, material, productType, mainDesc, purity } = req.body;
+        const { name, varient, material, productType, mainDesc, purity, slug } = req.body;
 
        
             
@@ -65,6 +65,7 @@ exports.addProduct = asyncHandler(async (req, res) => {
             productType,
             mainDesc,
             purity,
+            slug
         });
 
         res.json({ message: "Product Add Success" });
@@ -425,71 +426,177 @@ exports.getCompanyAddress = asyncHandler(async(req, res)=> {
     res.json({message:"Company address get Success", result})
 })
 
+// exports.addMenuItem = asyncHandler(async (req, res) => {
+//     upload2(req, res, async (err) => {
+//         if (err) {
+//             return res.status(400).json({ message: "File upload failed", error: err.message });
+//         }
+
+//         const { menuitem } = req.body; 
+//         const newChildren = [];
+
+
+//         let menuImageFile = req.files.menuImage && req.files.menuImage[0]; 
+//         let menuImageUrl = null;
+
+//         if (menuImageFile) {
+//             const menuImagePath = menuImageFile.path;
+//             const uploadResult = await cloudinary.uploader.upload(menuImagePath);
+//             menuImageUrl = uploadResult.secure_url; 
+//         }
+ 
+
+//         for (let i = 0; ; i++) {
+//             const childMenuItem = req.body[`children[${i}].menuitem`];
+//             const childSubtitle = req.body[`children[${i}].subtitle`];
+//             const childLink = req.body[`children[${i}].link`];
+//             const childImageFile = req.files[`children[${i}].image`] && req.files[`children[${i}].image`][0];
+
+//             if (!childMenuItem) break;
+
+//         const childImagePath = childImageFile ? childImageFile.path : null;
+//         let secure_url = null;
+//             if (childImagePath) {
+//                 const uploadResult = await cloudinary.uploader.upload(childImagePath);
+//                 secure_url = uploadResult.secure_url;
+//             }
+
+//             newChildren.push({
+//                 menuitem: childMenuItem,
+//                 subtitle: childSubtitle,
+//                 link: childLink,
+//                 image: secure_url 
+//             });
+//         }
+
+//         const { isError, error } = checkEmpty({ menuitem });
+//         if (isError) {
+//             return res.status(400).json({ message: "All Fields Required", error });
+//         }
+
+//         let existingMenuItem = await Navmenu.findOne({ menuitem });
+
+//         if (existingMenuItem) {
+//       const updatedChildren = [...existingMenuItem.children, ...newChildren];
+//       existingMenuItem.children = updatedChildren;
+
+//       if (menuImageUrl) {
+//           existingMenuItem.menuImage = menuImageUrl;
+//       }
+
+//       await existingMenuItem.save();
+
+//       return res.json({ message: "Menu Item updated successfully" });
+//         } else {
+//             await Navmenu.create({
+//                 menuitem,
+//                 menuImage: menuImageUrl,
+//                 children: newChildren
+//             });
+
+//             res.json({ message: "Menu Item created successfully" });
+//         }
+//     });
+// });
+// const asyncHandler = require("express-async-handler");
+// const cloudinary = require("cloudinary").v2;
+// const Navmenu = require("../models/navmenuModel"); // Assuming the path to your model is correct
+
 exports.addMenuItem = asyncHandler(async (req, res) => {
     upload2(req, res, async (err) => {
         if (err) {
             return res.status(400).json({ message: "File upload failed", error: err.message });
         }
 
-        const { menuitem } = req.body; 
+        const { menuitem, header } = req.body;
         const newChildren = [];
 
-
-        let menuImageFile = req.files.menuImage && req.files.menuImage[0]; 
+        let menuImageFile = req.files.menuImage && req.files.menuImage[0];
         let menuImageUrl = null;
 
+        // Handle menu image upload
         if (menuImageFile) {
             const menuImagePath = menuImageFile.path;
             const uploadResult = await cloudinary.uploader.upload(menuImagePath);
-            menuImageUrl = uploadResult.secure_url; 
+            menuImageUrl = uploadResult.secure_url;
         }
- 
 
+        // Iterate over each child menu item
         for (let i = 0; ; i++) {
             const childMenuItem = req.body[`children[${i}].menuitem`];
-            const childSubtitle = req.body[`children[${i}].subtitle`];
             const childLink = req.body[`children[${i}].link`];
+            const childBadge = req.body[`children[${i}].badge`];
             const childImageFile = req.files[`children[${i}].image`] && req.files[`children[${i}].image`][0];
 
+            // Break the loop if no more child menu items are found
             if (!childMenuItem) break;
 
-        const childImagePath = childImageFile ? childImageFile.path : null;
-        let secure_url = null;
+            const childImagePath = childImageFile ? childImageFile.path : null;
+            let childImageUrl = null;
             if (childImagePath) {
                 const uploadResult = await cloudinary.uploader.upload(childImagePath);
-                secure_url = uploadResult.secure_url;
+                childImageUrl = uploadResult.secure_url;
             }
 
+            const newGrandChildren = [];
+            
+            // Handle grandchildren data
+            for (let j = 0; ; j++) {
+                const grandChildName = req.body[`children[${i}].grandChildren[${j}].name`];
+                const grandChildLink = req.body[`children[${i}].grandChildren[${j}].link`];
+
+                if (!grandChildName) break;  // If no more grandchildren, exit the loop
+
+                newGrandChildren.push({
+                    name: grandChildName,
+                    link: grandChildLink
+                });
+            }
+
+            // Push the new child menu item along with grandchildren if any
             newChildren.push({
                 menuitem: childMenuItem,
-                subtitle: childSubtitle,
                 link: childLink,
-                image: secure_url 
+                badge: childBadge,
+                image: childImageUrl,
+                grandChildren: newGrandChildren
             });
         }
 
+        // Check for any empty required fields
         const { isError, error } = checkEmpty({ menuitem });
         if (isError) {
             return res.status(400).json({ message: "All Fields Required", error });
         }
 
+        // Check if menu item already exists
         let existingMenuItem = await Navmenu.findOne({ menuitem });
-
         if (existingMenuItem) {
-      const updatedChildren = [...existingMenuItem.children, ...newChildren];
-      existingMenuItem.children = updatedChildren;
+            // If exists, update the menu item
+            const updatedChildren = [...existingMenuItem.children, ...newChildren];
+            existingMenuItem.children = updatedChildren;
 
-      if (menuImageUrl) {
-          existingMenuItem.menuImage = menuImageUrl;
-      }
+            if (menuImageUrl) {
+                existingMenuItem.menuImage = menuImageUrl;
+            }
 
-      await existingMenuItem.save();
+            if (header) {
+                existingMenuItem.header = header;
+            }
 
-      return res.json({ message: "Menu Item updated successfully" });
+            await existingMenuItem.save();
+            return res.json({ message: "Menu Item updated successfully" });
         } else {
+            // If doesn't exist, create a new menu item
+            console.log({   menuitem,
+                menuImage: menuImageUrl,
+                header,  
+                children: newChildren});
+            
             await Navmenu.create({
                 menuitem,
                 menuImage: menuImageUrl,
+                header,  // Add header if available
                 children: newChildren
             });
 
@@ -507,28 +614,91 @@ exports.getAllMenuItems = asyncHandler(async(req, res)=> {
     res.json({message:"all Menu Items Fetch Success", result})
 })
 
-exports.updateMenuItem = asyncHandler(async(req,res)=> {
-    const {id}= req.params
-    upload(req, res, async err => {
+exports.updateMenuItem = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    upload2(req, res, async (err) => {
         if (err) {
             return res.status(400).json({ message: "File upload failed", error: err.message });
         }
-        const result = await Navmenu.findById(id)
-        
-        if (result.children.image) {
-            const x = result.children.image.split('/').pop().split('.')[0]; 
-            await cloudinary.uploader.destroy(x);
-        }
-        let imageNew
-        if (req.files[0]) {
-                const {secure_url} = await cloudinary.uploader.upload(req.files[0].path);
-                imageNew = secure_url;  
-        }
 
-        await Navmenu.findByIdAndUpdate(id, {...req.body, image:imageNew})
-        res.json({message:"NavMenu Update Success"})
-    })
-})
+        try {
+            const menuItem = await Navmenu.findById(id);
+
+            if (!menuItem) {
+                return res.status(404).json({ message: "Menu item not found" });
+            }
+
+            const { menuitem, header } = req.body;
+            const updatedChildren = [];
+            
+            let menuImageFile = req.files.menuImage && req.files.menuImage[0];
+            let menuImageUrl = menuItem.menuImage; // Retain the old image if no new image is uploaded
+
+            // Handle menu image update
+            if (menuImageFile) {
+                // Remove the old menu image if it exists
+                if (menuImageUrl) {
+                    const publicId = menuImageUrl.split('/').pop().split('.')[0];
+                    await cloudinary.uploader.destroy(publicId);
+                }
+                const uploadResult = await cloudinary.uploader.upload(menuImageFile.path);
+                menuImageUrl = uploadResult.secure_url;
+            }
+
+            // Iterate over each child menu item from the request body
+            for (let i = 0; ; i++) {
+                const childMenuItem = req.body[`children[${i}].menuitem`];
+                const childLink = req.body[`children[${i}].link`];
+                const childBadge = req.body[`children[${i}].badge`];
+                const childImageFile = req.files[`children[${i}].image`] && req.files[`children[${i}].image`][0];
+
+                if (!childMenuItem) break; // Stop loop if no more children are present
+
+                let childImageUrl = null;
+
+                if (childImageFile) {
+                    const uploadResult = await cloudinary.uploader.upload(childImageFile.path);
+                    childImageUrl = uploadResult.secure_url;
+                }
+
+                const newGrandChildren = [];
+                for (let j = 0; ; j++) {
+                    const grandChildName = req.body[`children[${i}].grandChildren[${j}].name`];
+                    const grandChildLink = req.body[`children[${i}].grandChildren[${j}].link`];
+
+                    if (!grandChildName) break; // Stop loop if no more grandchildren are present
+
+                    newGrandChildren.push({
+                        name: grandChildName,
+                        link: grandChildLink,
+                    });
+                }
+
+                updatedChildren.push({
+                    menuitem: childMenuItem,
+                    link: childLink,
+                    badge: childBadge,
+                    image: childImageUrl,
+                    grandChildren: newGrandChildren,
+                });
+            }
+
+            // Update the menu item
+            menuItem.menuitem = menuitem || menuItem.menuitem;
+            menuItem.header = header || menuItem.header;
+            menuItem.menuImage = menuImageUrl;
+            menuItem.children = updatedChildren.length > 0 ? updatedChildren : menuItem.children;
+
+            await menuItem.save();
+
+            res.json({ message: "Menu Item updated successfully", updatedData: menuItem });
+        } catch (error) {
+            res.status(500).json({ message: "Failed to update menu item", error: error.message });
+        }
+    });
+});
+
 
 exports.addScrollCard = asyncHandler(async(req, res)=> {
     upload(req, res, async err => {
@@ -605,7 +775,7 @@ exports.deleteMenuItem = asyncHandler(async (req, res) => {
     }
     const childIndex = result.children.findIndex(child => child._id.toString() === menuId);
     if (childIndex === -1) {
-        return res.status(404).json({ message: "Child Menu Item not found" });
+        return res.status(414).json({ message: "Child Menu Item not found" });
     }
     result.children.splice(childIndex, 1);
     await result.save();

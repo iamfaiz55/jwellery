@@ -59,8 +59,10 @@ import AddressInfo from '../ristel/user/AddressInfo';
 import Profile from '../ristel/user/Profile';
 import Watchlist from '../ristel/user/Watchlist';
 import Coupon from '../ristel/user/Coupon';
-import Mentor from '../ristel/admin/pages/cms/Mentor';
+// import Mentor from '../ristel/admin/pages/cms/Mentor';
 import AllOrders from '../ristel/admin/pages/orders/AllOrders';
+import ScrollCards from '../ristel/admin/pages/cms/ScrollCards';
+import NavbarManage from '../ristel/admin/pages/NavbarManage';
 
 
 export const CartContext = createContext();
@@ -113,8 +115,9 @@ const AllRoutes = () => {
 				<Route path="cms/gallery" element={<Gallery />} />
 				<Route path="cms/address" element={<CmsAddress />} />
 				<Route path="cms/logo" element={<Logo />} />
+				<Route path="cms/navbar-manage" element={<NavbarManage />} />
 				<Route path="cms/reviews" element={<CmsReviews />} />
-				<Route path="cms/mentor" element={<Mentor />} />
+				<Route path="cms/scroll-cards" element={<ScrollCards />} />
 				<Route path="cms/about" element={<About />} />
 				<Route path="cms/contact" element={<Contact />} />
 				<Route path="cms/privacy-policy" element={<PrivacyPolicy />} />

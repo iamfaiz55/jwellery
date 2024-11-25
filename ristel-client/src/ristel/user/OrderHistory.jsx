@@ -102,15 +102,15 @@ const OrderHistory = () => {
     const [selectedOrder, setSelectedOrder] = useState(null);
 
     const handleCancelClick = (orderId) => {
-        setSelectedOrder(orderId); // Store the order ID
-        setShowModal(true); // Show the modal
+        setSelectedOrder(orderId);
+        setShowModal(true);
     };
 
     const handleConfirmCancel = () => {
         if (selectedOrder) {
-            cancelOrder(selectedOrder); // Call the cancel order function
-            setShowModal(false); // Close the modal
-            setSelectedOrder(null); // Reset the selected order
+            cancelOrder(selectedOrder);
+            setShowModal(false);
+            setSelectedOrder(null);
         }
     };
 
@@ -240,7 +240,7 @@ const OrderHistory = () => {
                     <Button variant="secondary" onClick={() => setShowModal(false)}>
                         Close
                     </Button>
-                    <Button variant="danger" onClick={handleConfirmCancel}>
+                    <Button variant="primary" onClick={handleConfirmCancel}>
                         Confirm Cancel
                     </Button>
                 </Modal.Footer>

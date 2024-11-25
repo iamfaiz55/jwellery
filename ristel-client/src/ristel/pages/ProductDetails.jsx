@@ -331,63 +331,63 @@ const ProductDetailsAccordion = ({ data, selectedVariant, setSelectedVariant }) 
     </>
 }
 // data 👇
-const PDetails = [
-    {
-        id: 1,
-        title: 'Product Details',
-        content: `<div>
-			<div class="d-flex gap-2">
-				<span>Product Code </span>
-				<b>076974-27515605</b>
-			</div>
-			<div class="d-flex gap-2">
-				<span>Height</span>
-				<b>20.2 mm</b>
-			</div>
-			<div class="d-flex gap-2">
-				<span>Width</span>
-				<b>8.8 mm</b>
-			</div>
-			<div class="d-flex gap-2">
-				<span>Product Weight</span>
-				<b>2.96 gram</b>
-			</div>
-			<div class="d-flex gap-2">
-				<span>Total Weight</span>
-				<b>0.506 Ct</b>
-			</div>
-			<div class="d-flex gap-2">
-				<span>Total No. Of Diamonds</span>
-				<b>44</b>
-			</div>
-		</div>`
-    },
-    {
-        id: 2,
-        title: 'Specifications',
-        content: `<p>We'll dive into GraphQL, the fundamentals of GraphQL. 
-        We're only gonna use the pieces of it that we need to build in Gatsby. 
-        We're not gonna be doing a deep dive into what GraphQL is or the language specifics. 
-        We're also gonna get into MDX. MDX is a way to write React components in your markdown.</p>`
-    },
-    {
-        id: 3,
-        title: 'Free Shipping Policy',
-        content: `<p>We'll dive into GraphQL, the fundamentals of GraphQL. 
-        We're only gonna use the pieces of it that we need to build in Gatsby. 
-        We're not gonna be doing a deep dive into what GraphQL is or the language specifics.
-        We're also gonna get into MDX. MDX is a way to write React components in your markdown.</p>`
-    },
-    {
-        id: 4,
-        title: 'Refund Policy',
-        content: `<p>
-        We'll dive into GraphQL, the fundamentals of GraphQL. We're only gonna use the pieces of it that we need to build in Gatsby. We're not gonna be doing a deep dive into what GraphQL is or the language specifics. We're also gonna get into MDX. MDX is a way
-        to write React components in your markdown.</p>
-        <p>We'll dive into GraphQL, the fundamentals of GraphQL. We're only gonna use the pieces of it that we need to build in Gatsby. We're not gonna be doing a deep dive into what GraphQL is or the language specifics. We're also gonna get into MDX. MDX is a way
-            to write React components in your markdown.</p>`
-    }
-]
+// const PDetails = [
+//     {
+//         id: 1,
+//         title: 'Product Details',
+//         content: `<div>
+// 			<div class="d-flex gap-2">
+// 				<span>Product Code </span>
+// 				<b>076974-27515605</b>
+// 			</div>
+// 			<div class="d-flex gap-2">
+// 				<span>Height</span>
+// 				<b>20.2 mm</b>
+// 			</div>
+// 			<div class="d-flex gap-2">
+// 				<span>Width</span>
+// 				<b>8.8 mm</b>
+// 			</div>
+// 			<div class="d-flex gap-2">
+// 				<span>Product Weight</span>
+// 				<b>2.96 gram</b>
+// 			</div>
+// 			<div class="d-flex gap-2">
+// 				<span>Total Weight</span>
+// 				<b>0.506 Ct</b>
+// 			</div>
+// 			<div class="d-flex gap-2">
+// 				<span>Total No. Of Diamonds</span>
+// 				<b>44</b>
+// 			</div>
+// 		</div>`
+//     },
+//     {
+//         id: 2,
+//         title: 'Specifications',
+//         content: `<p>We'll dive into GraphQL, the fundamentals of GraphQL. 
+//         We're only gonna use the pieces of it that we need to build in Gatsby. 
+//         We're not gonna be doing a deep dive into what GraphQL is or the language specifics. 
+//         We're also gonna get into MDX. MDX is a way to write React components in your markdown.</p>`
+//     },
+//     {
+//         id: 3,
+//         title: 'Free Shipping Policy',
+//         content: `<p>We'll dive into GraphQL, the fundamentals of GraphQL. 
+//         We're only gonna use the pieces of it that we need to build in Gatsby. 
+//         We're not gonna be doing a deep dive into what GraphQL is or the language specifics.
+//         We're also gonna get into MDX. MDX is a way to write React components in your markdown.</p>`
+//     },
+//     {
+//         id: 4,
+//         title: 'Refund Policy',
+//         content: `<p>
+//         We'll dive into GraphQL, the fundamentals of GraphQL. We're only gonna use the pieces of it that we need to build in Gatsby. We're not gonna be doing a deep dive into what GraphQL is or the language specifics. We're also gonna get into MDX. MDX is a way
+//         to write React components in your markdown.</p>
+//         <p>We'll dive into GraphQL, the fundamentals of GraphQL. We're only gonna use the pieces of it that we need to build in Gatsby. We're not gonna be doing a deep dive into what GraphQL is or the language specifics. We're also gonna get into MDX. MDX is a way
+//             to write React components in your markdown.</p>`
+//     }
+// ]
 
 const ProductGallery2 = ({ sliderImages = [] }) => {
     const [active, setActive] = useState(0)
@@ -410,7 +410,7 @@ const ProductGallery2 = ({ sliderImages = [] }) => {
     //     "https://kinclimg4.bluestone.com/f_webp,c_scale,w_1024,b_rgb:f0f0f0/giproduct/BIDG0319R180_YAA18DIG6XXXXXXXX_ABCD00-BP-PICS-00001-1024-66194.png"
     // ]
 
-    return (
+    return <>
         <Row>
             <Col xs={12}>
                 <div>
@@ -445,7 +445,7 @@ const ProductGallery2 = ({ sliderImages = [] }) => {
                 </div>
             </Col>
         </Row>
-    )
+    </>
 }
 
 const RatingsReviews = () => {

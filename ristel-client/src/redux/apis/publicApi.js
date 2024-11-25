@@ -15,14 +15,18 @@ export const publicApi = createApi({
                 providesTags: ["user"]
             }),
             getFilteredData: builder.query({
-                query: (type) => ({
+                query: ({ material, page = 1, limit = 12 }) => ({
                     url: `/filter`,
                     method: "GET",
-                    params: type
+                    params: { material, page, limit }, 
                 }),
-                transformResponse: (data) => data.result,
-                providesTags: ["user"]
+                // transformResponse: (response) => ({
+                //     products: response.result, 
+                //     pagination: response.pagination,
+                // }),
+                providesTags: ["Products"],
             }),
+            
             getCArousel: builder.query({
                 query: () => ({
                     url: `/carousel`,
@@ -37,7 +41,7 @@ export const publicApi = createApi({
                     method: "GET",
                     params: { page, limit, type }
                 }),
-                transformResponse: (data) => data.result,
+                // transformResponse: (data) => data.result,
                 providesTags: ["user"]
             }),
             getDetails: builder.query({
@@ -100,6 +104,25 @@ export const publicApi = createApi({
                 transformResponse: data => data.result,
                 invalidatesTags: ["admin"]
             }),
+            getAllMenuItems: builder.query({
+                query: () => ({
+                    url: `/get-menu-items`,
+                    method: "GET"
+                }),
+                transformResponse: (data) => data.result,
+                providesTags: ["user"]
+            }),
+              // material
+              getPublicProductMaterial: builder.query({
+                query: (materialData) => {
+                    return {
+                        url: `/get-product-material`,
+                        method: "GET",
+                    }
+                },
+                transformResponse: data => data.result,
+                providesTags: ["material"]
+            }),
         }
     }
 })
@@ -117,7 +140,9 @@ export const {
     useGetCompanyDetailsQuery,
     useGetAllScrollCardsQuery,
     useGetAllGalleryImagesQuery,
-    useGetScheduleQuery
+    useGetScheduleQuery,
+    useGetAllMenuItemsQuery,
+    useGetPublicProductMaterialQuery
 } = publicApi
 
 

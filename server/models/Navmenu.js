@@ -9,24 +9,36 @@
             type: String,
             // required: true
         },
+        header: {
+            type: String,
+            // required: true
+        },
         children: [
             {
                 menuitem: {
                     type: String,
                 },
-                subtitle: {
-                    type: String,
-                },
+               
                 image: {
                     type: String,
                 },
                 link: {
                     type: String,
                 },
-                button: {
-                    type: Boolean,
-                    default: false 
-                }
+                badge: {
+                    type:String,
+                     
+                },
+                grandChildren:[
+                    {
+                        name:{
+                            type:String
+                        },
+                        link:{
+                            type:String
+                        }
+                    }
+                ]
             }
         ]
     }, { timestamps: true }); 

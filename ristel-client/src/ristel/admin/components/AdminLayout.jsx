@@ -17,6 +17,7 @@ import 'tippy.js/themes/light.css';
 import 'tippy.js/animations/scale.css';
 import Avatar1 from './../../../assets/images/avatar/avatar-1.jpg';
 import NotificationList from './../../../data/Notification';
+import { useSelector } from 'react-redux';
 const AdminLayout = (props) => {
     const { children, className, overflowHidden } = props;
     const [showMenu, setShowMenu] = useState(true);
@@ -66,14 +67,13 @@ const HeaderDefault = (props) => {
                         >
                             <Menu size="18px" />
                         </Link>
-                        <div className="ms-lg-3 d-none d-md-none d-lg-block">
+                        <div className="ms-lg-3 d-none d-md-none d-lg-block ">
                             {/* <!-- Form --> */}
-                            <Form className="d-flex align-items-center">
-                                <span className="position-absolute ps-3 search-icon">
-                                    <i className="fe fe-search"></i>
-                                </span>
+                            <Form className="d-flex align-items-center position-relative">
                                 <Form.Control type="search" className="form-control ps-6" placeholder="Search Entire Dashboard" />
+
                             </Form>
+
                         </div>
                     </div>
                     <Nav className="navbar-nav navbar-right-wrap ms-auto d-flex align-items-center nav-top-wrap">
@@ -87,144 +87,121 @@ const HeaderDefault = (props) => {
 
 const QuickMenu = () => {
     const isDesktop = useMediaQuery({
-        query: '(min-width: 1224px)'
+        query: '(min-width: 1224px)',
     });
 
-    const Notifications = () => {
-        return (
-            <SimpleBar style={{ maxHeight: '300px' }}>
-                <ListGroup variant="flush">
-                    {NotificationList.map(function (item, index) {
-                        return (
-                            <ListGroup.Item
-                                className={index === 0 ? 'bg-light' : ''}
-                                key={index}
-                            >
-                                <Row>
-                                    <Col>
-                                        <Link className="text-body" to="#">
-                                            <div className="d-flex">
-                                                <Image
-                                                    src={item.image}
-                                                    alt=""
-                                                    className="avatar-md rounded-circle"
-                                                />
-                                                <div className="ms-3">
-                                                    <h5 className="fw-bold mb-1">{item.sender}</h5>
-                                                    <p className="mb-3">{item.message}</p>
-                                                    <span className="fs-6 text-muted">
-                                                        <span>
-                                                            <span className="fe fe-thumbs-up text-success me-1"></span>
-                                                            {item.date}
-                                                        </span>
-                                                        <span className="ms-1">{item.time}</span>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </Col>
-                                    <Col xs="auto" className="text-center me-2">
-                                        <GKTippy content="Mark as unread">
-                                            <Link to="#">
-                                                <DotBadge bg="secondary"></DotBadge>
-                                            </Link>
-                                        </GKTippy>
-                                    </Col>
-                                </Row>
-                            </ListGroup.Item>
-                        );
-                    })}
-                </ListGroup>
-            </SimpleBar>
-        );
-    };
+    const Notifications = () => (
+        <SimpleBar style={{ maxHeight: '300px' }}>
+            <ListGroup variant="flush">
+                {NotificationList.map((item, index) => (
+                    <ListGroup.Item
+                        className={`py-3 ${index === 0 ? 'bg-light' : ''}`}
+                        key={index}
+                    >
+                        <div className="d-flex align-items-start gap-3">
+                            <Image
+                                src={item.image}
+                                alt=""
+                                className="avatar-md rounded-circle"
+                            />
+                            <div className="flex-grow-1">
+                                <h5 className="fw-bold mb-1">{item.sender}</h5>
+                                <p className="text-muted small mb-2">{item.message}</p>
+                                <div className="d-flex text-muted small">
+                                    <span className="me-3">
+                                        <i className="fe fe-thumbs-up text-success me-1"></i>
+                                        {item.date}
+                                    </span>
+                                    <span>{item.time}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <GKTippy content="Mark as unread">
+                                    <Link to="#" className="text-secondary">
+                                        <DotBadge bg="secondary" />
+                                    </Link>
+                                </GKTippy>
+                            </div>
+                        </div>
+                    </ListGroup.Item>
+                ))}
+            </ListGroup>
+        </SimpleBar>
+    );
+    const { admin } = useSelector(state => state.admin)
     return (
         <Fragment>
             <DarkLightMode />
             <ListGroup
                 as="ul"
                 bsPrefix="navbar-nav"
-                className="navbar-right-wrap ms-2 d-flex nav-top-wrap"
+                className="navbar-right-wrap ms-2 d-flex align-items-center gap-3"
             >
-                <Dropdown as="li">
+                {/* Notifications */}
+                <Dropdown as="li" className="position-relative">
                     <Dropdown.Toggle
                         as="a"
                         bsPrefix=" "
-                        className="text-dark icon-notifications me-lg-1  btn btn-light btn-icon rounded-circle indicator indicator-primary text-muted"
+                        className="btn btn-light btn-icon rounded-circle indicator indicator-primary"
                         id="dropdownNotification"
                     >
                         <i className="fe fe-bell"></i>
                     </Dropdown.Toggle>
                     <Dropdown.Menu
-                        show={isDesktop ? true : false}
-                        className="dashboard-dropdown notifications-dropdown dropdown-menu-lg dropdown-menu-end mt-3 py-0"
+                        show={isDesktop}
+                        className="dashboard-dropdown notifications-dropdown dropdown-menu-lg dropdown-menu-end mt-3 shadow-sm rounded"
                         aria-labelledby="dropdownNotification"
-                        align="end"
                     >
-                        <div className="border-bottom px-3 pt-3 pb-3 d-flex justify-content-between align-items-end">
-                            <span className="h4 mb-0">Notifications</span>
-                            <Link to="# " className="text-muted">
-                                <span className="align-middle">
-                                    <i className="fe fe-settings me-1"></i>
-                                </span>
+                        <div className="px-4 py-3 border-bottom d-flex justify-content-between align-items-center">
+                            <h5 className="mb-0">Notifications</h5>
+                            <Link to="#" className="text-muted">
+                                <i className="fe fe-settings"></i>
                             </Link>
                         </div>
                         <Notifications />
-                        <div className="border-top px-3 pt-3 pb-3">
-                            <Link
-                                to="/authentication/notifications"
-                                className="text-link fw-semi-bold"
-                            >
+                        <div className="px-4 py-3 border-top text-center">
+                            <Link to="/authentication/notifications" className="fw-bold text-primary">
                                 See all Notifications
                             </Link>
                         </div>
                     </Dropdown.Menu>
                 </Dropdown>
 
-                <Dropdown as="li" className="ms-1">
-                    <Dropdown.Toggle
-                        as="a"
-                        bsPrefix=" "
-                        className="rounded-circle"
-                        id="dropdownUser"
-                    >
+                {/* User Profile */}
+                <Dropdown as="li">
+                    <Dropdown.Toggle as="a" bsPrefix=" " className="p-0">
                         <div className="avatar avatar-md avatar-indicators avatar-online">
                             <Image alt="avatar" src={Avatar1} className="rounded-circle" />
                         </div>
                     </Dropdown.Toggle>
                     <Dropdown.Menu
-                        show={isDesktop ? true : false}
-                        className="dashboard-dropdown dropdown-menu-end mt-4 py-0"
+                        show={isDesktop}
+                        className="dashboard-dropdown dropdown-menu-end mt-4 shadow-sm rounded"
                         aria-labelledby="dropdownUser"
-                        align="end"
                     >
-                        <Dropdown.Item className="mt-3">
-                            <div className="d-flex">
+                        <Dropdown.Item className="py-3">
+                            <div className="d-flex align-items-center gap-3">
                                 <div className="avatar avatar-md avatar-indicators avatar-online">
-                                    <Image
-                                        alt="avatar"
-                                        src={Avatar1}
-                                        className="rounded-circle"
-                                    />
+                                    <Image alt="avatar" src={Avatar1} className="rounded-circle" />
                                 </div>
-                                <div className="ms-3 lh-1">
-                                    <h5 className="mb-1">Annette Black</h5>
-                                    <p className="mb-0 text-muted">annette@geeksui.com</p>
+                                <div>
+                                    <h6 className="mb-0">{admin && admin.name}</h6>
+                                    <p className="text-muted small mb-0">{admin && admin.email}</p>
                                 </div>
                             </div>
                         </Dropdown.Item>
                         <Dropdown.Divider />
-                        <Dropdown.Item eventKey="2">
+                        <Dropdown.Item>
                             <i className="fe fe-user me-2"></i> Profile
                         </Dropdown.Item>
-                        <Dropdown.Item eventKey="3">
+                        <Dropdown.Item>
                             <i className="fe fe-star me-2"></i> Subscription
                         </Dropdown.Item>
                         <Dropdown.Item>
                             <i className="fe fe-settings me-2"></i> Settings
                         </Dropdown.Item>
                         <Dropdown.Divider />
-                        <Dropdown.Item className="mb-3">
+                        <Dropdown.Item>
                             <i className="fe fe-power me-2"></i> Sign Out
                         </Dropdown.Item>
                     </Dropdown.Menu>
@@ -233,17 +210,15 @@ const QuickMenu = () => {
         </Fragment>
     );
 };
-const DotBadge = ({ children, bg = 'light-primary' }) => {
-    return (
-        <span className="me-2">
-            <Badge bg={bg} className="badge-dot"></Badge> {children}
-        </span>
-    );
-};
+
+const DotBadge = ({ children, bg = 'light-primary' }) => (
+    <span className={`badge-dot bg-${bg} me-2`}></span>
+);
 
 DotBadge.propTypes = {
-    bg: PropTypes.string
+    bg: PropTypes.string,
 };
+
 
 // dark mode
 const DarkLightMode = ({ className }) => {

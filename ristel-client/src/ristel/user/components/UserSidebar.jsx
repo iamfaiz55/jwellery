@@ -96,7 +96,7 @@ import { Accordion, Card } from "react-bootstrap";
 import { useMediaQuery } from "react-responsive";
 import { Link, useLocation } from "react-router-dom";
 import SimpleBar from "simplebar-react";
-import "./user.css"; // Sidebar-specific styles
+import "./user.css";
 import { useSelector } from "react-redux";
 
 const UserSidebar = (props) => {

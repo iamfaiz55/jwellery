@@ -1,6 +1,6 @@
 import React, { useState, Fragment, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Container, Image, Button, Carousel, Col, Row, Tab, Nav, Card, Badge } from 'react-bootstrap'
+import { Container, Image, Button, Carousel, Col, Row, Tab, Nav, Card, Badge, Pagination } from 'react-bootstrap'
 import { v4 as uuid } from 'uuid'
 
 import MentorHeroGlow from './../../assets/images/mentor/mentor-glow.svg'
@@ -21,15 +21,31 @@ import Icon from '@mdi/react'
 import { mdiStar, mdiStarOutline, mdiStarHalfFull } from '@mdi/js'
 import PropTypes from 'prop-types'
 import Slider from 'react-slick'
-import { useGetAllGalleryImagesQuery, useGetAllProductsQuery, useGetAllScrollCardsQuery, useGetCArouselQuery } from '../../redux/apis/publicApi'
+import { useGetAllGalleryImagesQuery, useGetAllProductsQuery, useGetAllScrollCardsQuery, useGetCArouselQuery, useGetPublicProductMaterialQuery, useLazyGetAllProductsQuery, useLazyGetFilteredDataQuery } from '../../redux/apis/publicApi'
 import { useAddCartMutation } from '../../redux/apis/userApi'
+import ReactPaginate from 'react-paginate'
+import { ChevronLeft, ChevronRight } from 'react-feather'
+import CourseCard from '../../components/marketing/pages/courses/CourseCard'
 // import { useGetAllScrollCardsQuery } from '../../../../client/src/redux/apis/openApi'
 const Home = () => {
+
+
     return <>
 
         <Hero />
         <ProductMarquee />
         <MostPopularProducts />
+        {/* <Fragment> */}
+        {/* <Row>
+                {displayRecords.length > 0 ? (
+                    displayRecords
+                ) : (
+                    <Col>No matching records found.</Col>
+                )}
+            </Row> */}
+
+
+        {/* </Fragment> */}
         <WhatCustomersSay />
         <FindRightjewellery />
 
@@ -126,14 +142,14 @@ const ProductMarquee = () => {
                 </Container>
                 <div className="position-relative d-flex overflow-x-hidden py-lg-4 pt-4">
                     <div className="animate-marquee d-flex gap-3">
-                        {data && data.map((mentor, index) => {
+                        {data && data.map((item, index) => {
                             return (
                                 <Link key={index} to="#" className="bg-white text-center shadow-sm text-wrap rounded-4 w-100 border card-lift border mentor-card">
                                     <div className="p-3">
-                                        <Image src={mentor.image} alt="mentor 1" className="avatar avatar-xl rounded-circle" />
+                                        <Image src={item.image} alt="mentor 1" className="avatar avatar-xl rounded-circle" />
                                         <div className="mt-3 text-center">
-                                            <h4 className="mb-0 ">{mentor.title}</h4>
-                                            <span className="text-gray-800">{mentor.mentorRole}</span>
+                                            <h4 className="mb-0 ">{item.title}</h4>
+                                            <span className="text-gray-800">{item.desc}</span>
                                         </div>
                                     </div>
                                 </Link>
@@ -347,118 +363,155 @@ const JustifiedGallery = () => {
 
 // popular products
 const MostPopularProducts = () => {
-    const { data } = useGetAllProductsQuery()
-    const tabs = ['Diamond', 'Gold', 'Silver'];
-    let min, max = 0;
+    const [selectedMaterial, setSelectedMaterial] = useState(null); // Selected material
+    const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
+    const productsPerPage = 4; // Items per page
+    const [allProducts, setAllProducts] = useState([]); // Final products to display
+    const [totalPages, setTotalPages] = useState(1); // Total pages for pagination
+    const [filterPage, setfilterPage] = useState(1)
+    // Lazy query hooks for filtering and fetching products
+    const [filter, {
+        data: filteredData,
+        isSuccess: isFilterSuccess,
+        isError: isFilterError,
+        error: filterError
+    }] = useLazyGetFilteredDataQuery();
+
+    const [fetchProducts, { data: productsData, isSuccess: isProductsSuccess }] = useLazyGetAllProductsQuery();
+
+    const { data: materials } = useGetPublicProductMaterialQuery(); // Materials data (e.g., Diamond, Gold, etc.)
+
+    // Fetch filtered products
+    useEffect(() => {
+        if (selectedMaterial) {
+            filter({ material: selectedMaterial, page: filterPage, limit: productsPerPage });
+        }
+    }, [selectedMaterial, currentPage, filter]);
+
+    // Handle success response for filtered products
+    useEffect(() => {
+        if (isFilterSuccess && filteredData) {
+            setAllProducts(filteredData.result);
+            setTotalPages(filteredData.pagination?.totalPages || 1);
+        }
+    }, [isFilterSuccess, filteredData]);
+
+    // Fetch all products (no filter) when no material is selected
+    useEffect(() => {
+        if (!selectedMaterial) {
+            fetchProducts({ page: currentPage, limit: productsPerPage });
+        }
+    }, [fetchProducts, currentPage, selectedMaterial]);
+
+    // Handle success response for all products
+    useEffect(() => {
+        if (isProductsSuccess && productsData) {
+            setAllProducts(productsData.result);
+            setTotalPages(productsData.pagination?.totalPages || 1);
+        }
+    }, [isProductsSuccess, productsData, selectedMaterial === null]);
+
+    // Error handling
+    useEffect(() => {
+        if (isFilterError) {
+            toast.error(filterError?.message || 'An error occurred while filtering products.');
+        }
+    }, [isFilterError, filterError]);
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page); // Change page
+    };
+
     return (
-        // <Fragment>
-        //     <section className="pb-lg-14 pb-8 bg-white pt-5 mt-0 overflow-hidden">
-        //         <hr />
-        //         <Container className='mt-5'>
-        //             <Row>
-        //                 <Col xs={12}>
-        //                     <div className="mb-6">
-        //                         <h2 className="mb-1 h1">Most Popular Jewellery</h2>
-        //                         <p>
-        //                             These are the most popular Jewellery.
-        //                         </p>
-        //                     </div>
-        //                 </Col>
-        //             </Row>
-        //             <Row>
-        //                 <Col md={12}>
-        //                     <Tab.Container defaultActiveKey="Diamond">
-        //                         <Nav className="nav-lb-tab  mb-6 bg-gray-200 px-5 rounded-3 ">
-        //                             {tabs.map((tab, index) => {
-        //                                 return (
-        //                                     <Nav.Item
-        //                                         key={index}
-        //                                         className={index === 0 ? 'ms-0' : ''}
-        //                                     >
-        //                                         <Nav.Link eventKey={tab} className="mb-sm-3 mb-md-0">
-        //                                             {tab}
-        //                                         </Nav.Link>
-        //                                     </Nav.Item>
-        //                                 );
-        //                             })}
-        //                         </Nav>
-        //                         <Tab.Content>
-        //                             {tabs.map((tab, index) => {
-        //                                 min = Math.floor(Math.random() * 16);
-        //                                 max = min + 8;
-        //                                 return (
-        //                                     <Tab.Pane
-        //                                         eventKey={tab}
-        //                                         className="pb-4 p-4 ps-0 pe-0"
-        //                                         key={index}
-        //                                     >
-        //                                         <Row>
-        //                                             {data && data.map((item, index) => (
-        //                                                 <Col lg={3} md={6} sm={12} key={index}>
-        //                                                     {' '}
-        //                                                     <ProductCard item={item} />
-        //                                                 </Col>
-        //                                             ))}
-        //                                         </Row>
-        //                                     </Tab.Pane>
-        //                                 );
-        //                             })}
-        //                         </Tab.Content>
-        //                     </Tab.Container>
-        //                 </Col>
-        //             </Row>
-        //         </Container>
-        //     </section>
-        // </Fragment>
         <Fragment>
             <section className="pb-lg-14 pb-8 bg-white pt-5 mt-0 overflow-hidden">
                 <hr />
-                <Container className='mt-5'>
+                <Container className="mt-5">
                     <Row>
                         <Col xs={12}>
                             <div className="mb-6">
                                 <h2 className="mb-1 h1">Most Popular Jewellery</h2>
-                                <p>
-                                    These are the most popular Jewellery.
-                                </p>
+                                <p>These are the most popular Jewellery.</p>
                             </div>
                         </Col>
                     </Row>
                     <Row>
                         <Col md={12}>
                             <Tab.Container defaultActiveKey="Diamond">
-                                <Nav className="nav-lb-tab  mb-6 bg-gray-200 px-5 rounded-3 ">
-                                    {tabs.map((tab, index) => (
+                                <Nav className="nav-lb-tab mb-6 bg-gray-200 px-5 rounded-3">
+                                    {materials && materials.map((tab, index) => (
                                         <Nav.Item key={index} className={index === 0 ? 'ms-0' : ''}>
-                                            <Nav.Link eventKey={tab} className="mb-sm-3 mb-md-0 bg-gray-200">
-                                                {tab}
+                                            <Nav.Link
+                                                onClick={() => setSelectedMaterial(tab.name)}
+                                                eventKey={tab.name}
+                                                className="mb-sm-3 mb-md-0 bg-gray-200"
+                                            >
+                                                {tab.name}
                                             </Nav.Link>
                                         </Nav.Item>
                                     ))}
+                                    <Nav.Item>
+                                        <Nav.Link
+                                            onClick={() => setSelectedMaterial(null)}
+                                            className="mb-sm-3 mb-md-0 bg-gray-200"
+                                        >
+                                            All
+                                        </Nav.Link>
+                                    </Nav.Item>
                                 </Nav>
                                 <Tab.Content>
-                                    {tabs.map((tab, index) => (
-                                        <Tab.Pane eventKey={tab} className="pb-4 p-4 ps-0 pe-0" key={index}>
-                                            <Row className="d-flex justify-content-start">
-                                                {data && data.map((item, index) => (
-                                                    <Col lg={3} md={4} sm={6} xs={6} key={index}>
-                                                        <div className="d-flex">
-                                                            <ProductCard item={item} />
-                                                        </div>
-                                                    </Col>
-                                                ))}
-                                            </Row>
-                                        </Tab.Pane>
-                                    ))}
+                                    <Row className="d-flex justify-content-start">
+                                        {allProducts && allProducts.map((item, index) => (
+                                            <Col lg={3} md={4} sm={6} xs={6} key={index}>
+                                                <div className="d-flex">
+                                                    <ProductCard item={item} />
+                                                </div>
+                                            </Col>
+                                        ))}
+                                    </Row>
                                 </Tab.Content>
                             </Tab.Container>
                         </Col>
                     </Row>
                 </Container>
+                <div className="d-flex justify-content-center">
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <Pagination>
+                            {/* Previous Button */}
+                            <Pagination.Prev
+                                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                                disabled={currentPage === 1}
+                            >
+                                &laquo;
+                            </Pagination.Prev>
+
+                            {/* Page Numbers */}
+                            {Array.from({ length: totalPages }, (_, index) => (
+                                <Pagination.Item
+                                    key={index}
+                                    active={currentPage === index + 1}
+                                    onClick={() => handlePageChange(index + 1)}
+                                >
+                                    {index + 1}
+                                </Pagination.Item>
+                            ))}
+
+                            {/* Next Button */}
+                            <Pagination.Next
+                                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                                disabled={currentPage === totalPages}
+                            >
+                                &raquo;
+                            </Pagination.Next>
+                        </Pagination>
+                    )}
+                </div>
             </section>
         </Fragment>
     );
-}
+};
+
 const AllCoursesData = [
     {
         id: 1,
@@ -962,6 +1015,7 @@ const AllCoursesData = [
     }
 ]
 const ProductCard = ({ item }) => {
+    // console.log("item", item);
 
     return (
         <Link to={`/product-details/${item._id}`}>

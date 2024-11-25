@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Card, ListGroup, Row, Col, Modal, Form, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { useAddAddressMutation, useGetAddressesQuery, useUpdateAddressMutation } from '../../redux/apis/userApi';
+import { useAddAddressMutation, useDeleteAddressMutation, useGetAddressesQuery, useUpdateAddressMutation } from '../../redux/apis/userApi';
 import { useSelector } from 'react-redux';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { toast } from 'react-toastify';
+import { FaPencilAlt, FaTrash } from 'react-icons/fa';
 const AddressInfo = () => {
     const [updateAddress, { isSuccess: updateSuccess, isLoading: updateLoading }] = useUpdateAddressMutation()
     const [addAddress, { isSuccess, isLoading }] = useAddAddressMutation();
+    const [deleteAddress, { isSuccess: deleteSuccess }] = useDeleteAddressMutation()
     const [update, setUpdate] = useState(false)
     const [selectedAddress, setSelectedAddress] = useState()
     const { user } = useSelector(state => state.user)
@@ -71,14 +73,6 @@ const AddressInfo = () => {
     });
 
 
-    const AddNewAddressModal = (props) => {
-
-
-
-
-
-
-    };
 
     // console.log(data);
     // console.log(user);
@@ -107,6 +101,12 @@ const AddressInfo = () => {
             setUpdate(false)
         }
     }, [updateSuccess])
+    useEffect(() => {
+        if (deleteSuccess) {
+            toast.success("Address Delete Success ")
+            refetch()
+        }
+    }, [deleteSuccess])
     return (
         <>
             <Card className="border-0 shadow-sm">
@@ -141,9 +141,21 @@ const AddressInfo = () => {
                                                 setUpdate(true)
                                                 setSelectedAddress(item)
                                             }}
-                                            className="btn btn-outline-secondary btn-sm"
+                                            className="btn btn-outline-success btn-sm"
                                         >
-                                            Edit Address
+                                            <FaPencilAlt />
+                                        </button>
+                                    </Col>
+                                    <Col xs="auto" className="d-flex align-items-center">
+                                        <button
+                                            onClick={e => {
+                                                deleteAddress(item._id)
+                                                // setUpdate(true)
+                                                // setSelectedAddress(item)
+                                            }}
+                                            className="btn btn-outline-danger btn-sm"
+                                        >
+                                            <FaTrash />
                                         </button>
                                     </Col>
                                 </Row>

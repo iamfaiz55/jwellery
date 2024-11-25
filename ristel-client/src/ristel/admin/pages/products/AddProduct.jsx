@@ -3,8 +3,8 @@
  * TODO: https://www.npmjs.com/package/unique-slug to genrate unique slug
  **/
 
-import { Row, Col, Breadcrumb, Card, Form, Image, Spinner, Button, FloatingLabel } from 'react-bootstrap'
-import React, { useState, Fragment, useEffect } from 'react'
+import { Row, Col, Breadcrumb, Card, Form, Image, Spinner, Button, FloatingLabel, Accordion } from 'react-bootstrap'
+import React, { useState, Fragment, useEffect, useRef } from 'react'
 import Flatpickr from 'react-flatpickr'
 import PropTypes from 'prop-types'
 import { useDropzone } from 'react-dropzone'
@@ -15,9 +15,16 @@ import slug from 'slug'
 import { useFieldArray, useForm } from 'react-hook-form'
 import Nav from 'react-bootstrap/Nav';
 import Icon from '@mdi/react'
-import { mdiTrashCan } from '@mdi/js'
+import { mdiStar, mdiTrashCan } from '@mdi/js'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
+import "./product.css"
+import { toast } from 'react-toastify'
+import { useAddCartMutation, useGetReviewsQuery, useLikeMutation } from '../../../../redux/apis/userApi'
+import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { useGetTaxesQuery } from '../../../../redux/apis/publicApi'
+import Slider from 'react-slick'
 
 const AddProduct = ({ edit }) => {
     const [addProd, { isSuccess, isLoading: prodLoading }] = useAddProductMutation()
@@ -31,20 +38,22 @@ const AddProduct = ({ edit }) => {
             productType: "",
             mainDesc: "",
             purity: "",
+            slug: "",
             // rating: "",
         },
         validationSchema: yup.object({
             name: yup.string().required("Name is required"),
+            slug: yup.string(),
             images: yup.array().min(1, "At least one image is required"),
             varient: yup.array().of(
                 yup.object({
                     price: yup.number().required("Enter price"),
                     mrp: yup.number().required("Enter MRP"),
                     desc: yup.string().required("Enter description"),
-                    height: yup.string().required("Enter height"),
+                    height: yup.string(),
                     width: yup.string().required("Enter width"),
                     // width: yup.string().required("Enter width"),
-                    prductWeight: yup.string().required("Enter product weight"),
+                    prductWeight: yup.string(),
                     quantity: yup.number().required("Enter quantity"),
                 })
             ),
@@ -63,6 +72,7 @@ const AddProduct = ({ edit }) => {
             fd.append("productType", values.productType);
             fd.append("mainDesc", values.mainDesc);
             fd.append("purity", values.purity);
+            fd.append("slug", values.slug);
             // fd.append("rating", values.rating);
 
             values.images.forEach(file => {
@@ -79,12 +89,13 @@ const AddProduct = ({ edit }) => {
                 fd.append(`varient[${index}][prductWeight]`, variant.prductWeight);
                 fd.append(`varient[${index}][quantity]`, variant.quantity);
             });
+            console.log(fd);
 
-            // if (edit) {
-            //     updateProd({ ...edit, fd });
-            // } else {
-            //     addProd(fd);
-            // }
+            if (edit) {
+                updateProd({ ...edit, fd });
+            } else {
+                addProd(fd);
+            }
 
 
             resetForm();
@@ -158,59 +169,8 @@ const AddProduct = ({ edit }) => {
 
     const [activeKey, setActiveKey] = useState('first');
     const [tabCount, setTabCount] = useState(2);
-    // const addNewTab = () => {
-
-    //     const newTabKey = `tab${tabs.length + 1}`;
-    //     setTabs([
-    //         ...tabs,
-    //         {
-    //             key: newTabKey,
-    //             title: `Varient ${tabs.length + 1}`,
-    //             content: <Row>
-    //                 <Col md={6}>
-    //                     <FloatingLabel label="Product MRP" className="mb-3" >
-    //                         <Form.Control type="number" placeholder="Enter Product MRP" />
-    //                     </FloatingLabel>
-    //                 </Col>
-    //                 <Col md={6}>
-    //                     <FloatingLabel label="Selling Price" className="mb-3">
-    //                         <Form.Control type="number" placeholder="Selling price" />
-    //                     </FloatingLabel>
-    //                 </Col>
-    //                 <Col md={6}>
-    //                     <FloatingLabel label="Product Weight" className="mb-3" >
-    //                         <Form.Control type="number" placeholder="Product Weight" />
-    //                     </FloatingLabel>
-    //                 </Col>
-    //                 <Col md={6}>
-    //                     <FloatingLabel label="Product Height" className="mb-3" >
-    //                         <Form.Control type="number" placeholder="Enter Product Height" />
-    //                     </FloatingLabel>
-    //                 </Col>
-    //                 <Col md={6}>
-    //                     <FloatingLabel label="Product Weight" className="mb-3"  >
-    //                         <Form.Control type="number" placeholder="Enter Product Weight" />
-    //                     </FloatingLabel>
-    //                 </Col>
-    //                 <Col md={6}>
-    //                     <FloatingLabel label="Available Stock Quantity" className="mb-3" >
-    //                         <Form.Control type="number" placeholder="Enter Available Product Stock Quantity" />
-    //                     </FloatingLabel>
-    //                 </Col>
-    //                 <Col>
-    //                     <Form.Group className="mb-3">
-    //                         <Form.Label>Varient Description</Form.Label>
-    //                         <ReactQuillEditor initialValue='<p><br/><br/><br/><br/><br/></p>' />
-    //                     </Form.Group>
-    //                 </Col>
 
 
-    //             </Row>,
-    //         },
-    //     ]);
-    //     setActiveKey(newTabKey);  // Switch to the newly added tab
-    //     setTabCount(tabCount + 1);  // Increment tab count for unique keys
-    // };
 
     const addNewTab = () => {
         // Check if the last variant has values before adding a new one
@@ -357,229 +317,327 @@ const AddProduct = ({ edit }) => {
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/^-+|-+$/g, "");
     };
+    let slugReady = generateSlug()
+    const [selectedVariant, setSelectedVariant] = useState(0)
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success("Product Added Success")
+            // location.reload()
+            // location.resetForm()
+        }
+    }, [isSuccess])
+    // const [addToCart, { isSuccess, isError: isAddError, error: addError }] = useAddCartMutation();
+    // const { id } = useParams()
+    // let addToCart
+    const getFormattedPrice = amount => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(amount)
+    const getFormattedDiscount = (mrp, price) => (((mrp - price) / mrp) * 100).toFixed(0)
+    useEffect(() => {
+        setSelectedVariant(formik.values && formik.values.varient[0])
+    }, [])
+    // const { user } = useSelector((state) => state.user);
+    // console.log("user from redux", user);
 
-    return (
-        <form onSubmit={formik.handleSubmit}>
+    // const [like, { isSuccess: likeSuccesss, isError, error }] = useLikeMutation();
+    // const [liked, setLiked] = useState(false);
 
-            <Row>
-                <Col lg={12} md={12} xs={12}>
-                    <div className="border-bottom pb-3 mb-3 ">
-                        <div className="mb-2 mb-lg-0">
-                            <h1 className="mb-0 h2 fw-bold"> Add Product </h1>
-                            <Breadcrumb>
-                                <Breadcrumb.Item to="#">Dashboard</Breadcrumb.Item>
-                                <Breadcrumb.Item to="#">Products</Breadcrumb.Item>
-                                <Breadcrumb.Item active>Add Product</Breadcrumb.Item>
-                            </Breadcrumb>
-                        </div>
+    const handleLikeClick = async () => {
+        // console.log("------------");
+        // if (user) {
+
+        //     setLiked((prevLiked) => !prevLiked);
+        //     await like({ uId: user && user._id, pId: id, varientId: selectedVariant._id });
+        // } else if (!user) {
+        //     toast.success("Please Login First")
+        // }
+        // toast.success("Please Login First")
+    };
+    // useEffect(() => {
+    //     if (likeSuccesss) {
+    //         toast.success("Liked Success");
+    //     }
+    // }, [likeSuccesss]);
+    // useEffect(() => {
+    //     if (isError) {
+    //         toast.error(JSON.stringify(error.data.message));
+    //     }
+    // }, [isError]);
+    // useEffect(() => {
+    //     if (isSuccess) {
+    //         toast.success("Cart Added Success", {
+    //             style: {
+    //                 backgroundColor: 'white',
+    //                 color: 'blue',
+    //                 border: '1px solid blue',
+    //             },
+    //             icon: (
+    //                 <span style={{ color: 'blue', fontSize: '1.5em' }}>✔️</span>
+    //             ),
+    //             progressStyle: {
+    //                 backgroundColor: 'blue',
+    //             }
+    //         });
+    //     }
+    // }, [isSuccess]);
+    return <>
+
+        {
+            prodLoading
+                ? <>
+                    <div className="loader-overlay">
+                        <Spinner animation="border" role="status" variant="primary">
+                            <span className="visually-hidden">Loading...</span>
+                        </Spinner>
                     </div>
-                </Col>
-            </Row>
-            <Row>
-                <Col lg={7} xs={12}>
-                    <Card className="mb-4">
-                        {/* <pre>{JSON.stringify(formik.values, null, 2)}</pre> */}
-                        <Card.Header className='fw-bold'>Product Basic Info</Card.Header>
-                        <Card.Body>
-                            <div>
-                                {/* Product Title */}
-                                <Form.Group controlId="productTitle" className="mb-3">
-                                    <Form.Label>Product Name</Form.Label>
-                                    <Form.Control {...formik.getFieldProps("name")} type="text" placeholder="Enter Product Title" required />
-                                </Form.Group>
-                                <Row>
-                                    <Col>
-                                        {
-                                            isLoading
-                                                ? <Spinner></Spinner>
-                                                : <Form.Group controlId="material" className="mb-3">
-                                                    <Form.Label>Product Material</Form.Label>
-                                                    <Form.Select {...formik.getFieldProps("material")}>
-                                                        <option value="" disabled selected>Choose Product Material</option>
-                                                        {
-                                                            data && data.material.map(item => <option key={item._id} value={item.name}>{item.name}</option>)
-                                                        }
-                                                    </Form.Select>
-                                                </Form.Group>
-                                        }
+                </>
+                : <>
+                    <form onSubmit={formik.handleSubmit}>
 
-                                    </Col>
-                                    <Col>
-                                        {
-                                            isLoading
-                                                ? <Spinner></Spinner>
-                                                : <Form.Group controlId="type" className="mb-3">
-                                                    <Form.Label>Product Types</Form.Label>
-                                                    <Form.Select {...formik.getFieldProps("productType")}>
-                                                        <option value="" disabled selected>Choose Product Types</option>
-                                                        {
-                                                            data && data.type.map(item => <option key={item._id} value={item.name}>{item.name}</option>)
-                                                        }
-                                                    </Form.Select>
-                                                </Form.Group>
-                                        }
-
-                                    </Col>
-                                    <Col>
-                                        {
-                                            isLoading
-                                                ? <Spinner></Spinner>
-                                                : <Form.Group controlId="purity" className="mb-3">
-                                                    <Form.Label>Product Purity</Form.Label>
-                                                    <Form.Select {...formik.getFieldProps("purity")}>
-                                                        <option value="" disabled selected>Choose Product Purity</option>
-                                                        {
-                                                            data && data.purity.map(item => <option key={item._id} value={item.name}>{item.name}</option>)
-                                                        }
-                                                    </Form.Select>
-                                                </Form.Group>
-                                        }
-
-                                    </Col>
-                                </Row>
-
-                                {/* Product Description */}
-                                <Form.Group controlId="productDescription" className="mb-3">
-                                    <Form.Label>Product Description</Form.Label>
-                                    {/* <ReactQuillEditor
-                                        initialValue="<p><br/><br/><br/><br/><br/></p>"
-                                        on={(value) => console.log(value)
-                                        }
-                                    /> */}
-                                    <ReactQuill
-                                        // value={formik.values.v}
-                                        onChange={val => formik.setFieldValue("mainDesc", val)}
-                                    />
-                                </Form.Group>
-
-                                <Form.Group controlId="productSlug" className="mb-3">
-                                    <Form.Label>Product Slug</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Product Slug"
-                                        value={generateSlug()}
-                                        disabled
-                                    />
-                                </Form.Group>
-                            </div>
-                        </Card.Body>
-                    </Card>
-
-                    <Card className="mb-4">
-                        <Card.Header>Product Gallery</Card.Header>
-                        <Card.Body>
-                            <div>
-                                {/* <Form.Group className="mb-4" controlId="productGallery">
-                                    <Form.Label className="mb-1">Product Image </Form.Label>
-                                    <p>Add Product main Image.</p>
-                                    <Form.Control type="file" />
-                                </Form.Group> */}
-
-                                <div>
-                                    <h5 className="mb-1">Product Gallery</h5>
-                                    <p>Add Product Gallery Images.</p>
-                                    <div className="dropzone mt-4 p-4 border-dashed text-center">
-                                        <DropFiles setFieldValue={formik.setFieldValue} fieldName="images" />
+                        <Row>
+                            <Col lg={12} md={12} xs={12}>
+                                <div className="border-bottom pb-3 mb-3 ">
+                                    <div className="mb-2 mb-lg-0">
+                                        <h1 className="mb-0 h2 fw-bold"> Add Product </h1>
+                                        <Breadcrumb>
+                                            <Breadcrumb.Item to="#">Dashboard</Breadcrumb.Item>
+                                            <Breadcrumb.Item to="#">Products</Breadcrumb.Item>
+                                            <Breadcrumb.Item active>Add Product</Breadcrumb.Item>
+                                        </Breadcrumb>
                                     </div>
                                 </div>
-                            </div>
-                        </Card.Body>
-                    </Card>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col lg={7} xs={12}>
+                                <Card className="mb-4">
+                                    {/* <pre>{JSON.stringify(formik.errors, null, 2)}</pre> */}
+                                    {/* <pre>{JSON.stringify(formik.values.variant && formik.values.variant[0].price && formik.values.variant[0].price, null, 2)}</pre> */}
+                                    {/* <pre>{JSON.stringify(formik.values, null, 2)}</pre> */}
+                                    <Card.Header className='fw-bold'>Product Basic Info</Card.Header>
+                                    <Card.Body>
+                                        <div>
+                                            {/* Product Title */}
+                                            <Form.Group controlId="productTitle" className="mb-3">
+                                                <Form.Label>Product Name</Form.Label>
+                                                <Form.Control {...formik.getFieldProps("name")} type="text" placeholder="Enter Product Title" required />
+                                            </Form.Group>
+                                            <Row>
+                                                <Col>
+                                                    {
+                                                        isLoading
+                                                            ? <Spinner></Spinner>
+                                                            : <Form.Group controlId="material" className="mb-3">
+                                                                <Form.Label>Product Material</Form.Label>
+                                                                <Form.Select {...formik.getFieldProps("material")}>
+                                                                    <option value="" disabled selected>Choose Product Material</option>
+                                                                    {
+                                                                        data && data.material.map(item => <option key={item._id} value={item.name}>{item.name}</option>)
+                                                                    }
+                                                                </Form.Select>
+                                                            </Form.Group>
+                                                    }
 
+                                                </Col>
+                                                <Col>
+                                                    {
+                                                        isLoading
+                                                            ? <Spinner></Spinner>
+                                                            : <Form.Group controlId="type" className="mb-3">
+                                                                <Form.Label>Product Types</Form.Label>
+                                                                <Form.Select {...formik.getFieldProps("productType")}>
+                                                                    <option value="" disabled selected>Choose Product Types</option>
+                                                                    {
+                                                                        data && data.type.map(item => <option key={item._id} value={item.name}>{item.name}</option>)
+                                                                    }
+                                                                </Form.Select>
+                                                            </Form.Group>
+                                                    }
 
-                    <Card className="mb-4">
-                        <Card.Header className='d-flex justify-content-between align-items-center'>
-                            <span>Product Varient</span>
-                            <Button variant='outline-primary' onClick={addNewTab} size='sm'>+ Add Varient</Button>
-                        </Card.Header>
-                        <Card.Body>
-                            <Row>
-                                <Col sm={12}>
-                                    <Nav variant="tabs" activeKey={activeKey} onSelect={(k) => setActiveKey(k)}>
-                                        {tabs.map((tab) => (
-                                            <Nav.Item key={tab.key} className="d-flex justify-content-between align-items-center ">
-                                                <Nav.Link eventKey={tab.key}>{tab.title}
-                                                </Nav.Link>
+                                                </Col>
+                                                <Col>
+                                                    {
+                                                        isLoading
+                                                            ? <Spinner></Spinner>
+                                                            : <Form.Group controlId="purity" className="mb-3">
+                                                                <Form.Label>Product Purity</Form.Label>
+                                                                <Form.Select {...formik.getFieldProps("purity")}>
+                                                                    <option value="" disabled selected>Choose Product Purity</option>
+                                                                    {
+                                                                        data && data.purity.map(item => <option key={item._id} value={item.name}>{item.name}</option>)
+                                                                    }
+                                                                </Form.Select>
+                                                            </Form.Group>
+                                                    }
 
-                                            </Nav.Item>
-                                        ))}
-                                    </Nav>
-                                </Col>
-                                <Col sm={12}>
-                                    {/* Render the content corresponding to the active nav item */}
-                                    {tabs.map((tab) =>
-                                        tab.key === activeKey && (
-                                            <div key={tab.key} className='mt-3'>
-                                                <div className='d-flex justify-content-between align-items-center mx-2'>
-                                                    <h4>{tab.title}</h4>
-                                                    {tab.key !== 'first' && (
-                                                        <Button variant="outline-danger" className='ms-2' size="sm" onClick={() => removeNav(tab.key)}>
-                                                            <Icon path={mdiTrashCan} size={0.7} />
-                                                        </Button>
-                                                    )}
+                                                </Col>
+                                            </Row>
+
+                                            {/* Product Description */}
+                                            <Form.Group controlId="productDescription" className="mb-3">
+                                                <Form.Label>Product Description</Form.Label>
+                                                {/* <ReactQuillEditor
+                     initialValue="<p><br/><br/><br/><br/><br/></p>"
+                     on={(value) => console.log(value)
+                     }
+                 /> */}
+                                                <ReactQuill
+                                                    // value={formik.values.v}
+                                                    onChange={val => formik.setFieldValue("mainDesc", val)}
+                                                />
+                                            </Form.Group>
+
+                                            <Form.Group controlId="productSlug" className="mb-3">
+                                                <Form.Label>Product Slug</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+
+                                                    placeholder="Product Slug"
+                                                    value={generateSlug()}
+                                                    disabled
+                                                />
+                                            </Form.Group>
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+
+                                <Card className="mb-4">
+                                    <Card.Header>Product Gallery</Card.Header>
+                                    <Card.Body>
+                                        <div>
+                                            {/* <Form.Group className="mb-4" controlId="productGallery">
+                 <Form.Label className="mb-1">Product Image </Form.Label>
+                 <p>Add Product main Image.</p>
+                 <Form.Control type="file" />
+             </Form.Group> */}
+
+                                            <div>
+                                                <h5 className="mb-1">Product Gallery</h5>
+                                                <p>Add Product Gallery Images.</p>
+                                                <div className="dropzone mt-4 p-4 border-dashed text-center">
+                                                    <DropFiles setFieldValue={formik.setFieldValue} fieldName="images" />
                                                 </div>
-                                                <hr />
-                                                {tab.content}
                                             </div>
-                                        )
-                                    )}
-                                </Col>
-                            </Row>
-                        </Card.Body>
-                    </Card>
-
-                    <div className="d-grid">
-                        <Button type='submit' onClick={e => {
-                            const values = formik.values
-                            const fd = new FormData();
-                            // console.log(values);
-
-                            fd.append("name", values.name);
-                            fd.append("material", values.material);
-                            fd.append("productType", values.productType);
-                            fd.append("mainDesc", values.mainDesc);
-                            fd.append("purity", values.purity);
-                            // fd.append("rating", values.rating);
-
-                            values.images.forEach(file => {
-                                fd.append("images", file);
-                            });
-
-                            values.varient.forEach((variant, index) => {
-                                fd.append(`varient[${index}][price]`, variant.price);
-                                fd.append(`varient[${index}][mrp]`, variant.mrp);
-                                fd.append(`varient[${index}][discount]`, variant.discount);
-                                fd.append(`varient[${index}][desc]`, variant.desc);
-                                fd.append(`varient[${index}][height]`, variant.height);
-                                fd.append(`varient[${index}][width]`, variant.width);
-                                fd.append(`varient[${index}][prductWeight]`, variant.prductWeight);
-                                fd.append(`varient[${index}][quantity]`, variant.quantity);
-                            });
+                                        </div>
+                                    </Card.Body>
+                                </Card>
 
 
-                            addProd(fd)
+                                <Card className="mb-4">
+                                    <Card.Header className='d-flex justify-content-between align-items-center'>
+                                        <span>Product Varient</span>
+                                        <Button variant='outline-primary' onClick={addNewTab} size='sm'>+ Add Varient</Button>
+                                    </Card.Header>
+                                    <Card.Body>
+                                        <Row>
+                                            <Col sm={12}>
+                                                <Nav variant="tabs" activeKey={activeKey} onSelect={(k) => setActiveKey(k)}>
+                                                    {tabs.map((tab) => (
+                                                        <Nav.Item key={tab.key} className="d-flex justify-content-between align-items-center ">
+                                                            <Nav.Link eventKey={tab.key}>{tab.title}
+                                                            </Nav.Link>
 
-                        }} className="btn btn-primary">
-                            Create Product
-                        </Button>
-                    </div>
-                </Col>
-                <Col lg={5} >
-                    <div className='position-fixed pe-4 '>
-                        <Card>
-                            <Card.Body>
-                                <h4 className="mb-3">Product Summary</h4>
-                                <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quae aperiam nemo aut ea reprehenderit numquam a nam unde beatae quasi error consequuntur soluta ullam, veritatis possimus illum omnis doloribus optio!
-                                </p>
-                            </Card.Body>
-                        </Card>
-                    </div>
+                                                        </Nav.Item>
+                                                    ))}
+                                                </Nav>
+                                            </Col>
+                                            <Col sm={12}>
+                                                {/* Render the content corresponding to the active nav item */}
+                                                {tabs.map((tab) =>
+                                                    tab.key === activeKey && (
+                                                        <div key={tab.key} className='mt-3'>
+                                                            <div className='d-flex justify-content-between align-items-center mx-2'>
+                                                                <h4>{tab.title}</h4>
+                                                                {tab.key !== 'first' && (
+                                                                    <Button variant="outline-danger" className='ms-2' size="sm" onClick={() => removeNav(tab.key)}>
+                                                                        <Icon path={mdiTrashCan} size={0.7} />
+                                                                    </Button>
+                                                                )}
+                                                            </div>
+                                                            <hr />
+                                                            {tab.content}
+                                                        </div>
+                                                    )
+                                                )}
+                                            </Col>
+                                        </Row>
+                                    </Card.Body>
+                                </Card>
 
-                </Col>
-            </Row>
-        </form>
-    )
+                                <div className="d-grid">
+                                    <Button type='submit' onClick={e => {
+                                        // const values = formik.values
+                                        // const fd = new FormData();
+                                        // // console.log(values);
+
+                                        // fd.append("name", values.name);
+                                        // fd.append("material", values.material);
+                                        // fd.append("productType", values.productType);
+                                        // fd.append("mainDesc", values.mainDesc);
+                                        // fd.append("purity", values.purity);
+                                        // fd.append("slug", slugReady);
+                                        // // fd.append("rating", values.rating);
+
+                                        // values.images.forEach(file => {
+                                        //     fd.append("images", file);
+                                        // });
+
+                                        // values.varient.forEach((variant, index) => {
+                                        //     fd.append(`varient[${index}][price]`, variant.price);
+                                        //     fd.append(`varient[${index}][mrp]`, variant.mrp);
+                                        //     fd.append(`varient[${index}][discount]`, variant.discount);
+                                        //     fd.append(`varient[${index}][desc]`, variant.desc);
+                                        //     fd.append(`varient[${index}][height]`, variant.height);
+                                        //     fd.append(`varient[${index}][width]`, variant.width);
+                                        //     fd.append(`varient[${index}][prductWeight]`, variant.prductWeight);
+                                        //     fd.append(`varient[${index}][quantity]`, variant.quantity);
+                                        // });
+
+
+                                        // addProd(fd)
+
+                                    }} className="btn btn-primary">
+                                        Create Product
+                                    </Button>
+                                </div>
+                            </Col>
+                            <Col lg={5}>
+                                <div className="text-center">
+                                    <h4 className='fw-bold'>Preview</h4>
+                                </div>
+                                <div className="d-flex flex-wrap justify-content-center gap-2 m-3">
+                                    {
+                                        formik.values.images && formik.values.images.map((img, index) => (
+                                            <div key={index} className="position-relative">
+                                                <img
+                                                    src={img.preview}
+                                                    alt={`Product image ${index + 1}`}
+                                                    width={90}
+                                                    height={90}
+                                                    style={{
+                                                        objectFit: 'cover',
+                                                        borderRadius: '8px',
+                                                        border: '2px solid #ddd',
+                                                        transition: 'transform 0.3s ease'
+                                                    }}
+                                                    className="thumbnail-img"
+                                                />
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+
+
+
+                                <Preview data={formik.values} />
+
+                            </Col>
+
+
+                        </Row>
+                    </form>
+                </>
+
+        }
+    </>
 }
 
 const FlatPickr = ({ value, placeholder = 'Select Date' }) => {
@@ -715,14 +773,14 @@ const DropFiles = ({ setFieldValue, fieldName }) => {
 
 
 // react quill
-const ReactQuillEditor = ({ value, setValue, name }) => {
-    return (
-        <ReactQuill
-            value={value}
-            onChange={(content) => setValue(name, content)}  // Correctly pass the content to the parent onChange function
-        />
-    );
-};
+// const ReactQuillEditor = ({ value, setValue, name }) => {
+//     return (
+//         <ReactQuill
+//             value={value}
+//             onChange={(content) => setValue(name, content)}  // Correctly pass the content to the parent onChange function
+//         />
+//     );
+// };
 
 // tag
 const GKTagsInput = ({ defaulttags = [] }) => {
@@ -730,8 +788,110 @@ const GKTagsInput = ({ defaulttags = [] }) => {
     return <ReactTagInput tags={tags} onChange={(newTags) => setTags(newTags)} />;
 }
 
+
+
+
 GKTagsInput.propTypes = {
     defaulttags: PropTypes.array
 }
+
+
+
+const Preview = ({ data }) => {
+    // console.log(data);
+    const getFormattedPrice = amount => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(amount)
+    const getFormattedDiscount = (mrp, price) => (((mrp - price) / mrp) * 100).toFixed(0)
+
+    return <>
+        <Fragment>
+            <div>
+                <h2>{data && data.name} </h2>
+                <div>
+                    <span><span className="me-1 text-dark fw-semibold">{data && data.rating} <Icon path={mdiStar} size={0.6} className="text-success" />
+                    </span>592 Customer Reviews</span>
+                </div>
+            </div>
+            <hr className="my-3" />
+            <div>
+                {/* <h1>{data && data.mainDesc} </h1> */}
+                <div>
+                    <span className="me-1 ">{data && data.mainDesc}</span>
+                </div>
+            </div>
+            <hr className="my-3" />
+            <div className="mb-5">
+                <h4 className="mb-1">
+                    <span className="text-danger  me-2 fs-3 fw-light">-{data.varient && data.varient[0] && data.varient[0].price}%</span>
+                    <span className='me-2 fs-3'>₹{data.varient && data.varient[0] && data.varient[0].price}</span>
+                    {/* <pre>{JSON.stringify(data.varient && data.varient[0].price, null, 2)}</pre> */}
+                    MRP <span className="text-muted text-decoration-line-through ">₹{data.variant && data.variant[0] && data.variant[0].mrp}</span>
+                </h4>
+                <span>inclusive of all taxes</span>
+
+                <p className='pt-3'>Varients</p>
+                <div className='d-flex gap-2 overflow-x-auto'>
+                    {data && data.varient && data.varient.map((item, i) => <div onClick={e => setSelectedVariant(item)} className={`alert border border-2 ${data.variant && data.variant[0]._id === item._id && " alert-success"}`} style={{ cursor: "pointer" }}>
+                        <h5 className='d-flex justify-content-between'>{data.name} {item.prductWeight}  <span className='text-danger '>-{getFormattedDiscount(item.mrp, item.price)}%</span></h5>
+
+                        <p className='m-0'> <strong>₹{item.price}</strong> MRP: <del>₹{item.mrp}</del>
+
+                        </p>
+                    </div>)}
+                </div>
+            </div>
+
+            <Accordion defaultActiveKey="0" >
+                <Accordion.Item eventKey="0" className='border-end-0 border-start-0'>
+                    <Accordion.Header ><span className='fw-bold'>Product Details</span></Accordion.Header>
+                    <Accordion.Body>
+                        {data && data.varient && data.varient[0] && data.varient[0].desc}
+                    </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="1" className='border-end-0 border-start-0'>
+                    <Accordion.Header ><span className='fw-bold'>Specifications</span></Accordion.Header>
+                    <Accordion.Body>
+                        {/* {data && data.specification} */}
+                    </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="2" className='border-end-0 border-start-0'>
+                    <Accordion.Header ><span className='fw-bold'>Free Shipping Policy</span></Accordion.Header>
+                    <Accordion.Body>
+                        {/* {data && data.freeShippingPolicy} */}
+                    </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="3" className='border-end-0 border-start-0'>
+                    <Accordion.Header ><span className='fw-bold'>Refund Policy</span></Accordion.Header>
+                    <Accordion.Body>
+                        {/* {data && data.refundPolicy} */}
+                    </Accordion.Body>
+                </Accordion.Item>
+            </Accordion>
+            {/* <Row>
+                                        <Col md={6}>
+                                            <div className="d-grid mb-2 mb-md-0">
+                                                <button onClick={e => {
+                                                    // if (user) {
+                                                    //     addToCart({ pId: formik.values._id, uId: user?._id, varientId: selectedVariant._id })
+                                                    // }
+                                                    // toast.success("Please Login First")
+                                                }} className="btn btn-success"><i className="fe fe-shopping-cart me-2"></i>Add
+                                                    To Cart</button>
+                                            </div>
+                                        </Col>
+                                        <Col md={6}>
+                                            <div className="d-grid">
+                                                <button onClick={handleLikeClick} className="btn btn-outline-secondary"><i className="fe fe-heart me-2"></i>Wishlist</button>
+                                            </div>
+                                        </Col>
+                                    </Row> */}
+        </Fragment >
+    </>
+}
+
+
+
+
+
+
 
 export default AddProduct

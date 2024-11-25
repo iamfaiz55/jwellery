@@ -10,7 +10,7 @@ const scrollCardSchema = new mongoose.Schema({
     link: {
         type: String
     },
-    mentorRole: {
+    desc: {
         type: String
     },
 

@@ -21,6 +21,7 @@ router
     .get("/get-menu-items", adminController.getAllMenuItems)
     .get("/get-adds-images", adminController.getAddsImages)
     .get("/get-schedules", getSchedules)
+    .get("/get-product-material", adminController.getMaterial)
     // .get("/get-adds-images", adminController.)
     // .get("/get-varient/:id", adminController.getVarient)
 

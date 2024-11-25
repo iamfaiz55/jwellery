@@ -125,6 +125,8 @@ const ProductMaterial = () => {
     const [selectedProduct, setSelectedProduct] = useState()
     const { register, handleSubmit, watch, reset, formState: { errors, } } = useForm();
     const { data } = useGetAdminProductMaterialQuery()
+    console.log("materials", data);
+
     const [addPurity, { isLoading: isLoadingaddPurity, isSuccess: isSucessaddPurity, isError: isErroraddPurity }] = useAddAdminProductMaterialMutation()
     const [updatePurity, { isLoading: isLoadingupdatePurity, isSuccess: isSucessupdatePurity, isError: isErrorupdatePurity }] = useUpdateAdminProductMaterialMutation()
     const [deletePurity, { isLoading: isLoadingdeletePurity, isSuccess: isSucessdeletePurity, isError: isErrordeletePurity }] = useDeleteAdminProductMaterialMutation()

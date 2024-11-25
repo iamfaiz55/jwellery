@@ -1,11 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Image, Navbar, Nav, Container, ListGroup } from 'react-bootstrap';
+import { Image, Navbar, Nav, Container, ListGroup, Dropdown } from 'react-bootstrap';
 import { v4 as uuid } from 'uuid';
 import { mdiAccount, mdiCartOutline, mdiFacebook, mdiTwitter, mdiInstagram } from '@mdi/js';
 import Icon from '@mdi/react';
+
+// import useMediaQuery from 'react-responsive';
+
 import { NavDropdown, Badge } from 'react-bootstrap';
 import { useMediaQuery } from 'react-responsive';
 import { Row, Col } from 'react-bootstrap';
@@ -18,7 +21,9 @@ import PlayStore from './../../assets/images/svg/playstore.svg';
 import RistelFooterWithLinks from './RistelFooterWithLinks';
 import { useGetAllCartItemsQuery } from '../../redux/apis/userApi';
 import { useSelector } from 'react-redux';
-import { useGetCompanyDetailsQuery } from '../../redux/apis/publicApi';
+import { useGetAllMenuItemsQuery, useGetCompanyDetailsQuery } from '../../redux/apis/publicApi';
+import { useLogoutUserMutation } from '../../redux/apis/userAuthApi';
+import { toast } from 'react-toastify';
 
 const PublicLayout = () => {
     return <>
@@ -31,10 +36,18 @@ const PublicLayout = () => {
 
 export const RistelNavbarMegaMenu = () => {
     const { data: companyDetails } = useGetCompanyDetailsQuery();
-
+    const { data } = useGetAllMenuItemsQuery()
+    // console.log("nav data", data);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [logout, { isSuccess: logoutSuccess }] = useLogoutUserMutation()
     const [expandedMenu, setExpandedMenu] = useState(false);
     const { user } = useSelector(state => state.user);
     const { data: cartItems } = useGetAllCartItemsQuery(user && user._id);
+    useEffect(() => {
+        if (logoutSuccess) {
+            toast.success("Logout Success")
+        }
+    }, [logoutSuccess])
 
     return (
         <Fragment>
@@ -60,7 +73,32 @@ export const RistelNavbarMegaMenu = () => {
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="ms-auto">
                             <MegaMenu />
-                            {NavbarDefault.slice(1, 100).map((item, index) => {
+                            {/* original */}
+                            {/* {NavbarDefault && NavbarDefault.map((item, index) => {
+                                // console.log(item);
+
+                                if (item.children === undefined) {
+                                    return (
+                                        <Nav.Link key={index} as={Link} to={item.link}>
+                                            {item.menuitem}
+                                        </Nav.Link>
+                                    );
+                                } else {
+                                    return (
+                                        <NavMegaDropdown
+                                            item={item}
+                                            key={index}
+                                            onClick={(value) => setExpandedMenu(value)}
+                                        />
+                                    );
+                                }
+                            })} */}
+
+
+                            {/* mine */}
+                            {data && data.map((item, index) => {
+                                // console.log(item);
+
                                 if (item.children === undefined) {
                                     return (
                                         <Nav.Link key={index} as={Link} to={item.link}>
@@ -78,6 +116,9 @@ export const RistelNavbarMegaMenu = () => {
                                 }
                             })}
 
+
+
+
                             {/* <DocumentMenu /> */}
                         </Nav>
 
@@ -85,21 +126,47 @@ export const RistelNavbarMegaMenu = () => {
                         <div className="ms-auto mt-3 mt-lg-0">
                             <div className="d-flex align-items-center">
                                 {/* <DarkLightMode /> */}
-                                <Link to="/user" className="btn btn-outline-primary ms-3">
-                                    <Icon path={mdiAccount} size={0.7} />
-                                </Link>
+                                <Dropdown
+                                    onMouseEnter={() => setShowDropdown(true)}
+                                    onMouseLeave={() => setShowDropdown(false)}
+                                    show={showDropdown}
+                                >
+                                    <Dropdown.Toggle
+                                        variant="outline-primary"
+                                        id="dropdown-account"
+                                        className="d-flex align-items-center ms-3"
+                                    >
+                                        <Icon path={mdiAccount} size={0.7} />
+                                        <span className="ms-2">{user && user.name}</span>
+                                    </Dropdown.Toggle>
+
+                                    <Dropdown.Menu align="end">
+                                        <Dropdown.Item as={Link} to="/user">
+                                            Profile
+                                        </Dropdown.Item>
+                                        <Dropdown.Divider />
+                                        <Dropdown.Item
+                                            onClick={() => {
+                                                logout()
+                                            }}
+                                            className="text-danger"
+                                        >
+                                            Logout
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+
                                 <Link to="/cart" className="btn btn-outline-primary ms-3 position-relative">
                                     <Icon path={mdiCartOutline} size={0.7} />
-
                                     {cartItems && cartItems.length > 0 && (
                                         <span className="badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-light text-primary">
-                                            {cartItems && cartItems.length}
+                                            {cartItems.length}
                                         </span>
                                     )}
                                 </Link>
                                 {/* <Link to="#" className="btn btn-primary ms-1">
-									Sign up
-								</Link> */}
+                    Sign up
+                </Link> */}
                             </div>
                         </div>
                         {/* end of right side quick / shortcut menu  */}
@@ -110,159 +177,19 @@ export const RistelNavbarMegaMenu = () => {
     );
 };
 
-// navbar data 
 const NavbarDefault = [
-    {
-        id: uuid(),
-        menuitem: 'Browse',
-        link: '#',
-        children: [
-            {
-                id: uuid(),
-                menuitem: 'Web Development',
-                link: '#',
-                children: [
-                    {
-                        id: uuid(),
-                        menuitem: 'Bootstrap',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'React',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'GraphQl',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'Gatsby',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'Grunt',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'Svelte',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'Meteor',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'HTML5',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'Angular',
-                        link: '/marketing/course-category/'
-                    }
-                ]
-            },
-            {
-                id: uuid(),
-                menuitem: 'Design',
-                link: '#',
-                children: [
-                    {
-                        id: uuid(),
-                        menuitem: 'Graphic Design',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'Illustrator',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'UX / UI Design',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'Figma Design',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'Adobe XD',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'Sketch',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'Icon Design',
-                        link: '/marketing/course-category/'
-                    },
-                    {
-                        id: uuid(),
-                        menuitem: 'Photoshop',
-                        link: '/marketing/course-category/'
-                    }
-                ]
-            },
-            {
-                id: uuid(),
-                menuitem: 'Mobile App',
-                link: '/marketing/course-category/'
-            },
-            {
-                id: uuid(),
-                menuitem: 'IT Software',
-                link: '/marketing/course-category/'
-            },
-            {
-                id: uuid(),
-                menuitem: 'Marketing',
-                link: '/marketing/course-category/'
-            },
-            {
-                id: uuid(),
-                menuitem: 'Music',
-                link: '/marketing/course-category/'
-            },
-            {
-                id: uuid(),
-                menuitem: 'Life Style',
-                link: '/marketing/course-category/'
-            },
-            {
-                id: uuid(),
-                menuitem: 'Business',
-                link: '/marketing/course-category/'
-            },
-            {
-                id: uuid(),
-                menuitem: 'Photography',
-                link: '/marketing/course-category/'
-            }
-        ]
-    },
+
     {
         id: uuid(),
         menuitem: 'Diamond',
         link: '#',
+        header: 'Diamond Collections',
         children: [
-            {
-                id: uuid(),
-                header: true,
-                header_text: 'Diamond Collections'
-            },
+            // {
+            //     id: uuid(),
+            //     header: true,
+            //     header: 'Diamond Collections'
+            // },
             {
                 id: uuid(),
                 menuitem: 'Rings',
@@ -316,52 +243,53 @@ const NavbarDefault = [
         id: uuid(),
         menuitem: 'Gold',
         link: '#',
+        header: 'Gold Collections',
         children: [
-            {
-                id: uuid(),
-                header: true,
-                header_text: 'Gold Collections'
-            },
+            // {
+            //     id: uuid(),
+            //     header: true,
+            //     header: 'Gold Collections'
+            // },
             {
                 id: uuid(),
                 menuitem: 'Rings',
                 link: "#",
-                children: [
+                grandChildren: [
                     {
                         id: uuid(),
-                        menuitem: 'Studs',
+                        name: 'Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Jhumkas',
+                        name: 'Jhumkas',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Daily Wear',
+                        name: 'Daily Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Drop and Danglers',
+                        name: 'Drop and Danglers',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Hoop and Huggies',
+                        name: 'Hoop and Huggies',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Office Wear',
+                        name: 'Office Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Men Studs',
+                        name: 'Men Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Kids Wear',
+                        name: 'Kids Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Party Wear',
+                        name: 'Party Wear',
                     },
                 ]
             },
@@ -369,42 +297,42 @@ const NavbarDefault = [
                 id: uuid(),
                 menuitem: 'Earrings',
                 link: "#",
-                children: [
+                grandChildren: [
                     {
                         id: uuid(),
-                        menuitem: 'Studs',
+                        name: 'Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Jhumkas',
+                        name: 'Jhumkas',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Daily Wear',
+                        name: 'Daily Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Drop and Danglers',
+                        name: 'Drop and Danglers',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Hoop and Huggies',
+                        name: 'Hoop and Huggies',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Office Wear',
+                        name: 'Office Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Men Studs',
+                        name: 'Men Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Kids Wear',
+                        name: 'Kids Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Party Wear',
+                        name: 'Party Wear',
                     },
                 ]
             },
@@ -412,42 +340,42 @@ const NavbarDefault = [
                 id: uuid(),
                 menuitem: 'Pendant',
                 link: "#",
-                children: [
+                grandChildren: [
                     {
                         id: uuid(),
-                        menuitem: 'Studs',
+                        name: 'Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Jhumkas',
+                        name: 'Jhumkas',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Daily Wear',
+                        name: 'Daily Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Drop and Danglers',
+                        name: 'Drop and Danglers',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Hoop and Huggies',
+                        name: 'Hoop and Huggies',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Office Wear',
+                        name: 'Office Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Men Studs',
+                        name: 'Men Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Kids Wear',
+                        name: 'Kids Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Party Wear',
+                        name: 'Party Wear',
                     },
                 ]
             },
@@ -455,42 +383,42 @@ const NavbarDefault = [
                 id: uuid(),
                 menuitem: 'Necklaces',
                 link: "#",
-                children: [
+                grandChildren: [
                     {
                         id: uuid(),
-                        menuitem: 'Studs',
+                        name: 'Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Jhumkas',
+                        name: 'Jhumkas',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Daily Wear',
+                        name: 'Daily Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Drop and Danglers',
+                        name: 'Drop and Danglers',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Hoop and Huggies',
+                        name: 'Hoop and Huggies',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Office Wear',
+                        name: 'Office Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Men Studs',
+                        name: 'Men Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Kids Wear',
+                        name: 'Kids Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Party Wear',
+                        name: 'Party Wear',
                     },
                 ]
             },
@@ -528,52 +456,53 @@ const NavbarDefault = [
         id: uuid(),
         menuitem: 'Silver',
         link: '#',
+        header: 'Silver Collections',
         children: [
-            {
-                id: uuid(),
-                header: true,
-                header_text: 'Silver Collections'
-            },
+            // {
+            //     id: uuid(),
+            //     header: true,
+            //     header: 'Silver Collections'
+            // },
             {
                 id: uuid(),
                 menuitem: 'Rings',
                 link: "#",
-                children: [
+                grandChildren: [
                     {
                         id: uuid(),
-                        menuitem: 'Studs',
+                        name: 'Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Jhumkas',
+                        name: 'Jhumkas',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Daily Wear',
+                        name: 'Daily Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Drop and Danglers',
+                        name: 'Drop and Danglers',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Hoop and Huggies',
+                        name: 'Hoop and Huggies',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Office Wear',
+                        name: 'Office Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Men Studs',
+                        name: 'Men Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Kids Wear',
+                        name: 'Kids Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Party Wear',
+                        name: 'Party Wear',
                     },
                 ]
             },
@@ -581,42 +510,42 @@ const NavbarDefault = [
                 id: uuid(),
                 menuitem: 'Earrings',
                 link: "#",
-                children: [
+                grandChildren: [
                     {
                         id: uuid(),
-                        menuitem: 'Studs',
+                        name: 'Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Jhumkas',
+                        name: 'Jhumkas',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Daily Wear',
+                        name: 'Daily Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Drop and Danglers',
+                        name: 'Drop and Danglers',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Hoop and Huggies',
+                        name: 'Hoop and Huggies',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Office Wear',
+                        name: 'Office Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Men Studs',
+                        name: 'Men Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Kids Wear',
+                        name: 'Kids Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Party Wear',
+                        name: 'Party Wear',
                     },
                 ]
             },
@@ -624,42 +553,42 @@ const NavbarDefault = [
                 id: uuid(),
                 menuitem: 'Pendant',
                 link: "#",
-                children: [
+                grandChildren: [
                     {
                         id: uuid(),
-                        menuitem: 'Studs',
+                        name: 'Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Jhumkas',
+                        name: 'Jhumkas',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Daily Wear',
+                        name: 'Daily Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Drop and Danglers',
+                        name: 'Drop and Danglers',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Hoop and Huggies',
+                        name: 'Hoop and Huggies',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Office Wear',
+                        name: 'Office Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Men Studs',
+                        name: 'Men Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Kids Wear',
+                        name: 'Kids Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Party Wear',
+                        name: 'Party Wear',
                     },
                 ]
             },
@@ -667,42 +596,42 @@ const NavbarDefault = [
                 id: uuid(),
                 menuitem: 'Necklaces',
                 link: "#",
-                children: [
+                grandChildren: [
                     {
                         id: uuid(),
-                        menuitem: 'Studs',
+                        name: 'Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Jhumkas',
+                        name: 'Jhumkas',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Daily Wear',
+                        name: 'Daily Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Drop and Danglers',
+                        name: 'Drop and Danglers',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Hoop and Huggies',
+                        name: 'Hoop and Huggies',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Office Wear',
+                        name: 'Office Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Men Studs',
+                        name: 'Men Studs',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Kids Wear',
+                        name: 'Kids Wear',
                     },
                     {
                         id: uuid(),
-                        menuitem: 'Party Wear',
+                        name: 'Party Wear',
                     },
                 ]
             },
@@ -765,193 +694,61 @@ const NavMegaDropdown = (props) => {
     const NavbarDesktop = () => {
         return (
             <NavDropdown title={item.menuitem} show>
+                <h4 className="dropdown-header" >
+                    {/* Second level menu heading - its not a menu item */}
+                    {item.header}
+                </h4>
                 {item.children.map((submenu, submenuindex) => {
-                    if (submenu.divider || submenu.header) {
-                        return submenu.divider ? (
-                            <NavDropdown.Divider bsPrefix="mx-3" key={submenuindex} />
-                        ) : (
-                            <h4 className="dropdown-header" key={submenuindex}>
-                                {/* Second level menu heading - its not a menu item */}
-                                {submenu.header_text}
-                            </h4>
+                    // if (submenu.divider || submenu.header)  {
+                    if (submenu.grandChildren === undefined) {
+                        return (
+                            <NavDropdown.Item
+                                key={submenuindex}
+                                as={Link}
+                                to={submenu.link}
+                                onClick={(expandedMenu) => onClick(!expandedMenu)}
+                            >
+                                {/* Second level menu item without having sub menu items */}
+                                {submenu.menuitem}
+                                {submenu.badge && (
+                                    <Badge
+                                        className="ms-1"
+                                        bg={submenu.badgecolor ? submenu.badgecolor : 'primary'}
+                                    >
+                                        {submenu.badge}
+                                    </Badge>
+                                )}
+                            </NavDropdown.Item>
                         );
                     } else {
-                        if (submenu.children === undefined) {
-                            return (
-                                <NavDropdown.Item
-                                    key={submenuindex}
-                                    as={Link}
-                                    to={submenu.link}
-                                    onClick={(expandedMenu) => onClick(!expandedMenu)}
-                                >
-                                    {/* Second level menu item without having sub menu items */}
-                                    {submenu.menuitem}
-                                    {submenu.badge && (
-                                        <Badge
-                                            className="ms-1"
-                                            bg={submenu.badgecolor ? submenu.badgecolor : 'primary'}
-                                        >
-                                            {submenu.badge}
-                                        </Badge>
-                                    )}
-                                </NavDropdown.Item>
-                            );
-                        } else {
-                            return (
-                                <NavDropdown
-                                    title={getTitle(submenu)}
-                                    key={submenuindex}
-                                    bsPrefix="dropdown-item d-block"
-                                    className={`dropdown-submenu dropend py-0 `}
-                                    show
-                                >
-                                    {submenu.children.map((submenuitem, submenuitemindex) => {
-                                        if (submenuitem.divider || submenuitem.header) {
-                                            return submenuitem.divider ? (
-                                                <NavDropdown.Divider
-                                                    bsPrefix="mx-3"
-                                                    key={submenuitemindex}
-                                                />
-                                            ) : (
-                                                <Fragment key={submenuitemindex}>
-                                                    {/* Third level menu heading with description  */}
-                                                    <h5 className="dropdown-header text-dark">
-                                                        {submenuitem.header_text}
-                                                    </h5>
-                                                    <p className="dropdown-text mb-0 text-wrap">
-                                                        {submenuitem.description}
-                                                    </p>
-                                                </Fragment>
-                                            );
-                                        } else {
-                                            if (submenuitem.children === undefined) {
-                                                return (
-                                                    <Fragment key={submenuitemindex}>
-                                                        {submenuitem.type === 'button' ? (
-                                                            <div className="px-3 d-grid">
-                                                                {/* Third Level with button format menu item */}
-                                                                <Link
-                                                                    to={submenuitem.link}
-                                                                    className="btn btn-sm btn-primary text-center"
-                                                                >
-                                                                    {submenuitem.menuitem}
-                                                                </Link>
-                                                            </div>
-                                                        ) : (
-                                                            <NavDropdown.Item
-                                                                as={Link}
-                                                                to={submenuitem.link}
-                                                                onClick={(expandedMenu) =>
-                                                                    onClick(!expandedMenu)
-                                                                }
-                                                            >
-                                                                {/* Third Level menu item */}
-                                                                {submenuitem.menuitem}
-                                                            </NavDropdown.Item>
-                                                        )}
-                                                    </Fragment>
-                                                );
-                                            } else {
-                                                return (
-                                                    <NavDropdown
-                                                        title={getTitle(submenuitem)}
-                                                        key={submenuitemindex}
-                                                        bsPrefix="dropdown-item d-block"
-                                                        className={`dropdown-submenu dropend py-0 `}
-                                                        show
-                                                    >
-                                                        {submenuitem.children.map(
-                                                            (submenuitem4, submenuitem4index) => {
-                                                                return (
-                                                                    <NavDropdown.Item
-                                                                        as={Link}
-                                                                        to={submenuitem4.link}
-                                                                        onClick={(expandedMenu) =>
-                                                                            onClick(!expandedMenu)
-                                                                        }
-                                                                        key={submenuitem4index}
-                                                                    >
-                                                                        {/* Fourth Level menu item */}
-                                                                        {submenuitem4.menuitem}
-                                                                    </NavDropdown.Item>
-                                                                );
-                                                            }
-                                                        )}
-                                                    </NavDropdown>
-                                                );
-                                            }
-                                        }
-                                    })}
-                                </NavDropdown>
-                            );
-                        }
-                    }
-                })}
-            </NavDropdown>
-        );
-    };
-
-    const NavbarMobile = () => {
-        return (
-            <NavDropdown title={item.menuitem}>
-                {item.children.map((submenu, submenuindex) => {
-                    if (submenu.divider || submenu.header) {
-                        return submenu.divider ? (
-                            <NavDropdown.Divider bsPrefix="mx-3" key={submenuindex} />
-                        ) : (
-                            <h4 className="dropdown-header" key={submenuindex}>
-                                {/* Second level menu heading - its not a menu item */}
-                                {submenu.header_text}
-                            </h4>
-                        );
-                    } else {
-                        if (submenu.children === undefined) {
-                            return (
-                                <NavDropdown.Item
-                                    key={submenuindex}
-                                    as={Link}
-                                    to={submenu.link}
-                                    onClick={(expandedMenu) => onClick(!expandedMenu)}
-                                >
-                                    {/* Second level menu item without having sub menu items */}
-                                    {submenu.menuitem}
-                                    {submenu.badge && (
-                                        <Badge
-                                            className="ms-1"
-                                            bg={submenu.badgecolor ? submenu.badgecolor : 'primary'}
-                                        >
-                                            {submenu.badge}
-                                        </Badge>
-                                    )}
-                                </NavDropdown.Item>
-                            );
-                        } else {
-                            return (
-                                <NavDropdown
-                                    title={getTitle(submenu)}
-                                    key={submenuindex}
-                                    bsPrefix="dropdown-item d-block"
-                                    className={`dropdown-submenu dropend py-0 `}
-                                >
-                                    {submenu.children.map((submenuitem, submenuitemindex) => {
-                                        if (submenuitem.divider || submenuitem.header) {
-                                            return submenuitem.divider ? (
-                                                <NavDropdown.Divider
-                                                    bsPrefix="mx-3"
-                                                    key={submenuitemindex}
-                                                />
-                                            ) : (
-                                                <Fragment key={submenuitemindex}>
-                                                    {/* Third level menu heading with description  */}
-                                                    <h5 className="dropdown-header text-dark">
-                                                        {submenuitem.header_text}
-                                                    </h5>
-                                                    <p className="dropdown-text mb-0 text-wrap">
-                                                        {submenuitem.description}
-                                                    </p>
-                                                </Fragment>
-                                            );
-                                        } else {
+                        return (
+                            <NavDropdown
+                                title={getTitle(submenu)}
+                                key={submenuindex}
+                                bsPrefix="dropdown-item d-block"
+                                className={`dropdown-submenu dropend py-0 `}
+                                show
+                            >
+                                {submenu.grandChildren.map((submenuitem, submenuitemindex) => {
+                                    if (submenuitem.divider || submenuitem.header) {
+                                        return submenuitem.divider ? (
+                                            <NavDropdown.Divider
+                                                bsPrefix="mx-3"
+                                                key={submenuitemindex}
+                                            />
+                                        ) : (
+                                            <Fragment key={submenuitemindex}>
+                                                {/* Third level menu heading with description  */}
+                                                <h5 className="dropdown-header text-dark">
+                                                    {submenuitem.header_text}
+                                                </h5>
+                                                <p className="dropdown-text mb-0 text-wrap">
+                                                    {submenuitem.description}
+                                                </p>
+                                            </Fragment>
+                                        );
+                                    } else {
+                                        if (submenuitem.children === undefined) {
                                             return (
                                                 <Fragment key={submenuitemindex}>
                                                     {submenuitem.type === 'button' ? (
@@ -959,7 +756,7 @@ const NavMegaDropdown = (props) => {
                                                             {/* Third Level with button format menu item */}
                                                             <Link
                                                                 to={submenuitem.link}
-                                                                className="btn-sm btn-primary text-center"
+                                                                className="btn btn-sm btn-primary text-center"
                                                             >
                                                                 {submenuitem.menuitem}
                                                             </Link>
@@ -968,20 +765,114 @@ const NavMegaDropdown = (props) => {
                                                         <NavDropdown.Item
                                                             as={Link}
                                                             to={submenuitem.link}
-                                                            onClick={(expandedMenu) => onClick(!expandedMenu)}
+                                                            onClick={(expandedMenu) =>
+                                                                onClick(!expandedMenu)
+                                                            }
                                                         >
                                                             {/* Third Level menu item */}
-                                                            {submenuitem.menuitem}
+                                                            {submenuitem.name}
                                                         </NavDropdown.Item>
                                                     )}
                                                 </Fragment>
                                             );
                                         }
-                                    })}
-                                </NavDropdown>
-                            );
-                        }
+                                    }
+                                })}
+                            </NavDropdown>
+                        );
                     }
+                    // }
+                })}
+            </NavDropdown>
+        );
+    };
+
+    const NavbarMobile = () => {
+        return (
+            <NavDropdown title={item.menuitem}>
+                <h4 className="dropdown-header">
+                    {/* Second level menu heading - its not a menu item */}
+                    {item.header}
+                </h4>
+                {item.children.map((submenu, submenuindex) => {
+                    // if (submenu.divider || submenu.header) {
+                    if (submenu.children === undefined) {
+                        return (
+                            <NavDropdown.Item
+                                key={submenuindex}
+                                as={Link}
+                                to={submenu.link}
+                                onClick={(expandedMenu) => onClick(!expandedMenu)}
+                            >
+                                {/* Second level menu item without having sub menu items */}
+                                {submenu.menuitem}
+                                {submenu.badge && (
+                                    <Badge
+                                        className="ms-1"
+                                        bg={submenu.badgecolor ? submenu.badgecolor : 'primary'}
+                                    >
+                                        {submenu.badge}
+                                    </Badge>
+                                )}
+                            </NavDropdown.Item>
+                        );
+                    } else {
+                        return (
+                            <NavDropdown
+                                title={getTitle(submenu)}
+                                key={submenuindex}
+                                bsPrefix="dropdown-item d-block"
+                                className={`dropdown-submenu dropend py-0 `}
+                            >
+                                {submenu.children.map((submenuitem, submenuitemindex) => {
+                                    if (submenuitem.divider || submenuitem.header) {
+                                        return submenuitem.divider ? (
+                                            <NavDropdown.Divider
+                                                bsPrefix="mx-3"
+                                                key={submenuitemindex}
+                                            />
+                                        ) : (
+                                            <Fragment key={submenuitemindex}>
+                                                {/* Third level menu heading with description  */}
+                                                <h5 className="dropdown-header text-dark">
+                                                    {submenuitem.header_text}
+                                                </h5>
+                                                <p className="dropdown-text mb-0 text-wrap">
+                                                    {submenuitem.description}
+                                                </p>
+                                            </Fragment>
+                                        );
+                                    } else {
+                                        return (
+                                            <Fragment key={submenuitemindex}>
+                                                {submenuitem.type === 'button' ? (
+                                                    <div className="px-3 d-grid">
+                                                        {/* Third Level with button format menu item */}
+                                                        <Link
+                                                            to={submenuitem.link}
+                                                            className="btn-sm btn-primary text-center"
+                                                        >
+                                                            {submenuitem.name}
+                                                        </Link>
+                                                    </div>
+                                                ) : (
+                                                    <NavDropdown.Item
+                                                        as={Link}
+                                                        to={submenuitem.link}
+                                                        onClick={(expandedMenu) => onClick(!expandedMenu)}
+                                                    >
+                                                        {/* Third Level menu item */}
+                                                        {submenuitem.menuitem}
+                                                    </NavDropdown.Item>
+                                                )}
+                                            </Fragment>
+                                        );
+                                    }
+                                })}
+                            </NavDropdown>
+                        );
+                    }
+                    // }
                 })}
             </NavDropdown>
         );
@@ -993,6 +884,7 @@ const NavMegaDropdown = (props) => {
         </Fragment>
     );
 };
+
 
 // mega menu
 

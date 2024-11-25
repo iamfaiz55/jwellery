@@ -14,6 +14,9 @@ const adminSlice = createSlice({
         .addMatcher(adminAuthApi.endpoints.loginAdmin.matchFulfilled, (state, { payload }) => {
             state.mobile = payload
         })
+        .addMatcher(adminAuthApi.endpoints.logoutAdmin.matchFulfilled, (state, { payload }) => {
+            state.admin = null
+        })
 
 })
 

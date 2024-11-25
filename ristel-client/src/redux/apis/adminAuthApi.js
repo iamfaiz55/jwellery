@@ -43,6 +43,7 @@ export const adminAuthApi = createApi({
                 },
                 transformResponse: data => {
                     localStorage.removeItem("ristel-admin")
+                    return data
                 },
             }),
 

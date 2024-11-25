@@ -468,6 +468,40 @@ export const adminApi = createApi({
             transformResponse:data => data.result,
             invalidatesTags: ["admin"]
         }),
+        deleteMenuItem: builder.mutation({
+            query: ({childId, menuId})=> {
+                return {
+                    url: `/delete-menu-item/${menuId}/${childId}`,
+                    method: "DELETE",
+                    // body: scrollCardData.fd
+                }
+            },
+            transformResponse:data => data.result,
+            invalidatesTags: ["admin"]
+        }),
+        addMenuItem: builder.mutation({
+            query: menuData=> {
+                return {
+                    url: `add-menu-item`,
+                    method: "POST",
+                    body: menuData
+                }
+            },
+            transformResponse:data => data.result,
+            invalidatesTags: ["admin"]
+        }),
+        updateMenuItem: builder.mutation({
+            query: menuData=> {
+                return {
+                    url: `/update-menu-item/${menuData._id}`,
+                    method: "PUT",
+                    body: menuData.fd
+                }
+            },
+            transformResponse:data => data.result,
+            invalidatesTags: ["admin"]
+        }),
+   
         }
     }
 })
@@ -532,5 +566,12 @@ export const {
     // mentor
     useAddScrollCardMutation,
     useUpdateScrollCardMutation,
-    useDeleteScrollCardMutation
+    useDeleteScrollCardMutation,
+
+
+
+    // nav menu
+    useDeleteMenuItemMutation,
+    useAddMenuItemMutation,
+    useUpdateMenuItemMutation
 } = adminApi
