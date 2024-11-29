@@ -8,6 +8,15 @@ const sendSms = async (message, numbers) => {
             throw new Error("Fast2SMS API key is missing in the environment variables.");
         }
 
+        if (!message || typeof message !== 'string') {
+            throw new Error("Invalid message content.");
+        }
+        if (!Array.isArray(numbers) || numbers.length === 0) {
+            throw new Error("Invalid mobile numbers array.");
+        }
+
+        const formattedNumbers = numbers.map((num) => num.trim()).join(',');
+
         const options = {
             method: 'POST',
             url: 'https://www.fast2sms.com/dev/bulkV2',
@@ -16,19 +25,22 @@ const sendSms = async (message, numbers) => {
                 'Content-Type': 'application/json',
             },
             data: {
-                route: 'v3', 
+                route: 'v3',
                 sender_id: 'TXTIND',
                 message: message,
                 language: 'english',
-                numbers: numbers.join(','),
+                numbers: formattedNumbers,
             },
         };
 
+        console.log("options", options);
         const response = await axios(options);
-        console.log('Fast2SMS Response:', response.data);
         return response.data;
     } catch (error) {
-        console.error('Error sending SMS:', error.message);
+        console.error("sending err", error.message);
+        if (error.response) {
+            console.error("err:", error.response.data);
+        }
         throw error;
     }
 };

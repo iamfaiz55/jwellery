@@ -4,7 +4,8 @@ const { checkEmpty } = require("../utils/checkEmpty")
 const User = require("../models/User");
 const History = require("../models/History");
 const mongoose  = require("mongoose");
-const crypto = require("crypto")
+const crypto = require("crypto");
+const sendSms = require("../utils/sendSms");
 
 exports.loginUser = asyncHandler(async (req, res) => {
     const { mobile } = req.body;
@@ -18,7 +19,11 @@ exports.loginUser = asyncHandler(async (req, res) => {
     if (!user) {    
       
         //    send otp to userr
+        const message = `Your OTP is ${otp}`;
 
+    //   const x =  await sendSms(message, [mobile]);
+   console.log(x);
+   
          await User.create({mobile, otp})
           return res.json({ message: "OTP sent for User registration", result:  mobile  });
         }else if(user.isBlock){
@@ -31,6 +36,10 @@ exports.loginUser = asyncHandler(async (req, res) => {
     
     
     else {
+        const message = `Your OTP is ${otp}`;
+
+    //   const x =  await sendSms(message, [mobile]);
+//    console.log(x);
         //    send otp to userr
          await User.findByIdAndUpdate(user._id, {otp})
 
