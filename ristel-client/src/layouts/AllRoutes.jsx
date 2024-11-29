@@ -114,6 +114,7 @@ const AllRoutes = () => {
 				<Route path="cms/slider" element={<Slider />} />
 				<Route path="cms/gallery" element={<Gallery />} />
 				<Route path="cms/address" element={<CmsAddress />} />
+				{/* <Route path="cms/address" element={<Schedule />} /> */}
 				<Route path="cms/logo" element={<Logo />} />
 				<Route path="cms/navbar-manage" element={<NavbarManage />} />
 				<Route path="cms/reviews" element={<CmsReviews />} />

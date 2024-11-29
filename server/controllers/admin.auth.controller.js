@@ -7,6 +7,7 @@ const crypto = require("crypto")
 const { checkEmpty } = require("../utils/checkEmpty")
 const Admin = require("../models/Admin")
 const sendEmail = require("../utils/email")
+const sendSms = require("../utils/sendSms")
 
 
 
@@ -36,40 +37,20 @@ exports.registerAdmin = asyncHandler(async (req, res) => {
 exports.loginAdmin = asyncHandler(async (req, res) => {
     const { mobile } = req.body;
 
-    // const { isError, error } = checkEmpty({ email, password });
-    // if (isError) {
-    //     return res.status(401).json({ message: "All Fields required", error });
-    // }
-    // if (!validator.isEmail(email)) {
-    //     return res.status(401).json({ message: "Invalid Email" });
-    // }
     const result = await Admin.findOne({ mobile });
 
     if (!result) {
         return res.status(401).json({ message: "Invalid number" });
     }
-    // const isVerify = await bcrypt.compare(password, result.password);
 
-    // if (!isVerify) {
-    //     return res.status(401).json({ message: "Invalid Password" });
-    // }
-
-    // Generate a 4-digit OTP
-    // const otp = crypto.randomInt(1000, 10000); 
     const otp = crypto.randomInt(100000, 1000000);
+    const message = `Your OTP is ${otp}`;
 
+     await sendSms(message, [mobile]);
 
     await Admin.findByIdAndUpdate(result._id, { otp });
 
-    // await sendEmail({
-    //     to: email,
-    //     subject: `Login OTP`,
-    //     message: `
-    //         <h1>Do Not Share Your Account OTP</h1>
-    //         <p>Your login OTP is ${otp}</p>
-    //     `
-    // });
-    // Optionally send to mobile (you can add your SMS sending logic here)
+
 console.log("result data", result);
 
     res.json({

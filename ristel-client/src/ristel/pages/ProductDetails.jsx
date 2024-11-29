@@ -1,6 +1,6 @@
 // import ProductSingleV2 from '../../components/dashboard/ecommerce/products/ProductSingleV2'
 import React, { Fragment, useContext, useEffect, useRef, useState } from 'react'
-import { Col, Row, Accordion, useAccordionButton, AccordionContext, ListGroup, Image, ProgressBar, Card, FormSelect } from 'react-bootstrap'
+import { Col, Row, Accordion, useAccordionButton, AccordionContext, ListGroup, Image, ProgressBar, Card, FormSelect, Button } from 'react-bootstrap'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import Icon from '@mdi/react'
 import { mdiStar } from '@mdi/js'
@@ -9,7 +9,7 @@ import RatingsBiIcon from './../../components/marketing/common/ratings/RatingsBi
 import ReviewImage1 from './../../assets/images/ecommerce/ecommerce-img-1.jpg'
 import ReviewImage2 from './../../assets/images/ecommerce/ecommerce-img-2.jpg'
 import ReviewImage3 from './../../assets/images/ecommerce/ecommerce-img-3.jpg'
-import { useGetDetailsQuery, useGetTaxesQuery } from '../../redux/apis/publicApi'
+import { useGetDetailsQuery, useGetScheduleQuery, useGetTaxesQuery, useLazyGetDetailsQuery } from '../../redux/apis/publicApi'
 import { useAddCartMutation, useGetReviewsQuery, useLikeMutation } from '../../redux/apis/userApi'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
@@ -23,7 +23,12 @@ const ProductDetails = () => {
     const { id } = useParams()
     // console.log("getting id", id);
 
-    const { data, isLoading } = useGetDetailsQuery(id)
+    // const { data, isLoading } = useGetDetailsQuery(id)
+    const [getData, { data, isLoading }] = useLazyGetDetailsQuery()
+    useEffect(() => {
+        getData(id)
+    }, [getData, data])
+
     // console.log("data", data);
 
 
@@ -191,7 +196,9 @@ const ProductDetails = () => {
 const ProductBriefInfo = ({ data, selectedVariant, setSelectedVariant }) => {
     const [addToCart, { isSuccess, isError: isAddError, error: addError }] = useAddCartMutation();
     const { id } = useParams()
-
+    // const { refetch } = useGetDetailsQuery(id)
+    const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+    const { data: schedules } = useGetScheduleQuery()
     const getFormattedPrice = amount => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(amount)
     const getFormattedDiscount = (mrp, price) => (((mrp - price) / mrp) * 100).toFixed(0)
     useEffect(() => {
@@ -242,6 +249,95 @@ const ProductBriefInfo = ({ data, selectedVariant, setSelectedVariant }) => {
         }
     }, [isSuccess]);
 
+    const schedule = schedules?.find((sch) => sch.pId._id === data?._id);
+    const start = new Date(schedule?.startTimeAndDate);
+    const end = new Date(schedule?.endTimeAndDate);
+
+    const [hasRefetchedStart, setHasRefetchedStart] = useState(false);
+    const [hasRefetchedEnd, setHasRefetchedEnd] = useState(false);
+
+    useEffect(() => {
+        const updateTimer = () => {
+            const now = new Date().getTime();
+            const startTime = start.getTime();
+            const endTime = end.getTime();
+
+            if (now < startTime) {
+                const distanceToStart = startTime - now;
+                const days = Math.floor(distanceToStart / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distanceToStart % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distanceToStart % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distanceToStart % (1000 * 60)) / 1000);
+
+                setTimeLeft({ days, hours, minutes, seconds });
+
+                if (now + 1000 >= startTime && !hasRefetchedStart) {
+                    // refetch()
+                    toast.success("started")
+                    setHasRefetchedStart(true);
+                }
+            } else if (now >= startTime && now <= endTime) {
+                const distanceToEnd = endTime - now;
+                const days = Math.floor(distanceToEnd / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distanceToEnd % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distanceToEnd % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distanceToEnd % (1000 * 60)) / 1000);
+
+                setTimeLeft({ days, hours, minutes, seconds });
+            } else {
+                setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+                if (!hasRefetchedEnd) {
+                    // refetch();
+                    toast.success('ended');
+                    setHasRefetchedEnd(true);
+                }
+            }
+        };
+
+        const interval = setInterval(updateTimer, 1000);
+
+        return () => clearInterval(interval);
+    }, [start, end, hasRefetchedStart, hasRefetchedEnd]);
+
+
+
+
+
+
+
+
+    // const x = () => {
+    //     refetch()
+    // }
+
+
+    useEffect(() => {
+        if (hasRefetchedStart) {
+            // refetch()
+            // console.log("refetech func", refetch());
+            // console.log("seleted Varient", selectedVariant.price);
+            // console.log("data", data);
+            // console.log("selectedVariant.price", selectedVariant.price);
+            // toast.success('started');
+            // // console.log("from useEffect", data);
+            // setHasRefetchedStart(false)
+
+            // const i = async () => {
+            //     await refetch()
+            // }
+            // i()
+        }
+        // refetch()
+
+        // setSelectedVariant(data && data.varient[0])
+        // console.log("data", data);
+        // console.log("selectedVariant.price", selectedVariant.price);
+
+    }, [])
+
+
+
 
     return <>
         {
@@ -291,6 +387,48 @@ const ProductBriefInfo = ({ data, selectedVariant, setSelectedVariant }) => {
                             <button onClick={handleLikeClick} className="btn btn-outline-secondary"><i className="fe fe-heart me-2"></i>Wishlist</button>
                         </div>
                     </Col>
+                    {data && schedule && (
+                        <Card className="text-center border-0 shadow-sm my-4">
+                            {new Date().getTime() < start.getTime() ? (
+                                <Card.Header className="bg-primary text-white">
+                                    <h4 className="mb-0">Offer Starts In:</h4>
+                                </Card.Header>
+                            ) : new Date().getTime() <= end.getTime() ? (
+                                <Card.Header className="alert alert-success text-white">
+                                    <h4 className="mb-0">Offer Ends In:</h4>
+                                </Card.Header>
+                            ) : (
+                                <Card.Header className="alert alert-danger text-white">
+                                    <h4 className="mb-0">Event Ended</h4>
+                                </Card.Header>
+                            )}
+
+                            {new Date().getTime() <= end.getTime() && (
+                                <Card.Body className="bg-light">
+                                    <div className="d-flex justify-content-center gap-4">
+                                        <div className="text-center">
+                                            <h5 className="text-primary">{timeLeft.days}</h5>
+                                            <small className="text-muted">Days</small>
+                                        </div>
+                                        <div className="text-center">
+                                            <h5 className="text-primary">{timeLeft.hours}</h5>
+                                            <small className="text-muted">Hours</small>
+                                        </div>
+                                        <div className="text-center">
+                                            <h5 className="text-primary">{timeLeft.minutes}</h5>
+                                            <small className="text-muted">Minutes</small>
+                                        </div>
+                                        <div className="text-center">
+                                            <h5 className="text-primary">{timeLeft.seconds}</h5>
+                                            <small className="text-muted">Seconds</small>
+                                        </div>
+                                    </div>
+                                </Card.Body>
+                            )}
+                        </Card>
+                    )}
+                    <Button onClick={e => x()}>Click</Button>
+
                 </Row>
             </Fragment >
         }

@@ -142,7 +142,8 @@ export const {
     useGetAllGalleryImagesQuery,
     useGetScheduleQuery,
     useGetAllMenuItemsQuery,
-    useGetPublicProductMaterialQuery
+    useGetPublicProductMaterialQuery,
+    useLazyGetDetailsQuery
 } = publicApi
 
 

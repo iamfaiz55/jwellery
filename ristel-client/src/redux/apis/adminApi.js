@@ -501,6 +501,19 @@ export const adminApi = createApi({
             transformResponse:data => data.result,
             invalidatesTags: ["admin"]
         }),
+
+        // sccheduler
+        setSchedule: builder.mutation({
+            query: data=> {
+                return {
+                    url: `/schedule`,
+                    method: "POST",
+                    body: data
+                }
+            },
+            transformResponse: data => data.result,
+            invalidatesTags: ["admin"]
+        }),
    
         }
     }
@@ -573,5 +586,10 @@ export const {
     // nav menu
     useDeleteMenuItemMutation,
     useAddMenuItemMutation,
-    useUpdateMenuItemMutation
+    useUpdateMenuItemMutation,
+
+
+
+    // product Schedule
+    useSetScheduleMutation
 } = adminApi

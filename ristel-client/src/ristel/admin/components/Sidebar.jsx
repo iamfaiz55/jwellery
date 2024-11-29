@@ -63,6 +63,7 @@ const DashboardMenu = [
             { id: uuid(), link: '/admin/cms/scroll-cards', name: 'Scrolling Cards' },
             { id: uuid(), link: '/admin/cms/logo', name: 'Logo' },
             { id: uuid(), link: '/admin/cms/gallery', name: 'Gallery' },
+            { id: uuid(), link: '/admin/cms/schedule', name: 'Schedule' },
             { id: uuid(), link: '/admin/cms/navbar-manage', name: 'Navbar Manage' },
             // { id: uuid(), link: '/admin/cms/reviews', name: 'Reviews' },
             { id: uuid(), link: '/admin/cms/about', name: 'About' },
