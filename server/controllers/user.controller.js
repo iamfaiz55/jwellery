@@ -28,6 +28,8 @@ const Review = require("../models/Review")
 const PaymentMethod = require("../models/PaymentMethod")
 const History = require("../models/History")
 const axios = require('axios');
+const redisClient = require("../utils/redisClient")
+const { setCache } = require("../utils/redis")
 // const { payment } = require("..")
 // const Liked = require("../models/Liked")
 
@@ -488,36 +490,45 @@ exports.deleteAllCart = asyncHandler(async(req, res)=> {
     res.status(200).json({ message: "All cart items deleted successfully" });
 })
 exports.getAllProduct = asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;  
+    const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 12;
-    const skip = (page - 1) * limit;  
+    const skip = (page - 1) * limit;
 
-    // Assuming you are receiving filter type as a query parameter
-    const filterType = req.query.type; // Adjust as per your frontend filter parameters
+    const redisKey = `allProducts:page=${page}:limit=${limit}`;
 
-    let query = {};
-    if (filterType) {
-        query.type = filterType; // Adjust your query filter conditions
-    }
+    try {
+        const cachedData = await redisClient.get(redisKey);
 
-    const result = await Product.find(query).skip(skip).limit(limit);
-
-    const totalProducts = await Product.countDocuments(query); // Use the same filter for counting
-    const totalPages = Math.ceil(totalProducts / limit);
-
-    res.json({
-        message: "All Products Fetch Success",
-        result,
-        pagination: {
-            currentPage: page,
-            totalPages,
-            totalProducts,
-            hasNextPage: page < totalPages,
-            hasPrevPage: page > 1,
-            nextPage: page < totalPages ? page + 1 : null,
-            prevPage: page > 1 ? page - 1 : null
+        if (cachedData) {
+            console.log('Getting Productsfrom Redis');
+            return res.json(JSON.parse(cachedData));
         }
-    });
+
+        const result = await Product.find().skip(skip).limit(limit);
+
+        const totalProducts = await Product.countDocuments();
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        const responseData = {
+            message: "All Products Fetch Success",
+            result,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalProducts,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1,
+                nextPage: page < totalPages ? page + 1 : null,
+                prevPage: page > 1 ? page - 1 : null,
+            },
+        };
+
+        await redisClient.setEx(redisKey, 3600, JSON.stringify(responseData)); 
+        res.json(responseData);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).json({ message: 'Error fetching products', error: error.message });
+    }
 });
 
 exports.cancelOrder = asyncHandler(async(req, res)=> {
@@ -527,37 +538,56 @@ exports.cancelOrder = asyncHandler(async(req, res)=> {
 })
 
 exports.getFilteredProducts = asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1; 
+    const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 12;
-    const skip = (page - 1) * limit; 
+    const skip = (page - 1) * limit;
 
     const { material } = req.query;
 
-    // console.log("Material Filter:", material);
+    // Cache key for all products
+    const allProductsCacheKey = `allProducts`;
 
-    const query = {};
-    if (material) {
-        query.material = material; 
-    }
+    try {
+        // Step 1: Check if all products are cached
+        let allProducts = await redisClient.get(allProductsCacheKey);
 
-    const products = await Product.find(query).skip(skip).limit(limit);
+        if (!allProducts) {
 
-    const totalProducts = await Product.countDocuments(query);
-    const totalPages = Math.ceil(totalProducts / limit);
-
-    res.json({
-        message: "Filtered Products Fetch Success",
-        result: products,
-        pagination: {
-            currentPage: page,
-            totalPages,
-            totalProducts,
-            hasNextPage: page < totalPages,
-            hasPrevPage: page > 1,
-            nextPage: page < totalPages ? page + 1 : null,
-            prevPage: page > 1 ? page - 1 : null
+            allProducts = await Product.find();
+            await redisClient.setEx(allProductsCacheKey, 3600, JSON.stringify(allProducts)); 
+        } else {
+            console.log('Getting from Redis ');
+            allProducts = JSON.parse(allProducts);
         }
-    });
+
+        let filteredProducts = allProducts;
+        if (material) {
+            filteredProducts = filteredProducts.filter(product => product.material === material);
+        }
+
+        // Step 3: Apply pagination
+        const totalProducts = filteredProducts.length;
+        const totalPages = Math.ceil(totalProducts / limit);
+        const paginatedProducts = filteredProducts.slice(skip, skip + limit);
+
+        // Step 4: Return response
+        res.json({
+            message: "Filtered Products Fetch Success",
+            result: paginatedProducts,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalProducts,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1,
+                nextPage: page < totalPages ? page + 1 : null,
+                prevPage: page > 1 ? page - 1 : null,
+            },
+        });
+    } catch (error) {
+        console.error('Error fetching filtered products:', error);
+        res.status(500).json({ message: 'Error fetching products', error: error.message });
+    }
 });
 
 

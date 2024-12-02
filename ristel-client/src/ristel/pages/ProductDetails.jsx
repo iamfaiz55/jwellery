@@ -171,7 +171,7 @@ const ProductDetails = () => {
                                 <div className="my-5 mx-lg-10">
 
                                     {/* Product's brief information */}
-                                    <ProductBriefInfo data={data} selectedVariant={selectedVariant} setSelectedVariant={setSelectedVariant} />
+                                    <ProductBriefInfo getData={getData} data={data} selectedVariant={selectedVariant} setSelectedVariant={setSelectedVariant} />
 
                                     <p className="mt-4 mb-2"></p>
 
@@ -193,10 +193,10 @@ const ProductDetails = () => {
 
 
 
-const ProductBriefInfo = ({ data, selectedVariant, setSelectedVariant }) => {
+const ProductBriefInfo = ({ data, selectedVariant, setSelectedVariant, getData }) => {
     const [addToCart, { isSuccess, isError: isAddError, error: addError }] = useAddCartMutation();
     const { id } = useParams()
-    // const { refetch } = useGetDetailsQuery(id)
+    const { refetch } = useGetDetailsQuery(id)
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const { data: schedules } = useGetScheduleQuery()
     const getFormattedPrice = amount => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(amount)
@@ -273,7 +273,10 @@ const ProductBriefInfo = ({ data, selectedVariant, setSelectedVariant }) => {
 
                 if (now + 1000 >= startTime && !hasRefetchedStart) {
                     // refetch()
-                    toast.success("started")
+                    setTimeout(() => {
+                        getData(id)
+                    }, 1000);
+                    // toast.success("started")
                     setHasRefetchedStart(true);
                 }
             } else if (now >= startTime && now <= endTime) {
@@ -289,7 +292,8 @@ const ProductBriefInfo = ({ data, selectedVariant, setSelectedVariant }) => {
 
                 if (!hasRefetchedEnd) {
                     // refetch();
-                    toast.success('ended');
+                    getData(id)
+                    // toast.success('ended');
                     setHasRefetchedEnd(true);
                 }
             }
@@ -307,9 +311,9 @@ const ProductBriefInfo = ({ data, selectedVariant, setSelectedVariant }) => {
 
 
 
-    // const x = () => {
-    //     refetch()
-    // }
+    const x = () => {
+        refetch()
+    }
 
 
     useEffect(() => {

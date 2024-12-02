@@ -338,7 +338,7 @@ const JustifiedGallery = () => {
         }
     ];
     return (
-        <div className="gallery mb-12" >
+        <div className="gallery " >
             {images && images.map((item, index) => {
                 return (
                     <figure
@@ -379,16 +379,14 @@ const MostPopularProducts = () => {
 
     const [fetchProducts, { data: productsData, isSuccess: isProductsSuccess }] = useLazyGetAllProductsQuery();
 
-    const { data: materials } = useGetPublicProductMaterialQuery(); // Materials data (e.g., Diamond, Gold, etc.)
+    const { data: materials } = useGetPublicProductMaterialQuery();
 
-    // Fetch filtered products
     useEffect(() => {
         if (selectedMaterial) {
             filter({ material: selectedMaterial, page: filterPage, limit: productsPerPage });
         }
     }, [selectedMaterial, currentPage, filter]);
 
-    // Handle success response for filtered products
     useEffect(() => {
         if (isFilterSuccess && filteredData) {
             setAllProducts(filteredData.result);
@@ -396,14 +394,12 @@ const MostPopularProducts = () => {
         }
     }, [isFilterSuccess, filteredData]);
 
-    // Fetch all products (no filter) when no material is selected
     useEffect(() => {
         if (!selectedMaterial) {
             fetchProducts({ page: currentPage, limit: productsPerPage });
         }
     }, [fetchProducts, currentPage, selectedMaterial]);
 
-    // Handle success response for all products
     useEffect(() => {
         if (isProductsSuccess && productsData) {
             setAllProducts(productsData.result);
@@ -411,7 +407,6 @@ const MostPopularProducts = () => {
         }
     }, [isProductsSuccess, productsData, selectedMaterial === null]);
 
-    // Error handling
     useEffect(() => {
         if (isFilterError) {
             toast.error(filterError?.message || 'An error occurred while filtering products.');
@@ -419,7 +414,7 @@ const MostPopularProducts = () => {
     }, [isFilterError, filterError]);
 
     const handlePageChange = (page) => {
-        setCurrentPage(page); // Change page
+        setCurrentPage(page);
     };
 
     return (

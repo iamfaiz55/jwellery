@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Image, Navbar, Nav, Container, ListGroup, Dropdown } from 'react-bootstrap';
+import { Image, Navbar, Nav, Container, ListGroup, Dropdown, Button } from 'react-bootstrap';
 import { v4 as uuid } from 'uuid';
 import { mdiAccount, mdiCartOutline, mdiFacebook, mdiTwitter, mdiInstagram } from '@mdi/js';
 import Icon from '@mdi/react';
@@ -126,35 +126,42 @@ export const RistelNavbarMegaMenu = () => {
                         <div className="ms-auto mt-3 mt-lg-0">
                             <div className="d-flex align-items-center">
                                 {/* <DarkLightMode /> */}
-                                <Dropdown
-                                    onMouseEnter={() => setShowDropdown(true)}
-                                    onMouseLeave={() => setShowDropdown(false)}
-                                    show={showDropdown}
-                                >
-                                    <Dropdown.Toggle
-                                        variant="outline-primary"
-                                        id="dropdown-account"
-                                        className="d-flex align-items-center ms-3"
+                                {user ? (
+                                    <Dropdown
+                                        onMouseEnter={() => setShowDropdown(true)}
+                                        onMouseLeave={() => setShowDropdown(false)}
+                                        show={showDropdown}
                                     >
-                                        <Icon path={mdiAccount} size={0.7} />
-                                        <span className="ms-2">{user && user.name}</span>
-                                    </Dropdown.Toggle>
-
-                                    <Dropdown.Menu align="end">
-                                        <Dropdown.Item as={Link} to="/user">
-                                            Profile
-                                        </Dropdown.Item>
-                                        <Dropdown.Divider />
-                                        <Dropdown.Item
-                                            onClick={() => {
-                                                logout()
-                                            }}
-                                            className="text-danger"
+                                        <Dropdown.Toggle
+                                            variant="outline-primary"
+                                            id="dropdown-account"
+                                            className="d-flex align-items-center ms-3"
                                         >
-                                            Logout
-                                        </Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
+                                            <Icon path={mdiAccount} size={0.7} />
+                                            <span className="ms-2">{user.name}</span>
+                                        </Dropdown.Toggle>
+
+                                        <Dropdown.Menu align="end">
+                                            <Dropdown.Item as={Link} to="/user">
+                                                Profile
+                                            </Dropdown.Item>
+                                            <Dropdown.Divider />
+                                            <Dropdown.Item
+                                                onClick={() => {
+                                                    logout();
+                                                }}
+                                                className="text-danger"
+                                            >
+                                                Logout
+                                            </Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                ) : (
+                                    <Button variant="outline-primary" as={Link} to="/login" className="ms-3">
+                                        Login
+                                    </Button>
+                                )}
+
 
                                 <Link to="/cart" className="btn btn-outline-primary ms-3 position-relative">
                                     <Icon path={mdiCartOutline} size={0.7} />
